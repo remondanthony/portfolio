@@ -47,13 +47,18 @@ export const PIN_DISTANCE = '+=380%';
 export const POLISH_LAG = 0.85;
 
 /**
- * Parallax travel over the full film, in pixels. Furthest plane moves least.
- * The stage counter-moves, which is what makes it read as nearest to camera.
+ * Parallax travel over the full film, in pixels.
+ *
+ * All three planes drift the same way at different rates. The stage moves
+ * LEAST and DOWNWARD: a negative value here read as "nearest to camera" but
+ * carried the machine ~21px up into the headline mid-scrub, which is a
+ * collision no amount of static margin can fix. Drifting it gently away from
+ * the copy keeps the depth cue and makes the clearance monotonic.
  */
 export const PARALLAX = {
   grid: 30,
   dust: 66,
-  stage: -16,
+  stage: 12,
 } as const;
 
 /** Stagger grammar — the rhythm of the LEGO assembly. */
