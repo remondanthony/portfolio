@@ -38,8 +38,7 @@ export function buildMasterTimeline(gsap: Gsap, scope: HTMLElement): gsap.core.T
   const roomGlow = q1('roomGlow');
   const shadow = q1('shadow');
   const sheen = q1('sheen');
-  const canvasGrid = q1('canvasGrid');
-  const caret = q1('caret');
+  const workspace = q1('workspace');
   const chrome = q1('chrome');
   const loadbar = q1('loadbar');
   const live = q1('live');
@@ -73,19 +72,17 @@ export function buildMasterTimeline(gsap: Gsap, scope: HTMLElement): gsap.core.T
   /* ---------------------------------------------------------------
      THE MACHINE WAKES  (0 → ~1.6)
      It is already on the desk. Light finds it, the display comes up,
-     and a caret waits on an empty canvas.
+     and the workspace sits ready on an empty canvas.
   --------------------------------------------------------------- */
 
   if (shadow) tl.to(shadow, { opacity: 1, duration: 1.1 }, 0);
   if (roomGlow) tl.to(roomGlow, { opacity: 0.9, duration: 1.3 }, 0);
   if (sheen) tl.to(sheen, { opacity: 0.5, duration: 1.2 }, 0.1);
-  if (canvasGrid) tl.to(canvasGrid, { opacity: 1, duration: 0.9 }, 0.2);
-
-  if (caret) {
-    tl.to(caret, { opacity: 1, duration: 0.15 }, 0.5);
-    tl.to(caret, { opacity: 0, duration: 0.22, repeat: 3, yoyo: true, ease: 'steps(1)' }, 0.65);
-    // Leaves as the first component lands — the handover, not a cut.
-    tl.to(caret, { opacity: 0, duration: 0.3, ease: EXIT }, ACT.assemble - 0.1);
+  // The workspace IS the idle screen, so it is fully present at rest and
+  // dissolves as the first component arrives. One tween, so the handover
+  // reads as the tool getting out of the way rather than as a cut.
+  if (workspace) {
+    tl.to(workspace, { opacity: 0, duration: 1.0, ease: EXIT }, ACT.assemble - 0.55);
   }
 
   /* ---------------------------------------------------------------
@@ -158,7 +155,6 @@ export function buildMasterTimeline(gsap: Gsap, scope: HTMLElement): gsap.core.T
     tl.to(q('guide'), { opacity: 1, duration: 0.4, stagger: 0.05, ease: DRAW }, ACT.polish + 0.4);
     tl.to(q('guide'), { opacity: 0, duration: 0.55, ease: EXIT }, ACT.polish + 1.35);
   }
-  if (canvasGrid) tl.to(canvasGrid, { opacity: 0, duration: 0.9 }, ACT.polish + 1.1);
 
   /* ---------------------------------------------------------------
      ENGINEERING  (~7.4 → ~9.8)

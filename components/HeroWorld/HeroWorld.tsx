@@ -2,7 +2,8 @@
 
 import { useRef } from 'react';
 import styles from './HeroWorld.module.css';
-import SceneCanvas from './scenes/SceneCanvas';
+import SceneWorkspace from './scenes/SceneWorkspace';
+import SceneGuides from './scenes/SceneGuides';
 import SceneDepth from './scenes/SceneDepth';
 import SceneSite from './scenes/SceneSite';
 import SceneBuild from './scenes/SceneBuild';
@@ -60,6 +61,13 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
       <SceneDepth />
       <div className={styles.roomGlow} data-hw="roomGlow" />
 
+      {/* Reproduces .hero-blank::before. It sits BELOW the machine on purpose:
+          over it, the scrim took ~29% of luminance off a display that is
+          supposed to read as a bright white workspace. The hero copy and the
+          service labels render above .world entirely, so they still get the
+          full scrim they were designed against. */}
+      <div className={styles.vignette} />
+
       <div className={styles.stageAnchor}>
         <div className={styles.stage} data-hw="stage">
           <div className={styles.tilt} ref={tiltRef} data-hw="tilt">
@@ -73,7 +81,8 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
                 <div className={styles.bezel}>
                   {/* The display. Everything below is inside the glass. */}
                   <div className={styles.screen} data-hw="screen">
-                    <SceneCanvas />
+                    <SceneWorkspace />
+                    <SceneGuides />
                     <SceneSite />
                     <SceneLive project={project} />
                   </div>
@@ -102,8 +111,6 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
         ))}
       </div>
 
-      {/* Reproduces .hero-blank::before above the film — see the module CSS. */}
-      <div className={styles.vignette} />
     </div>
   );
 }

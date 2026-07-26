@@ -269,10 +269,10 @@
   opacity: 0;
   background: linear-gradient(
     108deg,
-    rgba(255, 255, 255, 0.4) 0%,
-    rgba(255, 255, 255, 0.13) 6%,
-    rgba(255, 255, 255, 0.03) 14%,
-    transparent 30%
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.07) 5%,
+    rgba(255, 255, 255, 0.02) 12%,
+    transparent 26%
   );
 }
 
@@ -285,25 +285,249 @@
   background: #ffffff;
 }
 
-/* Figma-like working grid on the blank canvas. */
-.canvasGrid {
+/* ============================================================
+   THE IDLE WORKSPACE
+   What the visitor meets before scrolling. Every value here is
+   tuned for a display roughly 470px wide, so sizes are in cqw
+   against .stage and stay proportionate at any laptop scale.
+   ============================================================ */
+
+.workspace {
   position: absolute;
   inset: 0;
-  opacity: 0;
-  background-image:
-    linear-gradient(to right, rgba(17, 24, 39, 0.055) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(17, 24, 39, 0.055) 1px, transparent 1px);
-  background-size: 6cqw 6cqw;
+  background: #fafafa;
+  font-family: var(--font, ui-sans-serif, system-ui, sans-serif);
+  will-change: opacity;
 }
 
-.caret {
+/* ---- application header ---- */
+
+.wsBar {
   position: absolute;
-  left: 9%;
-  top: 22%;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 7.4%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.6cqw;
+  background: #ffffff;
+  box-shadow: inset 0 -1px 0 rgba(17, 24, 39, 0.07);
+}
+
+.wsBarLeft { display: flex; align-items: center; gap: 1.1cqw; }
+
+.wsMuted {
+  font-size: 1.75cqw;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #9aa1ab;
+}
+
+.wsName {
+  font-size: 1.9cqw;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: #3c4350;
+}
+
+.wsDivider { width: 1px; height: 1.9cqw; background: rgba(17, 24, 39, 0.13); }
+
+/* ---- rulers ---- */
+
+.wsRulerTop {
+  position: absolute;
+  left: 2.6%;
+  right: 0;
+  top: 7.4%;
+  height: 2.6%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 0.4cqw;
+  background: #f4f5f7;
+  box-shadow: inset 0 -1px 0 rgba(17, 24, 39, 0.06);
+}
+
+.wsRulerLeft {
+  position: absolute;
+  left: 0;
+  top: 10%;
+  bottom: 0;
+  width: 2.6%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0.4cqw 0;
+  background: #f4f5f7;
+  box-shadow: inset -1px 0 0 rgba(17, 24, 39, 0.06);
+}
+
+.wsRulerCorner {
+  position: absolute;
+  left: 0;
+  top: 7.4%;
+  width: 2.6%;
+  height: 2.6%;
+  background: #eef0f3;
+  box-shadow: inset -1px 0 0 rgba(17,24,39,0.06), inset 0 -1px 0 rgba(17,24,39,0.06);
+}
+
+.wsTick      { width: 1px; height: 26%; background: rgba(17, 24, 39, 0.16); }
+.wsTickMajor { width: 1px; height: 52%; background: rgba(17, 24, 39, 0.26); }
+.wsTickV      { height: 1px; width: 26%; background: rgba(17, 24, 39, 0.16); }
+.wsTickMajorV { height: 1px; width: 52%; background: rgba(17, 24, 39, 0.26); }
+
+/* ---- canvas ---- */
+
+.wsCanvas {
+  position: absolute;
+  left: 2.6%;
+  right: 0;
+  top: 10%;
+  bottom: 0;
+  overflow: hidden;
+}
+
+/* The 24px design grid, scaled to the display. */
+.wsGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(17, 24, 39, 0.038) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17, 24, 39, 0.038) 1px, transparent 1px);
+  background-size: 1.9cqw 1.9cqw;
+}
+
+/* Centre alignment guides. */
+/* Drawn over the artboard, as a design tool draws them — underneath, an
+   opaque page simply hides them. */
+.wsAlign { position: absolute; z-index: 2; background: rgba(255, 91, 30, 0.13); }
+.wsAlignV { left: 50%; top: 0; bottom: 0; width: 1px; }
+.wsAlignH { top: 50%; left: 0; right: 0; height: 1px; }
+
+/* ---- the artboard ---- */
+
+.wsArtboard {
+  position: absolute;
+  left: 5.5%;
+  right: 5.5%;
+  top: 6.5%;
+  bottom: 7.5%;
+  border-radius: 0.9cqw;
+  background: #ffffff;
+  border: 1px solid rgba(17, 24, 39, 0.07);
+  box-shadow:
+    0 0.8cqw 2.2cqw rgba(17, 24, 39, 0.085),
+    0 0.2cqw 0.6cqw rgba(17, 24, 39, 0.05);
+}
+
+/* Safe-area margins. */
+.wsSafeArea {
+  position: absolute;
+  inset: 7.5% 6.5%;
+  border: 1px dashed rgba(17, 24, 39, 0.09);
+  border-radius: 0.4cqw;
+}
+
+/* Corner handles. */
+.wsHandle {
+  position: absolute;
+  width: 0.85cqw;
+  height: 0.85cqw;
+  background: #ffffff;
+  border: 1px solid rgba(17, 24, 39, 0.22);
+  border-radius: 1px;
+}
+.wsHandleTL { left: -0.42cqw; top: -0.42cqw; }
+.wsHandleTR { right: -0.42cqw; top: -0.42cqw; }
+.wsHandleBL { left: -0.42cqw; bottom: -0.42cqw; }
+.wsHandleBR { right: -0.42cqw; bottom: -0.42cqw; }
+
+/* Faint measurement lines down the safe-area edges. */
+.wsMeasure {
+  position: absolute;
+  top: 7.5%;
+  bottom: 7.5%;
+  width: 1px;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(17, 24, 39, 0.1) 0 2px,
+    transparent 2px 5px
+  );
+}
+.wsMeasureL { left: 6.5%; }
+.wsMeasureR { right: 6.5%; }
+
+/* Crosshairs where the safe area meets its corners. */
+.wsCross {
+  position: absolute;
+  width: 0.9cqw;
+  height: 0.9cqw;
+  opacity: 0.5;
+  background:
+    linear-gradient(to right, rgba(17,24,39,0.28) 0 100%) center/100% 1px no-repeat,
+    linear-gradient(to bottom, rgba(17,24,39,0.28) 0 100%) center/1px 100% no-repeat;
+}
+.wsCrossTL { left: 6.5%;  top: 7.5%;   transform: translate(-50%, -50%); }
+.wsCrossTR { right: 6.5%; top: 7.5%;   transform: translate(50%, -50%); }
+.wsCrossBL { left: 6.5%;  bottom: 7.5%; transform: translate(-50%, 50%); }
+.wsCrossBR { right: 6.5%; bottom: 7.5%; transform: translate(50%, 50%); }
+
+/* ---- the caret ----
+   CSS-driven so it keeps breathing while the page sits at rest; a
+   scroll-scrubbed timeline is frozen until the visitor moves, and a frozen
+   cursor is exactly the lifelessness this screen is meant to cure. */
+.wsCaret {
+  position: absolute;
+  left: 50%;
+  top: 50%;
   width: 1.5px;
-  height: 5.5%;
+  height: 4.4%;
+  margin: -2.2% 0 0 -0.75px;
+  background: #2c3340;
   opacity: 0;
-  background: #111827;
+  animation: wsBlink 1.15s steps(1, end) 0.4s infinite;
+}
+
+@keyframes wsBlink {
+  0%, 45% { opacity: 1; }
+  46%, 100% { opacity: 0; }
+}
+
+/* ---- ambience ---- */
+
+.wsGrain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.wsHighlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    62% 52% at 26% 8%,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.wsVignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    108% 96% at 50% 46%,
+    transparent 62%,
+    rgba(17, 24, 39, 0.035) 100%
+  );
 }
 
 /* Measurement guides for the "spacing becomes perfect" beat. */
