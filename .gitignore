@@ -6,11 +6,5 @@ out/
 .env*.local
 next-env.d.ts
 
-# pre-conversion static site — superseded by app/ + components/ + public/
-/macbook-landing.html
-/index.html
-/back.png
-/back1.png
-/img.png
-/logo.png
+# unused source asset kept on disk, out of the repo
 /Vioniche_Orange_Background.svg
