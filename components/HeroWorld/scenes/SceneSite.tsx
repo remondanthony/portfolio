@@ -1,0 +1,102 @@
+import styles from '../HeroWorld.module.css';
+
+/**
+ * SCENE 2 & 3 — ASSEMBLY, THEN POLISH
+ *
+ * The LEGO. Every component declares two things and nothing else:
+ *
+ *   data-from  the edge it flies in from — 'top' | 'left' | 'right' | 'bottom'
+ *   data-order its place in the build queue
+ *
+ * The timeline reads those and does the rest, which is why nothing here ever
+ * "fades in randomly": a nav bar drops from above because that is where a nav
+ * bar comes from, cards rise from below, the image slides in from the right
+ * edge it will occupy. Direction carries meaning.
+ *
+ * These same nodes are then polished in scene 3 — they are never replaced.
+ */
+
+type PartProps = {
+  cls: string;
+  from: 'top' | 'left' | 'right' | 'bottom';
+  order: number;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+};
+
+function Part({ cls, from, order, style, children }: PartProps) {
+  return (
+    <span
+      className={`${styles.part} ${cls}`}
+      data-hw="part"
+      data-from={from}
+      data-order={order}
+      style={style}
+    >
+      {children}
+    </span>
+  );
+}
+
+const NAV_LINKS = [24, 33, 42] as const;
+const CARDS = [
+  { left: '0%', label: 'Design' },
+  { left: '34.75%', label: 'Build' },
+  { left: '69.5%', label: 'Launch' },
+] as const;
+
+export default function SceneSite() {
+  return (
+    <div className={styles.site}>
+      {/* ---- navigation drops from the top ---- */}
+      <Part cls={styles.topbar} from="top" order={0} />
+      <Part cls={styles.brand} from="top" order={1} />
+      {NAV_LINKS.map((left, i) => (
+        <Part key={`n${i}`} cls={styles.navLink} from="top" order={2 + i} style={{ left: `${left}%` }} />
+      ))}
+      <Part cls={styles.navCta} from="top" order={5} />
+
+      {/* ---- hero copy builds from the left margin ---- */}
+      <Part cls={styles.h1a} from="left" order={6} />
+      <Part cls={styles.h1b} from="left" order={7} />
+      <Part cls={styles.subline} from="left" order={8} />
+      <Part cls={styles.subline2} from="left" order={9} />
+      <Part cls={styles.btnPrimary} from="left" order={10} />
+      <Part cls={styles.btnGhost} from="left" order={11} />
+
+      {/* ---- the image slides in from the edge it will live on ---- */}
+      <Part cls={styles.media} from="right" order={12}>
+        <span className={styles.mediaFill} data-hw="mediaFill" />
+      </Part>
+
+      {/* ---- cards rise from below ---- */}
+      <div className={styles.cardRow}>
+        {CARDS.map((c, i) => (
+          <Part key={c.label} cls={styles.card} from="bottom" order={13 + i} style={{ left: c.left }}>
+            <span className={styles.cardIcon} data-hw="cardIcon" />
+            <span className={`${styles.type} ${styles.typeCard}`} data-hw="type">
+              {c.label}
+            </span>
+          </Part>
+        ))}
+      </div>
+
+      {/* ---- real typography, revealed during polish ---- */}
+      <span className={`${styles.type} ${styles.typeH1} ${styles.typeH1a}`} data-hw="type">
+        Built to
+      </span>
+      <span className={`${styles.type} ${styles.typeH1} ${styles.typeH1b}`} data-hw="type">
+        convert.
+      </span>
+      <span className={`${styles.type} ${styles.typeSub}`} data-hw="type">
+        Design, development and launch — in one place.
+      </span>
+      <span className={`${styles.type} ${styles.typeBtn}`} data-hw="type">
+        Start a project
+      </span>
+      <span className={`${styles.type} ${styles.typeGhost}`} data-hw="type">
+        See our work
+      </span>
+    </div>
+  );
+}

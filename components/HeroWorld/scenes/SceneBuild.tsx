@@ -1,21 +1,22 @@
 import styles from '../HeroWorld.module.css';
 
 /**
- * ACT IV — DEVELOPMENT
+ * SCENE 4 — DEVELOPMENT
  *
- * The brief was explicit: no hacker aesthetic, no Matrix rain. So this act
- * shows only what a developer actually recognises — four components, a folder
- * path, and the three lines of output that mean the work shipped.
+ * Deliberately the shortest act, and the only one that happens OUTSIDE the
+ * screen: component cards float in the dark room around the laptop rather
+ * than on the white canvas. That separation is the idea — design happens on
+ * the artboard, engineering happens around it.
  *
- * The cards float ABOVE the artboard and then dissolve upward into it: the
- * reading is "these compiled into the site", not "these decorated the site".
+ * No hacker aesthetic, no Matrix rain. Four components, a folder path, and
+ * the three lines of output that mean the work actually shipped.
  */
 
 const COMPONENTS = [
-  { label: '<Hero />',     left: '-7%',  top: '10%' },
-  { label: '<Services />', left: '74%',  top: '25%' },
-  { label: '<Projects />', left: '-2%',  top: '68%' },
-  { label: '<Contact />',  left: '70%',  top: '78%' },
+  { label: '<Hero />',     left: '2%',  top: '12%' },
+  { label: '<Services />', left: '76%', top: '26%' },
+  { label: '<Projects />', left: '0%',  top: '70%' },
+  { label: '<Contact />',  left: '73%', top: '80%' },
 ] as const;
 
 const STATUS = [

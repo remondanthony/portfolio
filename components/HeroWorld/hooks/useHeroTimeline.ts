@@ -1,37 +1,31 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { buildMasterTimeline } from '../animations/buildMasterTimeline';
-import { CAPTIONS, IDLE, RUNTIME, SKIP_DURATION, ACT } from '../animations/tokens';
+import { ACT, CAPTIONS, IDLE, PIN_DISTANCE, RUNTIME } from '../animations/tokens';
 import { all, one } from '../utils/select';
 import { useReducedMotion } from './useReducedMotion';
-import { useSkipIntent } from './useSkipIntent';
 
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Orchestrates the whole hero: the finite film, the infinite ambience, the
- * caption track, the scroll settle and teardown.
+ * Drives the hero: a pinned, scroll-scrubbed build of a website inside a
+ * MacBook, plus the idle float that continues once the film is over.
  *
- * Everything is created inside a single gsap.context bound to the scope
- * element, so React StrictMode double-invocation and route changes cannot
- * leak a tween or a ScrollTrigger.
+ * There is no autoplay. Progress is a pure function of scroll position, so
+ * the visitor owns the pace completely — scrolling back up un-builds the site
+ * exactly as it was built, which is only possible because every tween in the
+ * timeline is stateless and finite.
+ *
+ * Everything lives in one gsap.context bound to the scope element, so React
+ * StrictMode double-invocation and unmounts cannot leak a tween, a pin or a
+ * ScrollTrigger.
  */
 export function useHeroTimeline(scopeRef: React.RefObject<HTMLElement | null>) {
   const reduced = useReducedMotion();
-  const tlRef = useRef<gsap.core.Timeline | null>(null);
   const [resolved, setResolved] = useState(false);
-
-  /** Fast-forward rather than cut — a jump reads as a bug, a rush reads as respect. */
-  const skip = useCallback(() => {
-    const tl = tlRef.current;
-    if (!tl || tl.progress() === 1) return;
-    gsap.to(tl, { time: RUNTIME, duration: SKIP_DURATION, ease: 'power2.inOut' });
-  }, []);
-
-  useSkipIntent(skip, !reduced && !resolved);
 
   useLayoutEffect(() => {
     const scope = scopeRef.current;
@@ -39,77 +33,53 @@ export function useHeroTimeline(scopeRef: React.RefObject<HTMLElement | null>) {
 
     const ctx = gsap.context(() => {
       const tl = buildMasterTimeline(gsap, scope);
-      tlRef.current = tl;
-      tl.eventCallback('onComplete', () => setResolved(true));
 
-      /* ---- caption track -------------------------------------------------
-         Captions live on their own timeline so copy can be re-timed without
-         touching a single scene tween. */
-      const captions = all(scope, 'caption');
-      captions.forEach((node, i) => {
+      /* ---- caption track --------------------------------------------------
+         On its own tweens so copy can be re-timed without touching a scene. */
+      all(scope, 'caption').forEach((node, i) => {
         const at = ACT[CAPTIONS[i].at];
         const next = CAPTIONS[i + 1] ? ACT[CAPTIONS[i + 1].at] : RUNTIME;
-        tl.fromTo(node, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.55 }, at + 0.35);
-        tl.to(node, { opacity: 0, y: -10, duration: 0.45, ease: 'power2.in' }, next - 0.45);
+        tl.fromTo(node, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 }, at + 0.2);
+        tl.to(node, { opacity: 0, y: -8, duration: 0.35, ease: 'power2.in' }, next - 0.4);
       });
 
       if (reduced) {
-        // No film. Resolve straight to the final frame and stop.
+        // No pin, no scrub, no scroll cost. Resolve to the finished frame.
         tl.progress(1).pause();
         setResolved(true);
-      } else {
-        tl.play();
-
-        /* ---- infinite ambience -----------------------------------------
-           Kept off the master timeline: a repeating tween there would mean
-           onComplete never fires, and skip-to-end would lose its meaning. */
-        all(scope, 'particle').forEach((p) => {
-          const drift = Number(p.dataset.drift ?? 0);
-          gsap.to(p, {
-            y: -18 - drift * 6,
-            x: (drift - 1) * 7,
-            duration: 7 + drift * 2.2,
-            repeat: -1,
-            yoyo: true,
-            ease: 'sine.inOut',
-            delay: drift * 0.5,
-          });
-        });
+        return;
       }
 
-      /* ---- idle breathing ------------------------------------------------
-         Starts only once the film resolves, so it never competes with the
-         camera push. */
-      const deck = one(scope, 'deck');
-      if (deck && !reduced) {
-        gsap.to(deck, {
-          y: -IDLE.breathDistance,
-          duration: IDLE.breathDuration,
+      /* ---- the pinned build ----------------------------------------------
+         The hero holds still while the site is assembled, then releases and
+         the page continues normally into #about. */
+      const hero = scope.parentElement;
+      if (!hero) return;
+
+      ScrollTrigger.create({
+        trigger: hero,
+        start: 'top top',
+        end: PIN_DISTANCE,
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
+        scrub: 0.8,
+        invalidateOnRefresh: true,
+        animation: tl,
+        // The float and parallax should only wake once the build is finished.
+        onUpdate: (self) => setResolved(self.progress > 0.985),
+      });
+
+      /* ---- idle float ------------------------------------------------------
+         Independent of scroll: the machine is alive whether or not you move. */
+      const float = one(scope, 'float');
+      if (float) {
+        gsap.to(float, {
+          y: -IDLE.floatDistance,
+          duration: IDLE.floatDuration,
           repeat: -1,
           yoyo: true,
           ease: 'sine.inOut',
-          delay: RUNTIME,
-        });
-      }
-
-      /* ---- scroll settle -------------------------------------------------
-         No pin, no added scroll distance. The film simply parts company with
-         the visitor as the hero leaves, so #about stays exactly where it was. */
-      const hero = scope.parentElement;
-      const stage = one(scope, 'stage');
-      if (hero && stage && !reduced) {
-        gsap.to(stage, {
-          y: -70,
-          opacity: 0.25,
-          scale: 0.97,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: hero,
-            start: 'top top',
-            end: 'bottom top',
-            scrub: 0.6,
-            invalidateOnRefresh: true,
-          },
         });
       }
     }, scopeRef);
@@ -117,12 +87,12 @@ export function useHeroTimeline(scopeRef: React.RefObject<HTMLElement | null>) {
     return () => ctx.revert();
   }, [scopeRef, reduced]);
 
-  // A late webfont or image can change layout under a pinned-free trigger.
+  // A late webfont or image changes layout, which moves every pin boundary.
   useEffect(() => {
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener('load', refresh);
     return () => window.removeEventListener('load', refresh);
   }, []);
 
-  return { resolved, skip, reduced };
+  return { resolved, reduced };
 }

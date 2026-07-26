@@ -15,5 +15,15 @@ export const EXIT = 'power2.in';
 /** Strokes drawing themselves — near-linear so the pen speed reads as constant. */
 export const DRAW = 'power1.inOut';
 
-/** The one moment allowed a little overshoot: the laptop arriving. */
+/** The one moment allowed a little overshoot: browser chrome arriving. */
 export const ARRIVE = 'back.out(1.35)';
+
+/**
+ * The LEGO click.
+ *
+ * A component travelling to its slot should decelerate hard and stop dead —
+ * no bounce, no settle wobble. power4.out is the strongest deceleration that
+ * still reads as physical rather than abrupt, and it is what makes fifteen
+ * separate arrivals feel like assembly instead of animation.
+ */
+export const LOCK = 'power4.out';

@@ -2,11 +2,10 @@
 
 import { useRef } from 'react';
 import styles from './HeroWorld.module.css';
-import SceneIdea from './scenes/SceneIdea';
-import SceneBlueprint from './scenes/SceneBlueprint';
-import SceneDesign from './scenes/SceneDesign';
+import SceneCanvas from './scenes/SceneCanvas';
+import SceneSite from './scenes/SceneSite';
 import SceneBuild from './scenes/SceneBuild';
-import SceneLaunch from './scenes/SceneLaunch';
+import SceneLive from './scenes/SceneLive';
 import { useHeroTimeline } from './hooks/useHeroTimeline';
 import { usePointerParallax } from './hooks/usePointerParallax';
 import { CAPTIONS } from './animations/tokens';
@@ -15,17 +14,21 @@ import { getFeaturedProject } from './utils/projects';
 /**
  * "The Website Is Born" — the hero backdrop.
  *
- * Replaces a static mascot with the eight-beat journey of making a website:
- * idea → blueprint → wireframe → design → development → deployment → live →
- * the client's project, sitting on a laptop.
+ * A MacBook sits on the desk from the first frame. As the visitor scrolls,
+ * a website is assembled inside it component by component: blank canvas,
+ * navigation, hero, typography, buttons, cards, polish, deployment, and
+ * finally the real project loading in a browser.
  *
  * Deliberate constraints:
- *   • Purely a backdrop. It renders at z-index 0 beneath the approved hero
- *     content and never receives pointer events, so nothing above it changes.
- *   • Adds no scroll distance. The film autoplays; scroll only scrubs the
- *     final settle. Every section below keeps its exact position.
- *   • Animates transform/opacity/filter only — no layout property is ever
- *     touched after mount, so there is no CLS and no main-thread layout.
+ *   • Backdrop only. Renders at z-index 0 beneath the approved hero content
+ *     and never takes pointer events, so nothing above it changes.
+ *   • Scroll-scrubbed, never autoplayed. The visitor owns every frame.
+ *   • transform / opacity / filter only — no layout property is touched after
+ *     mount, so there is no CLS and no main-thread layout during the scrub.
+ *
+ * The three nested transform hosts are not incidental: .tilt owns pointer
+ * parallax, .float owns the idle breath, and the timeline owns .stage. Giving
+ * each its own node is what stops them from overwriting one another.
  */
 
 type Props = {
@@ -50,37 +53,42 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
       aria-hidden="true"
       role="presentation"
     >
-      {/* ACT I — ambient field */}
-      <SceneIdea />
+      <div className={styles.roomGlow} data-hw="roomGlow" />
 
-      {/* The stage: one rectangle that becomes a website.
-          The anchor does the centring so GSAP can own stage's transform. */}
       <div className={styles.stageAnchor}>
         <div className={styles.stage} data-hw="stage">
           <div className={styles.tilt} ref={tiltRef} data-hw="tilt">
-            <div className={styles.deck} data-hw="deck">
-              <div className={styles.deckSurface} data-hw="deckSurface" />
+            <div className={styles.float} data-hw="float">
+              <span className={styles.shadow} data-hw="shadow" />
 
-              <div className={styles.deckContent} data-hw="deckContent">
-                {/* ACT II — measuring layer */}
-                <SceneBlueprint />
-                {/* ACT III — the site itself */}
-                <SceneDesign />
+              <div className={styles.laptop} data-hw="laptop">
+                <span className={styles.lid} />
+
+                <div className={styles.bezel}>
+                  {/* The display. Everything below is inside the glass. */}
+                  <div className={styles.screen} data-hw="screen">
+                    <SceneCanvas />
+                    <SceneSite />
+                    <SceneLive project={project} />
+                  </div>
+                  <span className={styles.screenFalloff} />
+                  <span className={styles.sheen} data-hw="sheen" />
+                </div>
+
+                <span className={styles.notch} />
+
+                <span className={styles.base}>
+                  <span className={styles.baseLip} />
+                </span>
               </div>
-
-              {/* ACT V. Comes last in DOM so chrome and the project screen
-                  crossfade OVER the built site; the laptop lid still renders
-                  behind it via translateZ(-14px) in the deck's 3D space. */}
-              <SceneLaunch project={project} />
             </div>
 
-            {/* ACT IV — floats around the deck, then compiles into it */}
+            {/* Scene 4 happens in the room, not on the artboard. */}
             <SceneBuild />
           </div>
         </div>
       </div>
 
-      {/* Caption track */}
       <div className={styles.captionWrap}>
         {CAPTIONS.map((c) => (
           <span key={c.at} className={styles.caption} data-hw="caption">
