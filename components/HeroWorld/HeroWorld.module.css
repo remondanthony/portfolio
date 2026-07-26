@@ -764,15 +764,32 @@
 @media (max-width: 820px) {
   /* The hero stacks its copy to the bottom on mobile, so the laptop takes
      the space that frees at the top. Detail is dropped, not shrunk. */
-  .stageAnchor { top: 13%; bottom: auto; height: 36%; align-items: center; }
-  /* Height-bounded here too. 84vw alone made the machine 441px tall inside
-     a 369px band on tablet portrait, so it grew straight down into the
-     stacked copy — the mobile twin of the desktop sizing bug. */
-  .stage { width: min(84vw, 52vh); }
+  /* The copy block on mobile is bottom-aligned and its height is set by font
+     clamps, not by the viewport — roughly 450px at any phone width. So the
+     space above it is (100vh - copy - navbar), and a percentage band cannot
+     express that: at 844px tall it looked fine, at a real 750px (Safari with
+     its address bar showing) the copy climbed straight into the machine.
+     Anchor to the navbar and derive the size from what is actually left. */
+  /* 92px, not 75px: the lid paints ~2.4% of the stage height ABOVE the box
+     it is positioned by, so anchoring flush to the navbar put the metal
+     through it. */
+  .stageAnchor { top: 92px; bottom: auto; height: auto; align-items: start; }
+  /* Width derived from the height still available above the copy.
+     The 1.46 converts available height to width: the machine paints
+     ~0.684 x its own width tall, lid and base included. */
+  .stage { width: clamp(120px, calc((100vh - 555px) * 1.46), 84vw); }
   .captionWrap { top: 4%; }
   .caption { font-size: 10px; }
   .buildLayer { inset: -8% -6%; }
   .componentCard:nth-child(n + 3) { display: none; }
+}
+
+/* Below ~645px of viewport height the copy block alone fills the space
+   between the navbar and the fold, leaving under 100px for the machine.
+   A 60px-tall laptop communicates nothing, so the hero simply shows its
+   gradient there rather than something too small to read. */
+@media (max-width: 820px) and (max-height: 645px) {
+  .stageAnchor { display: none; }
 }
 
 @media (max-width: 560px) {
