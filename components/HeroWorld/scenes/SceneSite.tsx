@@ -18,17 +18,19 @@ import styles from '../HeroWorld.module.css';
 
 type PartProps = {
   cls: string;
+  role: string;
   from: 'top' | 'left' | 'right' | 'bottom';
   order: number;
   style?: React.CSSProperties;
   children?: React.ReactNode;
 };
 
-function Part({ cls, from, order, style, children }: PartProps) {
+function Part({ cls, role, from, order, style, children }: PartProps) {
   return (
     <span
       className={`${styles.part} ${cls}`}
       data-hw="part"
+      data-role={role}
       data-from={from}
       data-order={order}
       style={style}
@@ -49,32 +51,32 @@ export default function SceneSite() {
   return (
     <div className={styles.site}>
       {/* ---- navigation drops from the top ---- */}
-      <Part cls={styles.topbar} from="top" order={0} />
-      <Part cls={styles.brand} from="top" order={1} />
+      <Part cls={styles.topbar} role="topbar" from="top" order={0} />
+      <Part cls={styles.brand} role="brand" from="top" order={1} />
       {NAV_LINKS.map((left, i) => (
-        <Part key={`n${i}`} cls={styles.navLink} from="top" order={2 + i} style={{ left: `${left}%` }} />
+        <Part key={`n${i}`} cls={styles.navLink} role="navLink" from="top" order={2 + i} style={{ left: `${left}%` }} />
       ))}
-      <Part cls={styles.navCta} from="top" order={5} />
+      <Part cls={styles.navCta} role="navCta" from="top" order={5} />
 
       {/* ---- hero copy builds from the left margin ---- */}
-      <Part cls={styles.h1a} from="left" order={6} />
-      <Part cls={styles.h1b} from="left" order={7} />
-      <Part cls={styles.subline} from="left" order={8} />
-      <Part cls={styles.subline2} from="left" order={9} />
-      <Part cls={styles.btnPrimary} from="left" order={10} />
-      <Part cls={styles.btnGhost} from="left" order={11} />
+      <Part cls={styles.h1a} role="h1a" from="left" order={6} />
+      <Part cls={styles.h1b} role="h1b" from="left" order={7} />
+      <Part cls={styles.subline} role="subline" from="left" order={8} />
+      <Part cls={styles.subline2} role="subline2" from="left" order={9} />
+      <Part cls={styles.btnPrimary} role="btnPrimary" from="left" order={10} />
+      <Part cls={styles.btnGhost} role="btnGhost" from="left" order={11} />
 
       {/* ---- the image slides in from the edge it will live on ---- */}
-      <Part cls={styles.media} from="right" order={12}>
+      <Part cls={styles.media} role="media" from="right" order={12}>
         <span className={styles.mediaFill} data-hw="mediaFill" />
       </Part>
 
       {/* ---- cards rise from below ---- */}
       <div className={styles.cardRow}>
         {CARDS.map((c, i) => (
-          <Part key={c.label} cls={styles.card} from="bottom" order={13 + i} style={{ left: c.left }}>
+          <Part key={c.label} cls={styles.card} role="card" from="bottom" order={13 + i} style={{ left: c.left }}>
             <span className={styles.cardIcon} data-hw="cardIcon" />
-            <span className={`${styles.type} ${styles.typeCard}`} data-hw="type">
+            <span className={`${styles.type} ${styles.typeCard}`} data-hw="type" data-for="card">
               {c.label}
             </span>
           </Part>
@@ -82,19 +84,19 @@ export default function SceneSite() {
       </div>
 
       {/* ---- real typography, revealed during polish ---- */}
-      <span className={`${styles.type} ${styles.typeH1} ${styles.typeH1a}`} data-hw="type">
+      <span className={`${styles.type} ${styles.typeH1} ${styles.typeH1a}`} data-hw="type" data-for="h1a">
         Built to
       </span>
-      <span className={`${styles.type} ${styles.typeH1} ${styles.typeH1b}`} data-hw="type">
+      <span className={`${styles.type} ${styles.typeH1} ${styles.typeH1b}`} data-hw="type" data-for="h1b">
         convert.
       </span>
-      <span className={`${styles.type} ${styles.typeSub}`} data-hw="type">
+      <span className={`${styles.type} ${styles.typeSub}`} data-hw="type" data-for="subline">
         Design, development and launch — in one place.
       </span>
-      <span className={`${styles.type} ${styles.typeBtn}`} data-hw="type">
+      <span className={`${styles.type} ${styles.typeBtn}`} data-hw="type" data-for="btnPrimary">
         Start a project
       </span>
-      <span className={`${styles.type} ${styles.typeGhost}`} data-hw="type">
+      <span className={`${styles.type} ${styles.typeGhost}`} data-hw="type" data-for="btnGhost">
         See our work
       </span>
     </div>

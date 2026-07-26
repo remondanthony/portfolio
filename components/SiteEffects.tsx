@@ -12,22 +12,50 @@ export default function SiteEffects() {
     if (!nav || !totop || !ham || !menu) return;
 
     const cleanups: Array<() => void> = [];
-    let lastY = window.scrollY;
 
-    // ---- nav: shrink on scroll, hide going down, reveal going up ----
+    // ---- nav: always visible, solid only once past the hero ----
+    /**
+     * The bar stays put. It only swaps to its solid treatment once the hero —
+     * including the distance its pinned build consumes — has left the top of
+     * the screen, so the crisp white type reads against the dark hero for the
+     * whole story instead of flipping to dark-on-glass after 8px of scroll.
+     */
+    let solidAt = 0;
+    const measure = () => {
+      const hero = document.querySelector<HTMLElement>('.hero-blank');
+      if (!hero) {
+        solidAt = 8;
+        return;
+      }
+      // ScrollTrigger wraps a pinned element in .pin-spacer; that spacer is
+      // what actually occupies the scroll, so measure whichever is outermost.
+      const box = (hero.closest('.pin-spacer') as HTMLElement) ?? hero;
+      solidAt = box.offsetTop + box.offsetHeight - nav.offsetHeight;
+    };
+    measure();
+
     const onScroll = () => {
       const y = window.scrollY;
-      nav.classList.toggle('scrolled', y > 8);
-      totop.classList.toggle('show', y > 700);
-      if (!menu.classList.contains('open')) {
-        if (y > lastY && y > 120) nav.classList.add('hide');
-        else if (y < lastY) nav.classList.remove('hide');
-      }
-      if (y <= 8) nav.classList.remove('hide');
-      lastY = y;
+      nav.classList.toggle('scrolled', y > solidAt);
+      // Also gated on the hero: the pinned build inflates scrollY far past
+      // any fixed threshold while the visitor is still in the first screen.
+      totop.classList.toggle('show', y > solidAt + 200);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', measure, { passive: true });
     cleanups.push(() => window.removeEventListener('scroll', onScroll));
+    cleanups.push(() => window.removeEventListener('resize', measure));
+    // The pin spacer only exists once GSAP has laid it out.
+    const remeasure = () => {
+      measure();
+      onScroll();
+    };
+    const raf = requestAnimationFrame(() => requestAnimationFrame(remeasure));
+    window.addEventListener('load', remeasure);
+    cleanups.push(() => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('load', remeasure);
+    });
     onScroll();
 
     const toTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });

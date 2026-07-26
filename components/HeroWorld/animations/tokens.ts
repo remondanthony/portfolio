@@ -36,6 +36,26 @@ export const RUNTIME = 12.4;
  */
 export const PIN_DISTANCE = '+=380%';
 
+/**
+ * How long after a component locks before it refines itself.
+ *
+ * This single number is what makes the build continuous: because each part
+ * polishes on its own clock rather than at a shared act boundary, the
+ * refinements of early parts overlap the arrivals of later ones, and there is
+ * never a moment where everything has stopped.
+ */
+export const POLISH_LAG = 0.85;
+
+/**
+ * Parallax travel over the full film, in pixels. Furthest plane moves least.
+ * The stage counter-moves, which is what makes it read as nearest to camera.
+ */
+export const PARALLAX = {
+  grid: 30,
+  dust: 66,
+  stage: -16,
+} as const;
+
 /** Stagger grammar — the rhythm of the LEGO assembly. */
 export const STAGGER = {
   navItem: 0.09,
@@ -58,5 +78,5 @@ export const CAPTIONS: ReadonlyArray<{ at: ActName; text: string }> = [
   { at: 'assemble', text: 'Every component, placed with intent.' },
   { at: 'polish', text: 'Then it becomes premium.' },
   { at: 'develop', text: 'Engineered, committed, deployed.' },
-  { at: 'live', text: 'And it goes live.' },
+  { at: 'live', text: 'From idea to launch.' },
 ];

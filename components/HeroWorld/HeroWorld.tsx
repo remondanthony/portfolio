@@ -3,11 +3,13 @@
 import { useRef } from 'react';
 import styles from './HeroWorld.module.css';
 import SceneCanvas from './scenes/SceneCanvas';
+import SceneDepth from './scenes/SceneDepth';
 import SceneSite from './scenes/SceneSite';
 import SceneBuild from './scenes/SceneBuild';
 import SceneLive from './scenes/SceneLive';
 import { useHeroTimeline } from './hooks/useHeroTimeline';
 import { usePointerParallax } from './hooks/usePointerParallax';
+import { useHeroCopyIntro } from './hooks/useHeroCopyIntro';
 import { CAPTIONS } from './animations/tokens';
 import { getFeaturedProject } from './utils/projects';
 
@@ -42,6 +44,7 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
 
   const { resolved, reduced } = useHeroTimeline(scopeRef);
   usePointerParallax(tiltRef, resolved && !reduced);
+  useHeroCopyIntro(scopeRef, !reduced);
 
   const project = getFeaturedProject(projectIndex);
 
@@ -53,6 +56,8 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
       aria-hidden="true"
       role="presentation"
     >
+      {/* Two planes behind the machine, each on its own parallax rate. */}
+      <SceneDepth />
       <div className={styles.roomGlow} data-hw="roomGlow" />
 
       <div className={styles.stageAnchor}>
@@ -63,6 +68,7 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
 
               <div className={styles.laptop} data-hw="laptop">
                 <span className={styles.lid} />
+                <span className={styles.lidEdge} />
 
                 <div className={styles.bezel}>
                   {/* The display. Everything below is inside the glass. */}
@@ -71,7 +77,6 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
                     <SceneSite />
                     <SceneLive project={project} />
                   </div>
-                  <span className={styles.screenFalloff} />
                   <span className={styles.sheen} data-hw="sheen" />
                 </div>
 
