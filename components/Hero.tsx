@@ -1,7 +1,12 @@
+import HeroWorld from './HeroWorld';
+
 export default function Hero() {
   return (
     <>
       <section className="hero-blank">
+        {/* Backdrop only — sits at z-index 0 beneath the approved hero content,
+            which is untouched below. Replaces the former back.png artwork. */}
+        <HeroWorld />
         <div className="hero-wrap">
           <div className="hero-lead">
             <div className="hero-eyebrow">Hey, we&rsquo;re a</div>
