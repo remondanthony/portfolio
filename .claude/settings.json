@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx next build)",
+      "Bash(npx next start *)",
+      "Bash(npx next dev *)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm run build)",
+      "Bash(npm run dev)",
+      "Bash(npm run lint)",
+      "Bash(npm run start)",
+      "Bash(curl -s http://localhost:*)",
+      "Bash(curl -s -o /dev/null *)",
+      "Bash(sips -g *)"
+    ]
+  }
+}

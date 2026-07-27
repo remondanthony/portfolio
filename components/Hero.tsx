@@ -9,7 +9,6 @@ export default function Hero() {
         <HeroWorld />
         <div className="hero-wrap">
           <div className="hero-lead">
-            <div className="hero-eyebrow">Hey, we&rsquo;re a</div>
             <h1 className="hero-title">Creative<br />Studio</h1>
           </div>
           <div className="hero-tag">

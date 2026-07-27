@@ -43,6 +43,32 @@ export function useHeroTimeline(scopeRef: React.RefObject<HTMLElement | null>) {
         tl.to(node, { opacity: 0, y: -8, duration: 0.35, ease: 'power2.in' }, next - 0.4);
       });
 
+      /* ---- the hero copy, held back until the build is finished ------------
+         The headline, tagline and service labels now arrive as the payoff of
+         the story rather than sitting there through it. They are hidden by
+         gsap.set at RUNTIME, never in the stylesheet: a failed bundle must
+         leave the hero readable, not blank.
+
+         Because these tweens live on the scrubbed timeline they also reverse —
+         scrolling back up returns the stage to the machine alone. */
+      const hero = scope.parentElement;
+      const copy = hero
+        ? [
+            hero.querySelector<HTMLElement>('.hero-lead'),
+            hero.querySelector<HTMLElement>('.hero-tag'),
+            ...Array.from(hero.querySelectorAll<HTMLElement>('.hero-services > div')),
+          ].filter((el): el is HTMLElement => Boolean(el))
+        : [];
+
+      if (copy.length) {
+        gsap.set(copy, { opacity: 0, y: 16 });
+        tl.to(
+          copy,
+          { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out', stagger: 0.09 },
+          ACT.settle - 0.15
+        );
+      }
+
       if (reduced) {
         // No pin, no scrub, no scroll cost. Resolve to the finished frame.
         tl.progress(1).pause();
@@ -53,7 +79,6 @@ export function useHeroTimeline(scopeRef: React.RefObject<HTMLElement | null>) {
       /* ---- the pinned build ----------------------------------------------
          The hero holds still while the site is assembled, then releases and
          the page continues normally into #about. */
-      const hero = scope.parentElement;
       if (!hero) return;
 
       ScrollTrigger.create({

@@ -10,7 +10,6 @@ import SceneBuild from './scenes/SceneBuild';
 import SceneLive from './scenes/SceneLive';
 import { useHeroTimeline } from './hooks/useHeroTimeline';
 import { usePointerParallax } from './hooks/usePointerParallax';
-import { useHeroCopyIntro } from './hooks/useHeroCopyIntro';
 import { CAPTIONS } from './animations/tokens';
 import { getFeaturedProject } from './utils/projects';
 
@@ -45,7 +44,6 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
 
   const { resolved, reduced } = useHeroTimeline(scopeRef);
   usePointerParallax(tiltRef, resolved && !reduced);
-  useHeroCopyIntro(scopeRef, !reduced);
 
   const project = getFeaturedProject(projectIndex);
 
