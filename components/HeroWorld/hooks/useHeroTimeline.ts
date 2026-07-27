@@ -79,6 +79,26 @@ export function useHeroTimeline(scopeRef: React.RefObject<HTMLElement | null>) {
         ? Array.from(hero.querySelectorAll<HTMLElement>('.hero-services > div'))
         : [];
 
+      /* ---- the machine makes room (mobile) --------------------------------
+         On a phone the copy stacks below rather than beside, so the machine
+         cannot simply stay put — it holds the centre through the build, then
+         rises 181px into the band above the copy as that copy arrives.
+
+         The tween writes a custom property, never a transform. Only the
+         mobile rule consumes --lift, so the media query decides whether this
+         does anything, and nothing has to be re-evaluated when the viewport
+         crosses the breakpoint. It also leaves the anchor's own transform
+         untouched, which a y-tween here would otherwise overwrite. */
+      const anchor = one(scope, 'stageAnchor');
+      if (anchor) {
+        tl.fromTo(
+          anchor,
+          { '--lift': 0 },
+          { '--lift': 1, duration: 2.1, ease: 'power2.inOut' },
+          ARRIVE.at - 0.3
+        );
+      }
+
       if (sequence.length || labels.length) {
         const arriving = [
           ...sequence.map((s) => s.el),

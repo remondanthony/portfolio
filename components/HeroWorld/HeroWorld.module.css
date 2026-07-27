@@ -777,15 +777,29 @@
 }
 
 @media (max-width: 820px) {
-  /* Mobile stacks its copy into normal flow at the bottom of the hero, and
-     that block measures a very consistent 421px tall from the hero's bottom
-     edge at every phone size tested (750 through 915, ±7px). Centring the
-     machine in the FULL hero therefore drops it straight onto the copy once
-     the copy arrives.
+  /* The machine holds the centre of the screen for the whole build, then
+     rises to make room as the copy arrives.
 
-     So the band is the gap between the navbar and where the copy starts:
-     75px down, 437px up from the bottom — 421 for the copy plus 16 of air. */
-  .stageAnchor { top: 75px; bottom: 437px; height: auto; align-items: center; }
+     Mobile stacks its copy into normal flow at the bottom of the hero, and
+     that block measures a very consistent 421px up from the hero's bottom
+     edge across every phone size tested (553 through 915, ±7px). Its resting
+     band is therefore 75px down (the navbar) to 437px up (421 plus air), and
+     the distance between the hero's centre and that band's centre works out
+     to exactly 181px — the vh terms cancel, so one constant serves every
+     phone.
+
+     The lift is driven by a custom property rather than a JS media check.
+     GSAP tweens --lift on every viewport, but only this rule consumes it, so
+     the media query alone decides whether the machine moves. Nothing goes
+     stale when the viewport crosses the breakpoint. */
+  .stageAnchor {
+    top: 0;
+    bottom: 0;
+    height: auto;
+    align-items: center;
+    --lift: 0;
+    transform: translate3d(0, calc(var(--lift) * -181px), 0);
+  }
 
   /* Sized to that band rather than to the viewport. The machine paints
      ~0.694 x its own width tall once lid and base are counted, so

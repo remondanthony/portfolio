@@ -66,7 +66,7 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
           full scrim they were designed against. */}
       <div className={styles.vignette} />
 
-      <div className={styles.stageAnchor}>
+      <div className={styles.stageAnchor} data-hw="stageAnchor">
         <div className={styles.stage} data-hw="stage">
           <div className={styles.tilt} ref={tiltRef} data-hw="tilt">
             <div className={styles.float} data-hw="float">
