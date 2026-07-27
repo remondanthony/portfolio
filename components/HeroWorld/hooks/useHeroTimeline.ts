@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { buildMasterTimeline } from '../animations/buildMasterTimeline';
-import { ACT, CAPTIONS, IDLE, PIN_DISTANCE, RUNTIME } from '../animations/tokens';
+import { ACT, ARRIVE, CAPTIONS, IDLE, PIN_DISTANCE, RISE, RUNTIME } from '../animations/tokens';
 import { all, one } from '../utils/select';
 import { useReducedMotion } from './useReducedMotion';
 
@@ -52,21 +52,60 @@ export function useHeroTimeline(scopeRef: React.RefObject<HTMLElement | null>) {
          Because these tweens live on the scrubbed timeline they also reverse —
          scrolling back up returns the stage to the machine alone. */
       const hero = scope.parentElement;
-      const copy = hero
-        ? [
-            hero.querySelector<HTMLElement>('.hero-lead'),
-            hero.querySelector<HTMLElement>('.hero-tag'),
-            ...Array.from(hero.querySelectorAll<HTMLElement>('.hero-services > div')),
-          ].filter((el): el is HTMLElement => Boolean(el))
+
+      /**
+       * The arrival order, as a sequence rather than a flat stagger.
+       *
+       * A single stagger over the whole block would treat a 108px headline and
+       * an 11px label as the same weight. Sequencing them — and giving bigger
+       * type a longer rise — is what makes this read as composed rather than
+       * animated. Transform and opacity only: no blur, no mask. Those announce
+       * themselves, and the brief was not to overpower the copy.
+       */
+      const q = (sel: string) => hero?.querySelector<HTMLElement>(sel) ?? null;
+
+      const sequence: Array<{ el: HTMLElement; rise: number }> = [];
+      const push = (el: HTMLElement | null, rise: number) => {
+        if (el) sequence.push({ el, rise });
+      };
+
+      push(q('.hero-lead'), RISE.headline);
+      push(q('.hero-tag h2'), RISE.tagline);
+      push(q('.hero-tag p'), RISE.body);
+
+      // Each service block arrives as a unit, its number a beat ahead of its
+      // name — the one internal detail, small enough to be felt not noticed.
+      const labels = hero
+        ? Array.from(hero.querySelectorAll<HTMLElement>('.hero-services > div'))
         : [];
 
-      if (copy.length) {
-        gsap.set(copy, { opacity: 0, y: 16 });
-        tl.to(
-          copy,
-          { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out', stagger: 0.09 },
-          ACT.settle - 0.15
-        );
+      if (sequence.length || labels.length) {
+        const arriving = [
+          ...sequence.map((s) => s.el),
+          ...labels.flatMap((d) => Array.from(d.children) as HTMLElement[]),
+        ];
+        // Hidden at RUNTIME, never in the stylesheet: a bundle that fails to
+        // load must leave the hero readable rather than blank.
+        gsap.set(arriving, { opacity: 0 });
+
+        sequence.forEach(({ el, rise }, i) => {
+          const at = ARRIVE.at + i * ARRIVE.step;
+          gsap.set(el, { y: rise });
+          tl.to(el, { opacity: 1, y: 0, duration: ARRIVE.duration, ease: 'power3.out' }, at);
+        });
+
+        labels.forEach((block, i) => {
+          const at = ARRIVE.at + (sequence.length + i) * ARRIVE.step;
+          Array.from(block.children).forEach((child, j) => {
+            const el = child as HTMLElement;
+            gsap.set(el, { y: RISE.label });
+            tl.to(
+              el,
+              { opacity: 1, y: 0, duration: ARRIVE.duration, ease: 'power3.out' },
+              at + j * ARRIVE.numberLead
+            );
+          });
+        });
       }
 
       if (reduced) {

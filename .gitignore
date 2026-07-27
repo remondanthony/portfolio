@@ -8,3 +8,6 @@ next-env.d.ts
 
 # unused source asset kept on disk, out of the repo
 /Vioniche_Orange_Background.svg
+
+# TypeScript incremental build cache
+tsconfig.tsbuildinfo

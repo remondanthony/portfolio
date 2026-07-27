@@ -25,7 +25,7 @@ export const ACT = {
 export type ActName = keyof typeof ACT;
 
 /** Total timeline length. Arbitrary units — scroll distance defines the pace. */
-export const RUNTIME = 12.4;
+export const RUNTIME = 14.4;
 
 /**
  * How much scroll the pinned build consumes.
@@ -34,7 +34,7 @@ export const RUNTIME = 12.4;
  * long before the visitor reaches #about". 380% ≈ 3.8 viewport heights, which
  * gives each act roughly three quarters of a screen of travel.
  */
-export const PIN_DISTANCE = '+=380%';
+export const PIN_DISTANCE = '+=440%';
 
 /**
  * How long after a component locks before it refines itself.
@@ -59,6 +59,42 @@ export const PARALLAX = {
   grid: 30,
   dust: 66,
   stage: 12,
+} as const;
+
+/**
+ * THE ARRIVAL — the hero copy, after the machine has finished.
+ *
+ * On a scrubbed timeline "slow" is not a duration, it is scroll distance:
+ * RUNTIME and PIN_DISTANCE were raised together so this reveal has room to
+ * breathe without speeding up the build that precedes it.
+ *
+ * `step` is deliberately larger than the assembly staggers. The build is
+ * busy and mechanical, so it wants a quick rhythm; this is the closing line
+ * and wants space between each phrase.
+ */
+export const ARRIVE = {
+  /** When the first line begins, just as the room starts dimming. */
+  at: 11.4,
+  /** Gap between one element and the next. */
+  step: 0.26,
+  /** How long any single element takes to settle. */
+  duration: 1.3,
+  /** A label's number leads its name by this much — a small internal beat. */
+  numberLead: 0.1,
+} as const;
+
+/**
+ * Rise distance per tier, in pixels.
+ *
+ * Bigger type travels further. That difference is the whole styling idea:
+ * it reads as depth and hierarchy rather than as an effect, and it costs
+ * nothing but a transform.
+ */
+export const RISE = {
+  headline: 44,
+  tagline: 30,
+  body: 24,
+  label: 18,
 } as const;
 
 /** Stagger grammar — the rhythm of the LEGO assembly. */
