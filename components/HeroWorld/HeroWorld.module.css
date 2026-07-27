@@ -39,7 +39,7 @@
 .bgGrid {
   position: absolute;
   inset: -8% -4%;
-  opacity: 0;
+  opacity: 0.82;
   background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
@@ -62,7 +62,7 @@
   width: 2px;
   height: 2px;
   border-radius: 50%;
-  opacity: 0;
+  opacity: 0.7;
   background: rgba(255, 216, 189, 0.9);
   box-shadow: 0 0 7px rgba(255, 138, 74, 0.75);
   will-change: transform, opacity;
@@ -78,7 +78,11 @@
   height: 50vmax;
   margin: -25vmax 0 0 -35vmax;
   border-radius: 50%;
-  opacity: 0;
+  /* Lit at rest. These ambient layers used to start at 0 and ramp in on
+     power3.out, which covers ~20% of its distance in the first 7% of the
+     timeline — so the whole room flashed on at the first touch of the wheel.
+     They now sit just below their final value and settle the rest of the way. */
+  opacity: 0.74;
   pointer-events: none;
   background: radial-gradient(
     circle,
@@ -165,7 +169,7 @@
   top: 102%;
   height: 10%;
   border-radius: 50%;
-  opacity: 0;
+  opacity: 0.86;
   background: radial-gradient(
     ellipse at center,
     rgba(0, 0, 0, 0.72) 0%,
@@ -266,7 +270,7 @@
   inset: 0;
   z-index: 5;
   pointer-events: none;
-  opacity: 0;
+  opacity: 0.42;
   background: linear-gradient(
     108deg,
     rgba(255, 255, 255, 0.22) 0%,

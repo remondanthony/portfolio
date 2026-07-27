@@ -51,17 +51,19 @@ export function buildMasterTimeline(gsap: Gsap, scope: HTMLElement): gsap.core.T
   --------------------------------------------------------------- */
 
   if (bgGrid) {
-    tl.fromTo(bgGrid, { opacity: 0 }, { opacity: 1, duration: 1.6 }, 0);
+    // Small deltas, not fades from nothing. Starting these at 0 meant the
+    // first pixel of scroll lit the entire room at once, which read as a
+    // glitch; the ambience now merely deepens as the story begins.
+    tl.to(bgGrid, { opacity: 1, duration: 1.6 }, 0);
     tl.fromTo(bgGrid, { y: 0 }, { y: PARALLAX.grid, duration: RUNTIME, ease: 'none' }, 0);
   }
   if (dust) {
     tl.fromTo(dust, { y: 0 }, { y: PARALLAX.dust, duration: RUNTIME, ease: 'none' }, 0);
   }
   if (present(q('mote'))) {
-    tl.fromTo(
+    tl.to(
       q('mote'),
-      { opacity: 0, scale: 0.4 },
-      { opacity: 0.85, scale: 1, duration: 1.4, stagger: { each: STAGGER.particle, from: 'random' } },
+      { opacity: 0.85, duration: 1.4, stagger: { each: STAGGER.particle, from: 'random' } },
       0.15
     );
   }
@@ -75,9 +77,11 @@ export function buildMasterTimeline(gsap: Gsap, scope: HTMLElement): gsap.core.T
      and the workspace sits ready on an empty canvas.
   --------------------------------------------------------------- */
 
-  if (shadow) tl.to(shadow, { opacity: 1, duration: 1.1 }, 0);
-  if (roomGlow) tl.to(roomGlow, { opacity: 0.9, duration: 1.3 }, 0);
-  if (sheen) tl.to(sheen, { opacity: 0.5, duration: 1.2 }, 0.1);
+  // Each of these begins from its lit CSS value, so the deltas are small and
+  // the opening reads as the room settling rather than switching on.
+  if (shadow) tl.to(shadow, { opacity: 1, duration: 1.4, ease: CAMERA }, 0);
+  if (roomGlow) tl.to(roomGlow, { opacity: 0.9, duration: 1.6, ease: CAMERA }, 0);
+  if (sheen) tl.to(sheen, { opacity: 0.5, duration: 1.5, ease: CAMERA }, 0.1);
   // The workspace IS the idle screen, so it is fully present at rest and
   // dissolves as the first component arrives. One tween, so the handover
   // reads as the tool getting out of the way rather than as a cut.

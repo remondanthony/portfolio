@@ -246,7 +246,7 @@
     .hero-services .hs-t { margin-top: 5px; }
   }
 
-  .hero-blank { height: 100vh; margin-top: -74px; position: relative; overflow: hidden; background: #0b0809; }
+  .hero-blank { height: 100vh; margin-top: -75px; position: relative; overflow: hidden; background: #0b0809; }
   /* How-We-Design section (dark, matched to sample) */
   .how { background: radial-gradient(125% 115% at 84% 90%, #5a2410 0%, #26120a 40%, #0b0809 76%); color: #fff; padding-block: clamp(56px, 8vw, 104px); overflow: hidden; }
   .how .wrap { position: relative; }
