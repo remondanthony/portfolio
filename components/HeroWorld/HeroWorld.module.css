@@ -777,15 +777,27 @@
 }
 
 @media (max-width: 820px) {
-  /* The machine owns the frame here, exactly as on desktop.
-     It used to be squeezed into the gap above the copy, sized from whatever
-     height was left over. That constraint died when the copy became a
-     post-build reveal, and it was doing real damage: the height-derived
-     width collapsed the machine to 159px on a 664px viewport. */
-  .stageAnchor { top: 0; bottom: 0; height: auto; align-items: center; }
-  /* Bounded against the VIEWPORT, not against leftover space: 86vw keeps
-     side margins, 62vh stops it overflowing on a short phone. */
-  .stage { width: min(86vw, 62vh); }
+  /* Mobile stacks its copy into normal flow at the bottom of the hero, and
+     that block measures a very consistent 421px tall from the hero's bottom
+     edge at every phone size tested (750 through 915, ±7px). Centring the
+     machine in the FULL hero therefore drops it straight onto the copy once
+     the copy arrives.
+
+     So the band is the gap between the navbar and where the copy starts:
+     75px down, 437px up from the bottom — 421 for the copy plus 16 of air. */
+  .stageAnchor { top: 75px; bottom: 437px; height: auto; align-items: center; }
+
+  /* Sized to that band rather than to the viewport. The machine paints
+     ~0.694 x its own width tall once lid and base are counted, so
+     (band - air) / 0.694 gives the widest it can be and still clear the copy;
+     1.44 is that reciprocal. 86vw caps it on tall phones, where the band is
+     generous and side margins become the real limit.
+
+     max(0px, ...) is load-bearing: without it a viewport shorter than 528px
+     yields a negative length, the whole declaration is dropped as invalid,
+     and the DESKTOP width rule wins — which is exactly the overlap this is
+     meant to prevent, at maximum size. */
+  .stage { width: min(86vw, max(0px, calc((100vh - 528px) * 1.44))); }
   .captionWrap { top: 4%; }
   .caption { font-size: 10px; }
   .buildLayer { inset: -8% -6%; }
