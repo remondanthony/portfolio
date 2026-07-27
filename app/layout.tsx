@@ -1,14 +1,5 @@
 import type { Metadata } from 'next';
-import { Simonetta } from 'next/font/google';
 import './globals.css';
-
-const simonetta = Simonetta({
-  subsets: ['latin'],
-  weight: ['400', '900'],
-  style: ['normal', 'italic'],
-  display: 'swap',
-  variable: '--font-simonetta',
-});
 
 export const metadata: Metadata = {
   title: 'VIONICHE — Web & Product Studio',
@@ -22,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={simonetta.variable}>
+    <html lang="en">
       <body>{children}</body>
     </html>
   );

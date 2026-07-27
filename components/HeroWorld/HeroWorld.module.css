@@ -749,6 +749,9 @@
 .caption {
   grid-area: 1 / 1;
   opacity: 0;
+  /* Stated rather than inherited: the story captions are typographic, so the
+     face they use should be visible here and not buried in a token upstream. */
+  font-family: var(--font);
   font-size: clamp(10px, 0.95vw, 13px);
   font-weight: 500;
   letter-spacing: 0.08em;

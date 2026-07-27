@@ -1,4 +1,50 @@
 /* ============ TOKENS ============ */
+/* ============ NEUE MONTREAL ============
+   Pangram Pangram. Self-hosted from public/fonts/, converted to .woff2 from
+   the licensed .otf files.
+
+   Weight RANGES, not single values, and deliberately so: only Regular (400)
+   and Medium (500) upright faces exist, while the design calls for 300, 600,
+   700 and 800. Declaring exact weights would make the browser synthesise the
+   missing ones, and a faked bold at 108px is visibly smeared. Ranges make it
+   pick the nearest REAL face instead — cleaner, though headings render
+   lighter than designed until a genuine Bold is licensed. */
+@font-face {
+  font-family: "Neue Montreal";
+  src: url("/fonts/NeueMontreal-Regular.woff2") format("woff2");
+  font-weight: 100 450;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Neue Montreal";
+  src: url("/fonts/NeueMontreal-Medium.woff2") format("woff2");
+  font-weight: 451 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Neue Montreal";
+  src: url("/fonts/NeueMontreal-LightItalic.woff2") format("woff2");
+  font-weight: 100 350;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Neue Montreal";
+  src: url("/fonts/NeueMontreal-Italic.woff2") format("woff2");
+  font-weight: 351 450;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Neue Montreal";
+  src: url("/fonts/NeueMontreal-MediumItalic.woff2") format("woff2");
+  font-weight: 451 900;
+  font-style: italic;
+  font-display: swap;
+}
+
   :root {
     --bg: #eef1f4;
     --bg-soft: #f6f7f9;
@@ -10,7 +56,11 @@
     --pill: #101317;
     --accent-orange: #ff5b1e;
     --font: "Neue Montreal", "NeueMontreal", "PP Neue Montreal", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, Helvetica, Arial, sans-serif;
-    --font-title: var(--font-simonetta), Georgia, "Times New Roman", serif;
+    /* Headings and body now share one typeface. Simonetta was retired with
+       the switch — it was still being preloaded on every page load while
+       nothing rendered in it. */
+    --font-title: "Neue Montreal", "NeueMontreal", "PP Neue Montreal",
+                  -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     --maxw: 1280px;
     --pad: clamp(20px, 5vw, 64px);
   }
