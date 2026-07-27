@@ -110,10 +110,15 @@
      1366x768) plus a margin. Anchoring to the TOP of the band rather than
      centring in it lifts the machine as high as the copy allows instead of
      letting it drift toward the fold. */
-  /* 46.5% is the measured floor of the copy (worst case ~44% at 1280x720)
-     plus real margin. The parallax then drifts the machine DOWNWARD, so
-     the clearance only ever grows as the visitor scrolls. */
-  top: 46.5%;
+  /* 32% puts the machine on the hero's vertical centre line.
+     It used to be pinned below the copy's measured floor (46.5%), but the
+     copy is now held back until the build finishes, so the middle of the
+     frame is free during the story and the machine can own it.
+     Solved, not eyeballed: painted height is 0.684 x the stage width once
+     lid and base are counted, and align-items:start puts the painted top at
+     top% x vh minus the lid's 2.4% overhang. 32% lands the centre at 47-52%
+     of viewport height across the sizes tested. */
+  top: 32%;
   bottom: 2%;
   display: grid;
   justify-items: center;
