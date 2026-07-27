@@ -110,8 +110,11 @@
      1366x768) plus a margin. Anchoring to the TOP of the band rather than
      centring in it lifts the machine as high as the copy allows instead of
      letting it drift toward the fold. */
-  top: 53%;
-  bottom: 1%;
+  /* 46.5% is the measured floor of the copy (worst case ~44% at 1280x720)
+     plus real margin. The parallax then drifts the machine DOWNWARD, so
+     the clearance only ever grows as the visitor scrolls. */
+  top: 46.5%;
+  bottom: 2%;
   display: grid;
   justify-items: center;
   align-items: start;
