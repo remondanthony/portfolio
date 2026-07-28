@@ -272,7 +272,19 @@
   .pv[data-phase="click"] .pv-cta,
   .pv[data-phase="scroll"] .pv-cta { transform: translateY(-1.1cqw) scale(1.03); box-shadow: 0 3cqw 6cqw -2cqw rgba(0,0,0,.4); filter: brightness(1.08); }
 
-  .pv-media { display: block; border-radius: 2cqw; }
+  /* A flat two-stop ramp reads as a graphic. Layering a key light, a falloff
+     and a fine grain over the base makes it read as a photograph at this size.
+     Each site sets --key (light direction/colour) and --base below. */
+  .pv-media { display: block; border-radius: 2cqw; position: relative; overflow: hidden;
+              background-image:
+                radial-gradient(58% 62% at var(--key-x, 32%) var(--key-y, 24%), var(--key, rgba(255,255,255,.34)) 0%, transparent 62%),
+                linear-gradient(var(--angle, 162deg), var(--base-a) 0%, var(--base-b) 58%, var(--base-c) 100%);
+              background-blend-mode: screen, normal; }
+  .pv-media::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+                     background-image:
+                       radial-gradient(120% 108% at 50% 42%, transparent 52%, rgba(0,0,0,.42) 100%),
+                       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+                     background-blend-mode: normal, overlay; }
   .pv-second { flex: 1; padding: 4cqw 5cqw 5cqw; }
   .pv-sect-title { display: block; font-size: 3.3cqw; font-weight: 700; letter-spacing: -.01em; }
   .pv-rows { list-style: none; margin: 3cqw 0 0; padding: 0; display: flex; flex-direction: column; gap: 2.4cqw; }
@@ -299,7 +311,10 @@
 
   /* ---- 1 · Ironhaus ---- */
   [data-ind="fitness"] .pv { background: #0d1013; color: #fff; }
-  [data-ind="fitness"] .pv-media { background: radial-gradient(76% 96% at 70% 26%, #414c57 0%, #1a2026 52%, #0d1013 100%); }
+  [data-ind="fitness"] .pv-media { --base-a: #48535f; --base-b: #1c232a; --base-c: #0b0e11; --key: rgba(255,150,90,.4); --key-x: 66%; --key-y: 20%; }
+  [data-ind="fitness"] .pv-h1 { font-size: 8.4cqw; font-weight: 800; letter-spacing: -.045em; }
+  [data-ind="fitness"] .pv-nav { text-transform: uppercase; letter-spacing: .1em; font-size: 2.5cqw; font-weight: 600; }
+  [data-ind="fitness"] .pv-sect-title { text-transform: uppercase; letter-spacing: .12em; }
   [data-ind="fitness"] .pv-cta { background: #ff5b1e; color: #fff; }
   [data-ind="fitness"] .pv-second { background: #0d1013; }
   [data-ind="fitness"] .pv-rows li { border-bottom: 1px solid rgba(255,255,255,.12); padding-bottom: 1.6cqw; }
@@ -307,7 +322,9 @@
 
   /* ---- 2 · Brightwell ---- */
   [data-ind="healthcare"] .pv { background: #fbfdff; color: #14304a; }
-  [data-ind="healthcare"] .pv-media { background: linear-gradient(158deg, #d3e8f7, #7cb3d8); }
+  [data-ind="healthcare"] .pv-media { --base-a: #dceaf6; --base-b: #8fbcda; --base-c: #4d84ab; --key: rgba(255,255,255,.5); --key-x: 40%; --key-y: 22%; }
+  [data-ind="healthcare"] .pv-h1 { font-weight: 600; letter-spacing: -.025em; }
+  [data-ind="healthcare"] .pv-rows li { border-radius: 2.4cqw; }
   [data-ind="healthcare"] .pv-cta { background: #2f9bd4; color: #fff; }
   [data-ind="healthcare"] .pv-second { background: #f2f8fc; }
   [data-ind="healthcare"] .pv-rows li { background: #fff; box-shadow: inset 0 0 0 1px #e0edf6; }
@@ -315,7 +332,9 @@
 
   /* ---- 3 · Sedge ---- */
   [data-ind="restaurant"] .pv { background: #fdf7ee; color: #43290f; }
-  [data-ind="restaurant"] .pv-media { border-radius: 50%; background: radial-gradient(62% 62% at 40% 34%, #ecb877, #a4622a 68%, #66381a); }
+  [data-ind="restaurant"] .pv-media { border-radius: 50%; --base-a: #e8b06f; --base-b: #a1622c; --base-c: #5d3316; --key: rgba(255,236,200,.5); --key-x: 36%; --key-y: 28%; }
+  [data-ind="restaurant"] .pv-h1, [data-ind="restaurant"] .pv-brand, [data-ind="restaurant"] .pv-sect-title { font-family: Georgia, "Times New Roman", serif; font-weight: 400; letter-spacing: -.005em; }
+  [data-ind="restaurant"] .pv-nav { letter-spacing: .08em; text-transform: uppercase; font-size: 2.5cqw; }
   [data-ind="restaurant"] .pv-cta { background: #b4541f; color: #fff; }
   [data-ind="restaurant"] .pv-second { background: #f7eddd; }
   [data-ind="restaurant"] .pv { --cta-x: 20cqw; --cta-y: 39.0cqw; }
@@ -324,40 +343,53 @@
   [data-ind="boutique"] .pv { background: #fff; color: #1b1a19; }
   [data-ind="boutique"] .pv-media i { background: linear-gradient(150deg, #efe9e4, #cdc3ba); }
   [data-ind="boutique"] .pv-media i:last-child { background: linear-gradient(150deg, #e6e1de, #bfb5ae); }
-  [data-ind="boutique"] .pv-cta { background: #1b1a19; color: #fff; }
+  [data-ind="boutique"] .pv-cta { background: #1b1a19; color: #fff; letter-spacing: .06em; text-transform: uppercase; font-size: 2.5cqw; }
+  [data-ind="boutique"] .pv-h1 { font-weight: 400; letter-spacing: .01em; font-size: 6.6cqw; }
+  [data-ind="boutique"] .pv-nav { text-transform: uppercase; letter-spacing: .14em; font-size: 2.4cqw; }
+  [data-ind="boutique"] .pv-brand { letter-spacing: .12em; text-transform: uppercase; font-weight: 500; font-size: 3.4cqw; }
   [data-ind="boutique"] .pv-second { background: #faf8f6; }
   [data-ind="boutique"] .pv-rows li { background: #fff; box-shadow: inset 0 0 0 1px #ece7e2; }
   [data-ind="boutique"] .pv { --cta-x: 22cqw; --cta-y: 49.5cqw; }
 
   /* ---- 5 · Aurelle ---- */
-  [data-ind="beauty"] .pv { background: #fdf6f6; color: #5c3b43; }
-  [data-ind="beauty"] .pv-media { background: linear-gradient(165deg, #f7e2e5, #d2a2aa 68%, #a97580); }
-  [data-ind="beauty"] .pv-cta { background: #b8737f; color: #fff; }
-  [data-ind="beauty"] .pv-second { background: #f8ecec; }
-  [data-ind="beauty"] .pv-rows li { background: #fff; box-shadow: inset 0 0 0 1px #f0dcdf; }
+  [data-ind="beauty"] .pv { background: #faf6f0; color: #55483c; }
+  [data-ind="beauty"] .pv-media { --base-a: #eee0cf; --base-b: #cbb098; --base-c: #93765d; --key: rgba(255,248,236,.52); --key-x: 34%; --key-y: 22%; }
+  [data-ind="beauty"] .pv-h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 6.8cqw; letter-spacing: -.01em; }
+  [data-ind="beauty"] .pv-nav { letter-spacing: .1em; text-transform: uppercase; font-size: 2.5cqw; }
+  [data-ind="beauty"] .pv-cta { background: #6f5b47; color: #fdfaf6; }
+  [data-ind="beauty"] .pv-second { background: #f3ece2; }
+  [data-ind="beauty"] .pv-rows li { background: #fffdfa; box-shadow: inset 0 0 0 1px #e7dccd; }
   [data-ind="beauty"] .pv { --cta-x: 48cqw; --cta-y: 37.5cqw; }
 
   /* ---- 6 · Ashcombe ---- */
-  [data-ind="realestate"] .pv { background: #101c18; color: #fff; }
-  [data-ind="realestate"] .pv-media { background: linear-gradient(168deg, #9db9ab 0%, #55735f 52%, #1d2c24 100%); }
-  [data-ind="realestate"] .pv-cta { background: #dfe9e2; color: #16261e; }
-  [data-ind="realestate"] .pv-second { background: #0c1613; }
-  [data-ind="realestate"] .pv-rows li { background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,.09); }
+  [data-ind="realestate"] .pv { background: #14140f; color: #f6f1e6; }
+  [data-ind="realestate"] .pv-media { --base-a: #6d6a5c; --base-b: #34342c; --base-c: #14140f; --key: rgba(226,192,122,.42); --key-x: 62%; --key-y: 26%; }
+  [data-ind="realestate"] .pv-h1, [data-ind="realestate"] .pv-brand { font-family: Georgia, "Times New Roman", serif; font-weight: 400; }
+  [data-ind="realestate"] .pv-nav { text-transform: uppercase; letter-spacing: .12em; font-size: 2.4cqw; }
+  [data-ind="realestate"] .pv-sect-title { color: #d9b877; letter-spacing: .1em; text-transform: uppercase; }
+  [data-ind="realestate"] .pv-cta { background: #cfa960; color: #1b1a12; letter-spacing: .05em; }
+  [data-ind="realestate"] .pv-second { background: #100f0b; }
+  [data-ind="realestate"] .pv-rows li { background: rgba(207,169,96,.07); box-shadow: inset 0 0 0 1px rgba(207,169,96,.2); }
   [data-ind="realestate"] .pv { --cta-x: 26cqw; --cta-y: 35.2cqw; }
 
   /* ---- 7 · Beanstalk ---- */
   [data-ind="education"] .pv { background: #f9f8fe; color: #322a63; }
-  [data-ind="education"] .pv-media { background: linear-gradient(155deg, #ded7fb, #9b8ce4); border-radius: 3cqw; }
+  [data-ind="education"] .pv-media { --base-a: #e3ddfc; --base-b: #a396e8; --base-c: #6957c4; --key: rgba(255,255,255,.46); border-radius: 4cqw; }
+  [data-ind="education"] .pv-h1 { font-weight: 700; letter-spacing: -.03em; }
+  [data-ind="education"] .pv-cta { border-radius: 20px; }
+  [data-ind="education"] .pv-rows li { border-radius: 2.6cqw; }
   [data-ind="education"] .pv-cta { background: #5b49c8; color: #fff; }
   [data-ind="education"] .pv-second { background: #f2effc; }
   [data-ind="education"] .pv-rows li { background: #fff; box-shadow: inset 0 0 0 1px #e3ddf7; }
   [data-ind="education"] .pv { --cta-x: 20cqw; --cta-y: 40.5cqw; }
 
   /* ---- 8 · Marchmont ---- */
-  [data-ind="law"] .pv { background: #11151c; color: #f2f0ec; font-family: Georgia, "Times New Roman", serif; }
+  [data-ind="law"] .pv { background: #1c1c1e; color: #eeece7; font-family: Georgia, "Times New Roman", serif; }
   [data-ind="law"] .pv-h1 { font-weight: 400; letter-spacing: -.01em; }
   [data-ind="law"] .pv-cta { background: transparent; color: #f2f0ec; box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); }
-  [data-ind="law"] .pv-second { background: #0d1117; }
+  [data-ind="law"] .pv-second { background: #161618; }
+  [data-ind="law"] .pv-nav { text-transform: uppercase; letter-spacing: .13em; font-size: 2.4cqw; font-family: var(--font); }
+  [data-ind="law"] .pv-sect-title { letter-spacing: .1em; text-transform: uppercase; font-size: 2.9cqw; }
   [data-ind="law"] .pv-rows li { border-bottom: 1px solid rgba(255,255,255,.13); padding-bottom: 1.6cqw; }
   [data-ind="law"] .pv { --cta-x: 44cqw; --cta-y: 39.0cqw; }
 
