@@ -102,23 +102,16 @@
   position: absolute;
   left: 0;
   right: 0;
-  /* The band the machine stands in.
-      Its top edge is set by .hero-tag's baseline, not by taste: any higher and
-      a white display sits under white copy. Its bottom now runs past the
-      service row because that row has been split around the corridor. */
-  /* 51% is the measured floor of the hero copy (worst case 49.2% at
-     1366x768) plus a margin. Anchoring to the TOP of the band rather than
-     centring in it lifts the machine as high as the copy allows instead of
-     letting it drift toward the fold. */
-  /* 32% puts the machine on the hero's vertical centre line.
-     It used to be pinned below the copy's measured floor (46.5%), but the
-     copy is now held back until the build finishes, so the middle of the
-     frame is free during the story and the machine can own it.
-     Solved, not eyeballed: painted height is 0.684 x the stage width once
-     lid and base are counted, and align-items:start puts the painted top at
-     top% x vh minus the lid's 2.4% overhang. 32% lands the centre at 47-52%
-     of viewport height across the sizes tested. */
-  top: 32%;
+  /* Headline and machine are solved as a PAIR, not placed independently.
+     "Ideas Become" runs past the viewport's centre line, so a centred machine
+     can never clear it horizontally — the headline has to finish above it.
+     That makes this anchor's floor (headline bottom + 16 + lid overhang) / vh
+     and its ceiling the point where the machine's base would leave the hero.
+     Across 1024x768 to 2560x1440 that window is [39.1%, 54.5%]; 43% sits
+     inside it with margin at both ends.
+     On the way down the machine passes THROUGH the service-label row, which
+     is fine: that row is split around a corridor wide enough to hold it. */
+  top: 43%;
   bottom: 2%;
   display: grid;
   justify-items: center;

@@ -268,7 +268,10 @@
     /* hero overlay text (Folioblox-style placement) */
   .hero-wrap { position: relative; z-index: 1; max-width: var(--maxw); margin: 0 auto; height: 100%; color: #fff; }
   .hero-blank::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(to bottom, transparent 44%, rgba(16,4,0,.62) 100%); }
-  .hero-lead { position: absolute; left: var(--pad); top: 1%; text-shadow: 0 2px 26px rgba(0,0,0,.28); }
+  /* 12% rather than flush to the top: the headline no longer has to be
+     crushed under the navbar to clear the machine, because the machine
+     moved down with it. Solved as a pair — see .stageAnchor. */
+  .hero-lead { position: absolute; left: var(--pad); top: 12%; text-shadow: 0 2px 26px rgba(0,0,0,.28); }
   /* The vh term is what keeps the headline clear of the MacBook. "Ideas
      Become" is far wider than "Creative", and it extends past the viewport's
      centre line — so a centred machine can never clear it horizontally, and
