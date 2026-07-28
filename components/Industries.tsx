@@ -1,26 +1,37 @@
-import { CONCEPTS } from './industries/concepts';
+import Image from 'next/image';
+import { CONCEPTS, type Format } from './industries/concepts';
 
 /**
- * Industries, as an exhibition rather than a grid of previews.
+ * Industries, as an exhibition of supplied hero mockups.
  *
- * Each exhibit is a photograph of a business with a fragment of that
- * business's website floating off it. The photograph is the subject; the
- * website is the smaller object resting on it. That ratio is the whole idea —
- * the visitor is meant to recognise the business first and want the site
- * second.
+ * Each exhibit is one final PNG: a website design already composed into the
+ * environment of the business it belongs to. The artwork is the source of
+ * truth and everything here is built around it.
  *
- * There is no JavaScript in this section any more. The browser chrome, the
- * travelling cursor, the shimmer and the self-scrolling page are all gone:
- * they were what made eight concepts read as eight animations. What replaces
- * them is static, which is why it can be a server component and why the whole
- * section costs nothing to run.
+ * That has a consequence worth stating, because it removed a lot of code: the
+ * floating website is INSIDE the artwork. This section used to draw its own
+ * floating canvas over a photograph, and keeping it would have put a second
+ * website on top of a picture that already has one. The canvas, the pool of
+ * shade beneath it, the mount board behind the plate and the colour grade over
+ * it are all gone for the same reason — the brief asks for no extra
+ * background, no added gradients, and no second artwork.
  *
- * The floating canvas is deliberately a CROP, never a small complete site.
- * Its content row is positioned to be cut by the bottom edge and to run past
- * the right edge, so it reads as a piece of something larger. A tidy,
- * fully-contained panel holding a wordmark, a headline and a row would just
- * be a tiny website — the exact thing this rebuild exists to remove.
+ * Every asset is 1536x1024, so every plate is 3:2 and nothing is ever cropped.
+ * Variety comes from scale and placement instead of from shape.
+ *
+ * next/image does the optimising: the PNGs are 1.7-2MB each and must never
+ * reach a visitor at that weight. It serves resized AVIF/WebP from a srcset,
+ * keeps them sharp on retina, and lazy-loads them — all from the untouched
+ * source files, which stay exactly as supplied.
  */
+
+/** What the plate actually measures, so the browser picks the right source. */
+const SIZES: Record<Format, string> = {
+  full: '(min-width: 1100px) 1152px, 100vw',
+  wide: '(min-width: 1100px) 760px, (min-width: 640px) 50vw, 92vw',
+  pair: '(min-width: 1100px) 562px, (min-width: 640px) 50vw, 92vw',
+};
+
 export default function Industries() {
   return (
     <section id="industries" className="industries">
@@ -50,34 +61,15 @@ export default function Industries() {
               style={{ ['--i' as string]: n }}
             >
               <div className="exh-stage">
-                {/* The float mount: a faintly lit board inset behind the plate,
-                    so the photograph stands proud of it on three sides. A real
-                    print-framing device rather than a negative margin. */}
-                <span className="exh-mount" aria-hidden="true" />
-
                 <div className="exh-plate">
-                  <img
+                  <Image
                     className="exh-photo"
                     src={c.photo}
                     alt={c.alt}
-                    loading="lazy"
-                    decoding="async"
+                    fill
+                    sizes={SIZES[c.format]}
+                    quality={82}
                   />
-                  <span className="exh-grade" aria-hidden="true" />
-                </div>
-
-                {/* A local pool of shade under the floating sheet, sized to its
-                    own footprint. Holds the sheet against the photograph
-                    without darkening the whole lower third of the image. */}
-                <span className="exh-seat" aria-hidden="true" />
-
-                <div className="exh-canvas" aria-hidden="true">
-                  <span className="exh-c-mark">{c.brand}</span>
-                  <p className="exh-c-line">{c.headline}</p>
-                  <span className="exh-c-row">
-                    <i>{c.row.label}</i>
-                    <b>{c.row.meta}</b>
-                  </span>
                 </div>
               </div>
 

@@ -1,44 +1,64 @@
-# Photography credits
+# Concept artwork
 
-Eight photographs, one per concept in the Industries section. All were licensed
-from the **Adobe Stock free collection** on 2026-07-28 against the Vioniche
-Adobe account. Free-collection assets carry the Adobe Stock Standard licence:
-usable on a commercial website, no attribution required, not resellable as-is.
+Eight supplied hero mockups, one per exhibit in the Industries section. Each is
+a website design composed into the environment of the business it belongs to,
+at 1536×1024 PNG.
 
-Keep this file. If the site is ever handed to another developer or the licence
-is questioned, the asset IDs below are the proof of provenance — a JPEG in a
-repo with no record of where it came from is a liability.
+These replaced eight Adobe Stock photographs that were licensed and then
+removed. The stock licences remain on the Vioniche Adobe account and cost
+nothing; no action is needed, but the files are gone from the repo.
 
-| File             | Adobe Stock ID | Subject                                              |
-| ---------------- | -------------- | ---------------------------------------------------- |
-| `fitness.jpg`    | 228266115      | Athlete pressing a barbell overhead in a dark gym     |
-| `restaurant.jpg` | 259713928      | Plated duck on a dark plate, warm low light           |
-| `healthcare.jpg` | 564639218      | Doctor in conversation with a patient                 |
-| `boutique.jpg`   | 871736760      | Editorial fashion, beige suit, hard directional light |
-| `beauty.jpg`     | 488133544      | Amber serum bottle on soft white fabric               |
-| `realestate.jpg` | 542433129      | Contemporary house at dusk, lit interior              |
-| `law.jpg`        | 488813768      | Scales, gavel and books on a desk                     |
-| `education.jpg`  | 291474059      | Two students working together over notebooks          |
+| File             | Exhibit     | Brand in the artwork |
+| ---------------- | ----------- | -------------------- |
+| `fitness.png`    | Fitness     | Stronger             |
+| `healthcare.png` | Healthcare  | MedCare              |
+| `resturant.png`  | Restaurant  | Tavolo               |
+| `boutique.png`   | Boutique    | Luxe                 |
+| `beauty.png`     | Beauty      | Aurelle              |
+| `realestate.png` | Real Estate | Habitat Realty       |
+| `education.png`  | Education   | Learnix              |
+| `law.png`        | Law         | Lexora               |
 
-## Processing
+`resturant.png` is spelled as supplied. The code references it exactly, so
+re-exporting over that filename keeps working. Renaming it means updating
+`photo:` for the restaurant entry in `components/industries/concepts.ts`.
 
-Originals were 5472–7106px on the long edge. Each was resized to a 1600px long
-edge and re-encoded as JPEG at quality 68 with `sips`. Nothing was cropped,
-retouched or recoloured — the grade is applied in CSS, so the source files stay
-clean and the look can be retuned without re-downloading anything.
+## Provenance is not recorded
 
-## Two deviations from the brief, on purpose
+Where these came from is not written down anywhere, and it should be. Whoever
+inherits this site cannot tell from the files whether they were commissioned,
+generated, or licensed — and that question gets asked eventually, usually at
+the worst moment. Add a line per image saying how it was made.
 
-**Beauty** was specified as a "luxury skincare portrait". It is a product
-still-life instead. The concept it sits under is Aurelle, a six-formula range,
-and a bottle on linen sits closer to that brand than a face does — it is also
-the more restrained choice beside the other seven.
+## Three things to look at
 
-**Law** was specified as a "professional office meeting". It is a desk
-still-life instead. The people-based candidates were all bright, smiling,
-handshake stock that read as a bank advertisement rather than as counsel; the
-brief asks law to feel like charcoal and authority, and a quiet desk carries
-that where a stock handshake actively works against it.
+**Invented statistics are baked into the fitness artwork.** It reads *500+
+Active Members*, *20+ Expert Coaches*, *98% Satisfaction Rate*. The law
+artwork claims *Proven Results — a track record of success*. Those are exactly
+the kind of numbers the rest of this site deliberately refuses to print. They
+are legible at the size the section renders. The section header says "None of
+these are clients", which frames the whole wall as concept work and carries
+most of the weight — but a visitor who reads the numbers before the header
+will read them as claims. Worth an edit to the artwork if these are easy to
+regenerate.
 
-Both are easy to swap: replace the file, keep the name, and nothing else in the
-codebase changes.
+**Third-party trademarks appear in the boutique artwork.** The books at lower
+right are lettered CHANEL, Dior and LOEWE. It is small and incidental set
+dressing, but it is a real brand appearing in Vioniche's own marketing for a
+business that has no relationship with it.
+
+**Retina is capped by the source.** The real-estate exhibit renders 1152px
+wide at desktop, so a 2× display wants 2304px. The source is 1536px, and the
+optimiser will not upscale past it — that exhibit shows at roughly 1.33×
+rather than 2×. It reads fine; it is simply not as crisp as the smaller
+exhibits, which have pixels to spare. A wider export of that one file would
+fix it.
+
+## Delivery
+
+The PNGs are 1.7–2MB each and never reach a visitor at that weight.
+`next/image` serves resized AVIF (WebP fallback) from a srcset — around 50–80KB
+per exhibit — and lazy-loads all eight. The source files are never modified.
+
+Do not pre-grade, darken or vignette a replacement file. Nothing is layered
+over the artwork in CSS any more, so what you export is exactly what shows.

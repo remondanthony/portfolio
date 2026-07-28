@@ -1,64 +1,70 @@
-# Swapping a concept photograph
+# Swapping a concept mockup
 
-Eight photographs, one per exhibit in the Industries section. They are the
-subject of that section — roughly seventy per cent of what a visitor looks at —
-so they are worth being fussy about.
+Eight supplied hero mockups, one per exhibit in the Industries section. Each is
+the final artwork — the layout is built around these, not the other way round.
 
 ## To replace one
 
 Drop your file in here using the **exact existing filename** and nothing else
 changes. No code edit, no rebuild step, no config.
 
-| File             | Exhibit     | Plate shape it is cropped into    |
-| ---------------- | ----------- | --------------------------------- |
-| `fitness.jpg`    | Fitness     | 3:2 landscape                     |
-| `healthcare.jpg` | Healthcare  | 4:5 portrait                      |
-| `restaurant.jpg` | Restaurant  | 4:5 portrait                      |
-| `boutique.jpg`   | Boutique    | 4:5 portrait                      |
-| `beauty.jpg`     | Beauty      | 4:5 portrait                      |
-| `realestate.jpg` | Real Estate | 21:9 full-bleed — the widest crop |
-| `education.jpg`  | Education   | 3:2 landscape                     |
-| `law.jpg`        | Law         | 3:2 landscape                     |
+| File             | Exhibit     |
+| ---------------- | ----------- |
+| `fitness.png`    | Fitness     |
+| `healthcare.png` | Healthcare  |
+| `resturant.png`  | Restaurant  |
+| `boutique.png`   | Boutique    |
+| `beauty.png`     | Beauty      |
+| `realestate.png` | Real Estate |
+| `education.png`  | Education   |
+| `law.png`        | Law         |
 
-If you change a filename, update `photo:` for that entry in
-[`components/industries/concepts.ts`](../../components/industries/concepts.ts)
-— and update `alt:` in the same object, which describes the picture for screen
-readers and is wrong the moment the picture changes.
+`resturant.png` is spelled as supplied and referenced exactly, so re-exporting
+over it keeps working. If you rename it, update `photo:` for the restaurant
+entry in
+[`components/industries/concepts.ts`](../../components/industries/concepts.ts).
 
-## What the crop will do to your image
+Whatever you change, update `alt:` in the same object. It describes the artwork
+for screen readers and for anyone whose images fail to load, and it is wrong
+the moment the picture changes.
 
-Every plate uses `object-fit: cover`, centred. The image is scaled until it
-fills the plate and whatever sticks out is cut off the edges, evenly. So:
+## Shape
 
-- A **landscape** photo in a 4:5 portrait plate loses its left and right sides.
-- A **portrait** photo in a 3:2 plate loses its top and bottom.
-- The **real estate** plate is 21:9 and will cut a normal photo to a letterbox
-  band through the middle.
+Every current asset is **1536×1024 (3:2)**, and every plate is 3:2 to match, so
+nothing is cropped anywhere — measured at 0.00% crop across ten widths from 360
+to 1728.
 
-Keep the subject near the centre and leave room around it. The shapes above are
-the desktop crops; below 640px every plate becomes 5:4, so a composition that
-only works at one extreme ratio will not survive both.
-
-Also leave the bottom corner quiet. A floating canvas sits over one of the two
-bottom corners on every exhibit, so anything important down there is covered.
+That only holds while the set stays 3:2. A replacement at a different ratio
+*will* be cropped, centred, because the plates use `object-fit: cover`. If you
+need a different shape, change the plate with it rather than letting it cut the
+artwork.
 
 ## Size
 
-About **1600px on the long edge** is the sweet spot. The largest plate on
-screen is roughly 760px wide and the full-bleed one matches the viewport, so
-1600px covers both at retina density without wasting bytes. JPEG quality
-around 68 is indistinguishable here and keeps each file near 150–330KB.
+**Wider than 1536px would help.** The largest exhibit renders 1152px wide, so a
+retina display wants 2304px, and the optimiser will not upscale past the
+source. Around 2400px on the long edge would make that one exhibit fully sharp;
+the other seven already have pixels to spare.
 
-Anything much larger is wasted — these load lazily, but they still load.
+File weight is not a concern — see below.
 
-## Grading
+## Do not pre-grade
 
-Do **not** darken, tint or vignette your file. All of that is applied in CSS
-(`.exh-grade`, plus a `--gr-tint` per industry in `app/globals.css`), so the
-look can be retuned without re-exporting anything. A pre-graded image gets
-graded twice and goes muddy.
+Nothing is layered over the artwork in CSS: no gradient, no vignette, no tint,
+no mount board behind it. What you export is exactly what shows, so a file that
+arrives pre-darkened simply looks darker.
+
+## Delivery is handled
+
+The PNGs are 1.7–2MB each and never reach a visitor at that weight.
+`next/image` serves resized AVIF (WebP fallback) from a srcset — roughly
+50–80KB per exhibit — and lazy-loads all eight below the fold. The source files
+are never modified, so keep them at full quality.
+
+Do not hand-optimise, convert to JPEG, or resize these down. That work happens
+at request time, and shrinking the source only lowers the ceiling.
 
 ## Provenance
 
-Whatever you put here, record where it came from in `CREDITS.md`. An image in a
-repo with no licence trail is a problem for whoever inherits the site.
+Record where each image came from in `CREDITS.md`. Artwork in a repo with no
+trail is a problem for whoever inherits the site.

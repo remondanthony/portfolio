@@ -61,11 +61,6 @@
        nothing rendered in it. */
     --font-title: "Neue Montreal", "NeueMontreal", "PP Neue Montreal",
                   -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-    /* Used only by the four concept canvases in Industries that call for a
-       serif voice. Iowan and Palatino are markedly better than Georgia on
-       macOS and iOS; everywhere else the stack falls through to Georgia,
-       which is what it always was. */
-    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
     --maxw: 1280px;
     --pad: clamp(20px, 5vw, 64px);
   }
@@ -176,18 +171,16 @@
   @media (max-width: 900px) { .proj-grid { grid-template-columns: 1fr; } }
 
   /* ============ INDUSTRIES ============
-     An exhibition, not a grid of previews.
+     An exhibition of supplied hero mockups.
 
-     Each exhibit is a photograph of a business with a fragment of that
-     business's website floating off it. The photograph is the subject and the
-     website is the smaller object resting on it — roughly 70/30 by area, and
-     that ratio is arithmetic rather than judgement: every canvas is sized as a
-     percentage of its own plate, so the business cannot lose.
+     Each exhibit is one final PNG: a website design already composed into the
+     environment of the business it belongs to. The artwork is the source of
+     truth, so this section adds nothing on top of it — no mount board behind,
+     no colour grade over, no second floating website, because the floating
+     website is already in the picture.
 
-     The previous version put eight tiny working websites in eight browser
-     frames and animated a cursor across each one. All of that is gone. What
-     is left is static, which is why this whole section is a server component
-     with no JavaScript behind it. */
+     Every asset is 1536x1024, so every plate is 3:2 and nothing is ever
+     cropped. Variety comes from scale and placement rather than from shape. */
   .industries {
     background:
       linear-gradient(180deg, rgba(4,4,6,.55) 0%, rgba(4,4,6,0) 34%),
@@ -196,8 +189,8 @@
     overflow: hidden;
     padding-block: clamp(88px, 11vw, 152px);
   }
-  /* One sheet of grain across eight different palettes is most of what makes
-     them read as one studio's work rather than eight themes. */
+  /* Grain on the room, not on the artwork — it sits under .wrap, so it never
+     touches a plate. */
   .industries::before {
     content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
     opacity: .05; mix-blend-mode: overlay;
@@ -227,86 +220,19 @@
                 margin-top: clamp(44px, 5vw, 68px); }
 
   .exh { margin: 0; min-width: 0; }
-
-  /* The stage is never clipped — the canvas has to be able to hang off it. */
   .exh-stage { position: relative; }
 
-  /* The float mount: a faintly lit board inset behind the plate, so the
-     photograph stands proud of it on three sides. A print-framing device
-     rather than a negative margin, and it holds the composition together
-     whatever the photograph turns out to be. */
-  .exh-mount { position: absolute; left: -16px; right: -16px; top: -14px; bottom: -24px; z-index: 0; border-radius: 4px;
-               border: 1px solid rgba(255,255,255,.07);
-               background: linear-gradient(178deg, rgba(255,255,255,.045), rgba(255,255,255,.01) 46%, rgba(255,255,255,.028));
-               transition: border-color .35s ease; }
+  /* The plate is exactly the artwork's own 3:2, so `cover` crops nothing — it
+     is there to absorb sub-pixel rounding, not to reframe the picture. */
+  .exh-plate { position: relative; overflow: hidden; border-radius: 4px; aspect-ratio: 3 / 2;
+               background: #0f0d0c; border: 1px solid rgba(255,255,255,.08);
+               transform: translateY(0);
+               transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease, border-color .35s ease;
+               box-shadow: 0 30px 64px -34px rgba(0,0,0,.85); }
+  .exh-photo { object-fit: cover; }
 
-  .exh-plate { position: relative; z-index: 1; overflow: hidden; border-radius: 3px; background: #16130f;
-               transform: translateY(0); transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease;
-               box-shadow: 0 30px 60px -34px rgba(0,0,0,.85); }
-  .exh-photo { display: block; width: 100%; height: 100%; object-fit: cover; }
-
-  /* Colour grading lives here rather than in the JPEGs, so the look can be
-     retuned without licensing anything again. Each industry sets --gr-tint. */
-  .exh-grade { position: absolute; inset: 0; pointer-events: none;
-               background-image:
-                 radial-gradient(120% 110% at 50% 38%, transparent 46%, rgba(0,0,0,.5) 100%),
-                 linear-gradient(180deg, transparent 52%, rgba(6,5,4,.44) 100%),
-                 var(--gr-tint, linear-gradient(0deg, rgba(255,255,255,0), rgba(255,255,255,0))); }
-
-  /* A local pool of shade under the floating sheet, sized to its own
-     footprint. A full-width scrim would flatten the lower third of every
-     photograph; this only darkens what the sheet actually sits on. */
-  .exh-seat { position: absolute; z-index: 2; pointer-events: none; opacity: .3;
-              background: radial-gradient(closest-side, rgba(0,0,0,.95), transparent 74%);
-              filter: blur(9px); transition: opacity .35s ease; }
-
-  /* ---- the floating canvas ----
-     A crop of a page, never a small complete site. Its content row is cut by
-     the bottom edge and runs past the right edge, so it reads as a piece of
-     something larger. */
-  .exh-canvas {
-    position: absolute; z-index: 3; overflow: hidden; border-radius: 5px;
-    container-type: inline-size;
-    background: var(--cv-bg, #fff); color: var(--cv-ink, #14161a);
-    padding: clamp(13px, 5.4cqw, 21px);
-    display: flex; flex-direction: column;
-    transform: perspective(1400px) translate3d(0, 0, 0) rotateY(-3.2deg) rotateX(1.6deg);
-    transform-origin: 50% 100%;
-    backface-visibility: hidden;
-    box-shadow:
-      0 2px 4px -2px rgba(0,0,0,.35),
-      0 18px 34px -18px rgba(0,0,0,.55),
-      0 54px 90px -46px rgba(0,0,0,.72),
-      inset 0 0 0 1px var(--cv-edge, rgba(12,14,17,.08));
-    transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease;
-  }
-  /* One soft specular sweep, same direction on all eight: one room, one lamp. */
-  .exh-canvas::after {
-    content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
-    background: linear-gradient(128deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,.08) 15%, transparent 34%);
-  }
-
-  .exh-c-mark { font-size: clamp(8.5px, 3.1cqw, 11px); letter-spacing: .22em; text-transform: uppercase; opacity: .55; font-weight: 500; }
-  /* 11ch forces every headline to wrap, whatever its length — the crop cannot
-     depend on a wrap that may or may not happen. */
-  .exh-c-line { font-size: clamp(18px, 9.2cqw, 30px); line-height: 1.05; letter-spacing: -.025em;
-                max-width: 11ch; margin-top: auto; margin-bottom: clamp(16px, 6.4cqw, 26px); }
-  /* Cut by the bottom edge — that is the crop. It used to also run off the
-     right, which clipped the price or the time down to a single letter and
-     read as a bug rather than as a fragment. One clean cut is enough. */
-  .exh-c-row { position: absolute; left: clamp(13px, 5.4cqw, 21px); right: clamp(13px, 5.4cqw, 21px); bottom: -.52em;
-               display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
-               font-size: clamp(8.5px, 3.3cqw, 11.5px); font-style: normal;
-               padding-top: .62em; border-top: 1px solid var(--cv-rule, rgba(0,0,0,.12)); }
-  .exh-c-row i { font-style: normal; }
-  .exh-c-row b { font-weight: 400; color: var(--cv-meta, inherit); white-space: nowrap; }
-
-  /* ---- caption: identical on all eight. This is the "one studio" glue ----
-     margin-top has to clear whatever the canvas hangs below the plate, or the
-     sheet lands on top of the catalogue number. */
-  .exh-caption { margin-top: 34px; }
-  .exh[data-format="column"] .exh-caption { margin-top: 84px; }
-  .exh[data-format="bleed"] .exh-caption { margin-top: 76px; }
+  /* ---- caption: identical on all eight. This is the "one studio" glue ---- */
+  .exh-caption { margin-top: 30px; }
   .exh-index { display: block; font-size: 11px; font-variant-numeric: tabular-nums; letter-spacing: .2em; color: rgba(255,255,255,.32); }
   .exh-kicker { display: block; margin-top: 12px; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; font-weight: 500; color: var(--tint, var(--accent-orange)); }
   .exh-caption h3 { font-size: clamp(21px, 2vw, 28px); font-weight: 400; letter-spacing: -.022em; line-height: 1.14; color: #fff; margin-top: 14px; }
@@ -315,55 +241,28 @@
   .exh-story { font-size: 15.5px; line-height: 1.62; color: rgba(255,255,255,.56); max-width: 34ch; margin-top: 12px;
                min-height: 3.24em; text-wrap: pretty; }
 
-  /* ---- formats ---- */
-  .exh[data-format="wide"] .exh-plate { aspect-ratio: 3 / 2; }
-  .exh[data-format="wide"] .exh-canvas { width: min(38%, 300px); aspect-ratio: 5 / 4; right: -34px; bottom: -46px; }
-  .exh[data-format="wide"] .exh-seat { width: min(46%, 350px); height: 74px; right: -50px; bottom: -58px; }
-
-  /* Narrower than it was, and hung off a corner rather than centred. Centred
-     and 78% wide, the sheet read as a caption bar bolted across the bottom of
-     the photograph instead of an object resting on it. */
-  .exh[data-format="column"] .exh-plate { aspect-ratio: 4 / 5; }
-  .exh[data-format="column"] .exh-canvas { width: min(66%, 278px); aspect-ratio: 16 / 10; right: -24px; bottom: -50px; }
-  .exh[data-format="column"] .exh-seat { width: min(76%, 320px); height: 66px; right: -34px; bottom: -60px; }
-  /* Alternating the corner gives the pairs a rhythm; all four on the same side
-     would rebuild the grid the section is trying to escape. */
-  .exh[data-ind="healthcare"] .exh-canvas,
-  .exh[data-ind="boutique"] .exh-canvas { left: -24px; right: auto; }
-  .exh[data-ind="healthcare"] .exh-seat,
-  .exh[data-ind="boutique"] .exh-seat { left: -34px; right: auto; }
-  /* A sheet on the left leans the other way, so the implied light source stays
-     in one place across the whole section. */
-  .exh[data-ind="healthcare"] .exh-canvas,
-  .exh[data-ind="boutique"] .exh-canvas { transform: perspective(1400px) translate3d(0, 0, 0) rotateY(3.2deg) rotateX(1.6deg); }
-
-  .exh[data-format="bleed"] .exh-plate { aspect-ratio: 21 / 9; border-radius: 0; }
-  .exh[data-format="bleed"] .exh-mount { display: none; }
-  .exh[data-format="bleed"] .exh-canvas { width: min(26%, 330px); aspect-ratio: 5 / 4; right: 9%; bottom: -44px; }
-  .exh[data-format="bleed"] .exh-seat { width: min(32%, 390px); height: 72px; right: 7%; bottom: -56px; }
-
   /* ---- the hang: placement per exhibit ---- */
   @media (min-width: 1100px) {
     .exh[data-ind="fitness"]    { grid-column: 1 / 13; grid-row: 1; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; }
-    .exh[data-ind="fitness"]    .exh-stage { grid-column: 1 / 9; }
-    .exh[data-ind="fitness"]    .exh-caption { grid-column: 10 / 13; align-self: end; margin-top: 0; }
+    .exh[data-ind="fitness"]    .exh-stage { grid-column: 1 / 8; }
+    .exh[data-ind="fitness"]    .exh-caption { grid-column: 9 / 13; align-self: end; margin-top: 0; }
 
-    .exh[data-ind="healthcare"] { grid-column: 1 / 6;  grid-row: 2; margin-top: clamp(80px, 9vw, 132px); margin-inline-start: -28px; }
-    .exh[data-ind="restaurant"] { grid-column: 8 / 13; grid-row: 2; margin-top: clamp(200px, 17vw, 280px); }
+    .exh[data-ind="healthcare"] { grid-column: 1 / 7;  grid-row: 2; margin-top: clamp(80px, 9vw, 132px); }
+    .exh[data-ind="restaurant"] { grid-column: 7 / 13; grid-row: 2; margin-top: clamp(168px, 15vw, 246px); }
 
-    .exh[data-ind="boutique"]   { grid-column: 2 / 7;  grid-row: 3; margin-top: clamp(88px, 10vw, 150px); }
-    .exh[data-ind="beauty"]     { grid-column: 8 / 13; grid-row: 3; margin-top: clamp(30px, 4vw, 64px); }
+    .exh[data-ind="boutique"]   { grid-column: 1 / 7;  grid-row: 3; margin-top: clamp(88px, 10vw, 150px); }
+    .exh[data-ind="beauty"]     { grid-column: 7 / 13; grid-row: 3; margin-top: clamp(26px, 3.5vw, 56px); }
 
-    /* The one exhibit that abandons the measure and owns the viewport. A
-       gallery hangs one work bigger than the rest and makes you stop. */
+    /* The one exhibit that takes the whole measure. A gallery hangs one work
+       bigger than the rest and makes you stop. */
     .exh[data-ind="realestate"] { grid-column: 1 / 13; grid-row: 4; margin-top: clamp(110px, 12vw, 180px);
                                   display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; }
-    .exh[data-ind="realestate"] .exh-stage { grid-column: 1 / 13; margin-inline: calc(50% - 50vw); }
+    .exh[data-ind="realestate"] .exh-stage { grid-column: 1 / 13; }
     .exh[data-ind="realestate"] .exh-caption { grid-column: 1 / 6; }
 
     .exh[data-ind="education"]  { grid-column: 1 / 13; grid-row: 5; margin-top: clamp(96px, 11vw, 168px);
                                   display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; }
-    .exh[data-ind="education"]  .exh-caption { grid-column: 1 / 4; align-self: end; margin-top: 0; }
+    .exh[data-ind="education"]  .exh-caption { grid-column: 1 / 5; align-self: end; margin-top: 0; }
     .exh[data-ind="education"]  .exh-stage { grid-column: 5 / 13; }
 
     .exh[data-ind="law"]        { grid-column: 1 / 13; grid-row: 6; margin-top: clamp(88px, 10vw, 150px);
@@ -372,66 +271,29 @@
     .exh[data-ind="law"]        .exh-caption { grid-column: 10 / 13; align-self: center; margin-top: 0; }
   }
 
-  /* ---- hover: 3px on the photograph, 8px on the website, 350ms ---- */
+  /* ---- hover: lift, deeper shadow, brighter edge. 350ms, nothing more ----
+     The brief also asks the floating website to lift further than the image.
+     It cannot: the website is inside the artwork, so the two move together. */
   @media (hover: hover) {
-    .exh:hover .exh-plate { transform: translateY(-3px); box-shadow: 0 40px 76px -38px rgba(0,0,0,.7); }
-    .exh[data-ind="healthcare"]:hover .exh-canvas,
-    .exh[data-ind="boutique"]:hover .exh-canvas {
-      transform: perspective(1400px) translate3d(0, -8px, 0) rotateY(3.2deg) rotateX(1.6deg);
+    .exh:hover .exh-plate {
+      transform: translateY(-4px);
+      box-shadow: 0 46px 88px -38px rgba(0,0,0,.92);
+      border-color: rgba(255,255,255,.2);
     }
-    .exh:hover .exh-canvas {
-      transform: perspective(1400px) translate3d(0, -8px, 0) rotateY(-3.2deg) rotateX(1.6deg);
-      box-shadow:
-        0 3px 7px -3px rgba(0,0,0,.28),
-        0 24px 46px -22px rgba(0,0,0,.44),
-        0 74px 120px -56px rgba(0,0,0,.6),
-        inset 0 0 0 1px var(--cv-edge-hi, rgba(12,14,17,.14));
-    }
-    .exh:hover .exh-mount { border-color: rgba(255,255,255,.14); }
-    .exh:hover .exh-seat { opacity: .22; }
   }
 
   /* ---- per-industry identity ----
-     Personality lives in the canvas surface and the kicker tint. Craft is held
-     constant by the shared structure, radius, padding scale and shadow stack. */
-  .exh[data-ind="fitness"]    { --tint: #ff7a45; --cv-bg: #0d1013; --cv-ink: #fff; --cv-meta: #ff5b1e;
-                                --cv-rule: rgba(255,255,255,.14); --cv-edge: rgba(255,255,255,.2); --cv-edge-hi: rgba(255,255,255,.32);
-                                --gr-tint: linear-gradient(200deg, rgba(255,110,40,.16), transparent 62%); }
-  .exh[data-ind="fitness"]    .exh-c-line { font-weight: 500; letter-spacing: -.045em; text-transform: uppercase; }
-
-  .exh[data-ind="healthcare"] { --tint: #6fc2ea; --cv-bg: #fbfdff; --cv-ink: #14304a; --cv-meta: #2f9bd4;
-                                --cv-rule: #dceaf6; --gr-tint: linear-gradient(200deg, rgba(120,190,230,.14), transparent 60%); }
-  .exh[data-ind="healthcare"] .exh-c-line { font-weight: 500; letter-spacing: -.02em; }
-
-  .exh[data-ind="restaurant"] { --tint: #e0a06a; --cv-bg: #fdf7ee; --cv-ink: #43290f; --cv-meta: #b4541f;
-                                --cv-rule: rgba(67,41,15,.18); --gr-tint: linear-gradient(200deg, rgba(255,170,80,.15), transparent 62%); }
-  .exh[data-ind="restaurant"] .exh-c-line,
-  .exh[data-ind="restaurant"] .exh-c-mark { font-family: var(--serif); font-weight: 400; letter-spacing: -.005em; }
-
-  .exh[data-ind="boutique"]   { --tint: #d8d2cc; --cv-bg: #fff; --cv-ink: #1b1a19; --cv-meta: #1b1a19;
-                                --cv-rule: #ece7e2; --gr-tint: linear-gradient(200deg, rgba(255,255,255,.1), transparent 58%); }
-  .exh[data-ind="boutique"]   .exh-c-line { font-weight: 400; letter-spacing: .02em; }
-  .exh[data-ind="boutique"]   .exh-c-mark { letter-spacing: .3em; }
-
-  .exh[data-ind="beauty"]     { --tint: #d9c3aa; --cv-bg: #faf6f0; --cv-ink: #55483c; --cv-meta: #6f5b47;
-                                --cv-rule: #e7dccd; --gr-tint: linear-gradient(200deg, rgba(230,200,170,.14), transparent 60%); }
-  .exh[data-ind="beauty"]     .exh-c-line { font-family: var(--serif); font-weight: 400; }
-
-  .exh[data-ind="realestate"] { --tint: #cfa960; --cv-bg: #14140f; --cv-ink: #f6f1e6; --cv-meta: #cfa960;
-                                --cv-rule: rgba(207,169,96,.22); --cv-edge: rgba(207,169,96,.26); --cv-edge-hi: rgba(207,169,96,.4);
-                                --gr-tint: linear-gradient(200deg, rgba(207,169,96,.14), transparent 62%); }
-  .exh[data-ind="realestate"] .exh-c-line,
-  .exh[data-ind="realestate"] .exh-c-mark { font-family: var(--serif); font-weight: 400; }
-
-  .exh[data-ind="education"]  { --tint: #9b8bea; --cv-bg: #f9f8fe; --cv-ink: #322a63; --cv-meta: #5b49c8;
-                                --cv-rule: #e3ddf7; --gr-tint: linear-gradient(200deg, rgba(150,130,235,.14), transparent 60%); }
-  .exh[data-ind="education"]  .exh-c-line { font-weight: 500; letter-spacing: -.03em; }
-  .exh[data-ind="education"]  .exh-canvas { border-radius: 10px; }
-
-  .exh[data-ind="law"]        { --tint: #b8b2a6; --cv-bg: #1c1c1e; --cv-ink: #eeece7; --cv-meta: rgba(238,236,231,.55);
-                                --cv-rule: rgba(255,255,255,.14); --cv-edge: rgba(255,255,255,.19); --cv-edge-hi: rgba(255,255,255,.3);
-                                --gr-tint: linear-gradient(200deg, rgba(200,190,170,.1), transparent 60%); }
-  .exh[data-ind="law"]        .exh-c-line { font-family: var(--serif); font-weight: 400; }
+     Only the kicker tint now, drawn from each artwork's own accent, so the
+     caption belongs to the picture above it. Everything else is held constant
+     because the artwork carries the personality. */
+  .exh[data-ind="fitness"]    { --tint: #ff7a45; }
+  .exh[data-ind="healthcare"] { --tint: #6fa8dc; }
+  .exh[data-ind="restaurant"] { --tint: #e0a06a; }
+  .exh[data-ind="boutique"]   { --tint: #d8d2cc; }
+  .exh[data-ind="beauty"]     { --tint: #d9c3aa; }
+  .exh[data-ind="realestate"] { --tint: #cfa960; }
+  .exh[data-ind="education"]  { --tint: #86a9dd; }
+  .exh[data-ind="law"]        { --tint: #c9a86a; }
 
   /* ---- the closing callout: a rule, not a panel ---- */
   .ind-cta { margin-top: clamp(96px, 10vw, 160px); border-top: 1px solid rgba(255,255,255,.12); padding-top: 40px;
@@ -441,8 +303,7 @@
   .btn-accent { background: var(--accent-orange); color: #fff; border-color: transparent; }
   .btn-accent .dot { background: #fff; color: var(--accent-orange); }
 
-  /* ---- entrance: one stage, not two. A staged rise would read as exactly
-     the scripted autoplay this rebuild removed. ---- */
+  /* ---- entrance: one stage, not two ---- */
   .ind-head .reveal { transition-delay: .05s; }
   .ind-head .ind-title.reveal { transition-delay: .15s; }
   .ind-lead.reveal { transition-delay: .25s; }
@@ -451,45 +312,20 @@
   @media (max-width: 1099px) {
     .ind-head { display: block; }
     .ind-lead { margin-top: 20px; max-width: 60ch; }
-    .ind-spread { grid-template-columns: repeat(2, 1fr); column-gap: clamp(20px, 3vw, 32px); row-gap: clamp(64px, 8vw, 104px); }
-    .exh { grid-column: span 1; margin-inline: 0; }
+    .ind-spread { grid-template-columns: repeat(2, 1fr); column-gap: clamp(20px, 3vw, 32px); row-gap: clamp(60px, 7vw, 96px); }
+    .exh { grid-column: span 1; }
     .exh[data-ind="realestate"] { grid-column: 1 / -1; }
-    .exh[data-ind="realestate"] .exh-plate { aspect-ratio: 16 / 9; }
-    .exh[data-format="wide"] .exh-plate,
-    .exh[data-format="column"] .exh-plate { aspect-ratio: 4 / 3; }
-    .exh[data-format="wide"] .exh-canvas,
-    .exh[data-format="column"] .exh-canvas { width: min(64%, 250px); aspect-ratio: 16 / 10; right: -18px; left: auto; bottom: -38px; margin-left: 0; }
-    .exh[data-format="wide"] .exh-seat,
-    .exh[data-format="column"] .exh-seat { width: min(72%, 280px); height: 56px; right: -26px; left: auto; bottom: -46px; margin-left: 0; }
-    .exh-caption { margin-top: 54px; }
+    .exh-caption { margin-top: 26px; }
     .exh-story { min-height: 0; }
   }
 
   @media (max-width: 640px) {
-    .ind-spread { grid-template-columns: 1fr; row-gap: clamp(72px, 14vw, 96px); }
-    .exh[data-format="wide"] .exh-plate,
-    .exh[data-format="column"] .exh-plate,
-    .exh[data-ind="realestate"] .exh-plate { aspect-ratio: 5 / 4; }
-    .exh-mount { left: 14px; right: 14px; top: 18px; bottom: -12px; }
-    .exh[data-format="wide"] .exh-canvas,
-    .exh[data-format="column"] .exh-canvas,
-    .exh[data-format="bleed"] .exh-canvas { width: min(66%, 230px); right: -10px; bottom: -32px; }
-    .exh[data-format="wide"] .exh-seat,
-    .exh[data-format="column"] .exh-seat,
-    .exh[data-format="bleed"] .exh-seat { width: min(74%, 260px); height: 48px; right: -16px; bottom: -40px; }
-    .exh-caption { margin-top: 50px; }
-    .ind-cta { flex-direction: column; align-items: flex-start; }
+    .ind-spread { grid-template-columns: 1fr; row-gap: clamp(64px, 12vw, 88px); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .exh-plate, .exh-canvas, .exh-seat, .exh-mount { transition: none; }
+    .exh-plate { transition: none; }
     .exh:hover .exh-plate { transform: none; }
-    /* Restate the resting transform rather than clearing it — `none` would
-       snap the sheet flat, which is a bigger motion than the hover. Both
-       leans need restating, or the mirrored pair keeps its lift. */
-    .exh:hover .exh-canvas { transform: perspective(1400px) translate3d(0, 0, 0) rotateY(-3.2deg) rotateX(1.6deg); }
-    .exh[data-ind="healthcare"]:hover .exh-canvas,
-    .exh[data-ind="boutique"]:hover .exh-canvas { transform: perspective(1400px) translate3d(0, 0, 0) rotateY(3.2deg) rotateX(1.6deg); }
   }
 
   /* ============ FAQ ============
