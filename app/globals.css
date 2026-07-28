@@ -268,13 +268,20 @@
     /* hero overlay text (Folioblox-style placement) */
   .hero-wrap { position: relative; z-index: 1; max-width: var(--maxw); margin: 0 auto; height: 100%; color: #fff; }
   .hero-blank::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(to bottom, transparent 44%, rgba(16,4,0,.62) 100%); }
-  .hero-lead { position: absolute; left: var(--pad); top: 3%; text-shadow: 0 2px 26px rgba(0,0,0,.28); }
-  .hero-title { font-size: clamp(40px, min(9.4vw, 13.3vh), 133px); font-weight: 800; line-height: .9; letter-spacing: -.04em; margin-top: 10px; }
+  .hero-lead { position: absolute; left: var(--pad); top: 1%; text-shadow: 0 2px 26px rgba(0,0,0,.28); }
+  /* The vh term is what keeps the headline clear of the MacBook. "Ideas
+     Become" is far wider than "Creative", and it extends past the viewport's
+     centre line — so a centred machine can never clear it horizontally, and
+     the headline must instead finish ABOVE it. Room between navbar and
+     machine is (0.32vh - lid overhang - 99); two lines at line-height .9
+     occupy 1.8x the size, and 9.2vh sits under that ceiling from 720px of
+     viewport height upward. */
+  .hero-title { font-size: clamp(40px, min(9.4vw, 9.2vh), 133px); font-weight: 800; line-height: .9; letter-spacing: -.04em; margin-top: 10px; }
   /* Sits beside the MacBook, not above it. Narrowed because the clear space
      to the right of the machine is a constant ~325px once .hero-wrap hits
      its 1280px cap, and 33ch overran that straight across the display. */
   .hero-tag { position: absolute; right: var(--pad); top: 52%; max-width: min(300px, 24vw); text-shadow: 0 2px 22px rgba(0,0,0,.32); }
-  .hero-tag h2 { font-size: clamp(22px, 2.7vw, 36px); font-weight: 700; letter-spacing: -.02em; line-height: 1.12; }
+  .hero-tag h2 { font-size: clamp(22px, 2.7vw, 33px); font-weight: 700; letter-spacing: -.02em; line-height: 1.12; }
   .hero-tag p { color: rgba(255,255,255,.74); margin-top: 14px; font-size: clamp(14px, 1.4vw, 18px); line-height: 1.5; }
   .hero-services { position: absolute; left: var(--pad); right: var(--pad); bottom: 0; display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; gap: 18px; text-shadow: 0 2px 14px rgba(0,0,0,.6); }
   /* #01 #02 hold the left, #03 #04 hold the right, and the empty middle
@@ -302,7 +309,11 @@
      dead space above the copy and below the service row. Reclaiming most of
      it lifts the copy and frees the middle of the frame for the MacBook.
      Desktop only: the mobile hero stacks its copy and is already tuned. */
-  @media (min-width: 821px) { .hero-blank { padding-block: clamp(64px, 6vw, 88px); } }
+  /* The 80px floor is the navbar's height plus clearance. At 1024 the 6vw
+     term computes to 61px, which put the top of the headline above the
+     navbar's baseline and clipped it. Wider viewports are unaffected —
+     6vw already exceeds 80 from 1334px up. */
+  @media (min-width: 821px) { .hero-blank { padding-block: clamp(80px, 6vw, 88px); } }
   /* How-We-Design section (dark, matched to sample) */
   .how { background: radial-gradient(125% 115% at 84% 90%, #5a2410 0%, #26120a 40%, #0b0809 76%); color: #fff; padding-block: clamp(56px, 8vw, 104px); overflow: hidden; }
   .how .wrap { position: relative; }
