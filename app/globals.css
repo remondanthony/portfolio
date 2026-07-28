@@ -171,35 +171,151 @@
   @media (max-width: 900px) { .proj-grid { grid-template-columns: 1fr; } }
 
   /* ============ INDUSTRIES ============
-     Concept mockups drawn entirely in CSS from one hue per industry. No
-     screenshots, because there are no sites to screenshot — inventing one
-     would contradict the badge sitting on top of it. */
-  .ind-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 50px; }
-  .ind { background: var(--panel); border: 1px solid var(--hair); border-radius: 20px; padding: 14px 14px 22px; transition: transform .25s, box-shadow .25s; }
-  .ind:hover { transform: translateY(-5px); box-shadow: 0 30px 60px -34px rgba(60,66,74,.4); }
-  .ind h3 { font-size: 17px; font-weight: 600; margin: 16px 0 0 6px; }
-  .ind p { color: var(--ink-2); font-size: 13.5px; margin: 6px 6px 0; }
+     A dark section between two light ones, reusing the warm gradient .how
+     already uses — the brief asked for white copy, light-grey subtext and a
+     dark CTA surface, none of which work on #eef1f4, and the site already
+     alternates light and dark so this is existing language, not a new one.
 
-  .ind-frame { position: relative; border-radius: 13px; overflow: hidden; background: hsl(var(--h) 30% 97%); box-shadow: inset 0 0 0 1px rgba(17,24,39,.07); }
-  .ind-chrome { display: flex; align-items: center; gap: 4px; height: 22px; padding: 0 9px; background: hsl(var(--h) 22% 94%); box-shadow: inset 0 -1px 0 rgba(17,24,39,.07); }
-  .ind-chrome i { width: 5px; height: 5px; border-radius: 50%; background: hsl(var(--h) 18% 78%); }
-  .ind-url { flex: 1; height: 8px; margin-left: 8px; border-radius: 20px; background: hsl(var(--h) 25% 99%); }
+     Every preview is drawn in CSS, and every one is a DIFFERENT layout. The
+     old version rotated a single wireframe's hue eight times, which read as
+     "we recolour a template" — precisely what this section must disprove. */
+  .industries { background: radial-gradient(125% 115% at 84% 90%, #5a2410 0%, #26120a 40%, #0b0809 76%); color: #fff; overflow: hidden; }
 
-  /* An abstract page: nav, headline, sub, button, media, three cards. */
-  .ind-view { position: relative; aspect-ratio: 4 / 3; }
-  .ind-view > span { position: absolute; border-radius: 3px; background: hsl(var(--h) 26% 88%); }
-  .ind-nav   { left: 8%; right: 8%; top: 9%;  height: 5%;  border-radius: 20px; }
-  .ind-h1    { left: 8%; width: 46%; top: 22%; height: 8%; background: hsl(var(--h) 34% 62%) !important; }
-  .ind-h2    { left: 8%; width: 32%; top: 34%; height: 8%; background: hsl(var(--h) 34% 62%) !important; }
-  .ind-cta   { left: 8%; width: 22%; top: 48%; height: 7%; border-radius: 20px; background: hsl(var(--h) 62% 52%) !important; }
-  .ind-media { right: 8%; width: 30%; top: 22%; height: 33%; border-radius: 7px; background: linear-gradient(150deg, hsl(var(--h) 70% 62%), hsl(var(--h) 60% 40%)) !important; }
-  .ind-row   { left: 8%; right: 8%; bottom: 10%; height: 20%; display: flex; gap: 5%; background: none !important; }
-  .ind-row i { flex: 1; border-radius: 5px; background: hsl(var(--h) 24% 92%); box-shadow: inset 0 0 0 1px hsl(var(--h) 20% 86%); }
+  .ind-head { text-align: center; max-width: 44ch; margin: 0 auto; }
+  .ind-eyebrow { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-orange); }
+  .ind-title { font-size: clamp(30px, 4.6vw, 56px); font-weight: 300; letter-spacing: -.035em; color: #fff; margin-top: 18px; }
+  .ind-title em { font-style: normal; font-weight: 700; color: var(--accent-orange); }
+  .ind-lead { margin-top: 20px; font-size: 17px; line-height: 1.6; color: rgba(255,255,255,.62); }
 
-  .ind-badge { position: absolute; right: 8px; top: 30px; font-size: 9.5px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-2); background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid var(--hair); border-radius: 20px; padding: 3px 8px; backdrop-filter: blur(6px); }
+  .ind-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 34px 22px; margin-top: 64px; }
+
+  .ind {
+    cursor: pointer;
+    background: rgba(255,255,255,.035);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 22px;
+    padding: 14px 14px 24px;
+    transition: transform .38s cubic-bezier(.2,.7,.2,1), box-shadow .38s cubic-bezier(.2,.7,.2,1),
+                border-color .38s ease, background .38s ease;
+  }
+  .ind:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: rgba(255,255,255,.22);
+    background: rgba(255,255,255,.06);
+    box-shadow: 0 40px 80px -40px rgba(0,0,0,.85);
+  }
+  .ind h3 { font-size: 17px; font-weight: 600; margin: 16px 6px 0; color: #fff; }
+  .ind p { color: rgba(255,255,255,.56); font-size: 13.5px; line-height: 1.55; margin: 7px 6px 0; }
+
+  .ind-pill { display: inline-block; margin: 14px 0 0 6px; font-size: 9.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.16); border-radius: 20px; padding: 4px 10px; }
+
+  /* ---- the browser shell ---- */
+  .ind-frame { border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 18px 40px -26px rgba(0,0,0,.9); }
+  .ind-chrome { display: flex; align-items: center; gap: 4px; height: 24px; padding: 0 10px; background: #eceef1; }
+  .ind-chrome i { width: 5px; height: 5px; border-radius: 50%; background: #c8ccd2; }
+  .ind-url { flex: 1; height: 9px; margin-left: 9px; border-radius: 20px; background: #fff; }
+
+  .ind-view { position: relative; aspect-ratio: 4 / 3; overflow: hidden; transition: transform .45s cubic-bezier(.2,.7,.2,1); }
+  .ind:hover .ind-view { transform: scale(1.045); }
+  .ind-view > span { position: absolute; }
+
+  /* ---- shared preview atoms ---- */
+  .p-topbar { left: 0; right: 0; top: 0; height: 11%; background: rgba(17,24,39,.05); }
+  .p-title  { left: 8%; width: 44%; height: 7%; border-radius: 3px; }
+  .p-title-lg { width: 62%; height: 11%; }
+  .p-sub    { height: 4%; border-radius: 3px; }
+  .p-btn    { border-radius: 20px; }
+  .p-center { left: 50%; transform: translateX(-50%); }
+  .p-right  { left: auto; right: 8%; }
+
+  /* ---- 1 · Fitness: dark, one big figure, timetable beneath ---- */
+  [data-ind="fitness"] .ind-view { background: #0e1114; }
+  .p-figure { inset: 0; background: radial-gradient(70% 90% at 68% 30%, #3d4650 0%, #1a1f25 55%, #0e1114 100%); }
+  [data-ind="fitness"] .p-kicker { left: 8%; top: 14%; width: 20%; height: 3.5%; border-radius: 3px; background: #ff5b1e; }
+  [data-ind="fitness"] .p-title { top: 23%; background: rgba(255,255,255,.92); }
+  [data-ind="fitness"] .p-btn { left: 8%; top: 42%; width: 26%; height: 8%; background: #ff5b1e; }
+  .p-rows { left: 8%; right: 8%; bottom: 9%; height: 30%; display: flex; flex-direction: column; justify-content: space-between; }
+  .p-rows i { height: 26%; border-radius: 4px; background: rgba(255,255,255,.11); }
+
+  /* ---- 2 · Healthcare: bright, centred, appointment-led ---- */
+  [data-ind="healthcare"] .ind-view { background: #fbfdff; }
+  [data-ind="healthcare"] .p-topbar { background: #eaf3fa; }
+  [data-ind="healthcare"] .p-title { top: 20%; width: 52%; background: #16324a; }
+  [data-ind="healthcare"] .p-sub { top: 31%; width: 38%; background: #b9cbd9; }
+  .p-portrait { left: 50%; top: 44%; width: 30%; aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%; background: linear-gradient(160deg, #cfe6f5, #7fb6d8); }
+  .p-center-btn { left: 50%; top: 38%; width: 26%; height: 6.5%; transform: translateX(-50%); background: #2f9bd4; }
+  .p-badges { left: 12%; right: 12%; bottom: 7%; height: 8%; display: flex; gap: 6%; }
+  .p-badges i { flex: 1; border-radius: 20px; background: #e6eef4; }
+
+  /* ---- 3 · Restaurant: warm, a dish, a menu with price leaders ---- */
+  [data-ind="restaurant"] .ind-view { background: #fdf7ee; }
+  .p-dish { right: 7%; top: 10%; width: 34%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(60% 60% at 40% 35%, #e8b06a, #a4622a 70%, #6d3d18); }
+  [data-ind="restaurant"] .p-title { top: 13%; width: 34%; background: #4a2c14; }
+  .p-menu { left: 8%; width: 44%; top: 27%; height: 40%; display: flex; flex-direction: column; justify-content: space-between; }
+  .p-menu i { height: 15%; border-radius: 3px; background: repeating-linear-gradient(to right, #d9c3a5 0 34%, transparent 34% 62%, #d9c3a5 62% 72%); }
+  [data-ind="restaurant"] .p-btn { left: 8%; bottom: 10%; width: 30%; height: 8%; background: #b4541f; }
+
+  /* ---- 4 · Boutique: a product grid and almost nothing else ---- */
+  [data-ind="boutique"] .ind-view { background: #fff; }
+  [data-ind="boutique"] .p-topbar { background: transparent; box-shadow: inset 0 -1px 0 rgba(17,24,39,.07); }
+  .p-shelf { left: 8%; right: 8%; top: 20%; height: 58%; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 7%; }
+  .p-shelf i { border-radius: 4px; background: linear-gradient(150deg, #f0ebe6, #d8cfc6); }
+  .p-shelf i:nth-child(2) { background: linear-gradient(150deg, #e7e2df, #c6bdb6); }
+  .p-shelf i:nth-child(3) { background: linear-gradient(150deg, #efe9e4, #cfc6bd); }
+  .p-caption { left: 8%; bottom: 8%; width: 26%; height: 4%; border-radius: 3px; background: #ded7d0; }
+
+  /* ---- 5 · Beauty: one product, a treatment list beside it ---- */
+  [data-ind="beauty"] .ind-view { background: #fdf6f6; }
+  .p-bottle { left: 9%; top: 16%; width: 26%; height: 62%; border-radius: 60px 60px 12px 12px; background: linear-gradient(165deg, #f6dfe2, #d3a3ab 70%, #a97580); }
+  [data-ind="beauty"] .p-title { top: 20%; width: 32%; background: #6d4750; }
+  .p-list { right: 8%; width: 42%; top: 33%; height: 32%; display: flex; flex-direction: column; justify-content: space-between; }
+  .p-list i { height: 24%; border-radius: 3px; background: #ecd7da; }
+  .p-btn-right { right: 8%; bottom: 12%; width: 28%; height: 7.5%; background: #b8737f; }
+
+  /* ---- 6 · Real estate: a wide property hero, then listings ---- */
+  [data-ind="realestate"] .ind-view { background: #f7f9f8; }
+  .p-hero { left: 0; right: 0; top: 0; height: 52%; background: linear-gradient(170deg, #b9cfc4 0%, #6d8f80 55%, #3f584d 100%); }
+  .p-listings { left: 6%; right: 6%; top: 58%; height: 26%; display: flex; gap: 5%; }
+  .p-listings i { flex: 1; border-radius: 5px; background: #fff; box-shadow: inset 0 0 0 1px #dfe6e2; }
+  .p-price { left: 6%; bottom: 7%; width: 22%; height: 5%; border-radius: 3px; background: #4d6b5d; }
+
+  /* ---- 7 · Education: a friendly grid of courses ---- */
+  [data-ind="education"] .ind-view { background: #f8f7fd; }
+  [data-ind="education"] .p-topbar { background: #ece9f9; }
+  [data-ind="education"] .p-title { top: 18%; width: 46%; background: #4a3f8f; }
+  .p-tiles { left: 8%; right: 8%; top: 33%; height: 52%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; gap: 6%; }
+  .p-tiles i { border-radius: 6px; background: #fff; box-shadow: inset 0 0 0 1px #e0dcf2; }
+  .p-tiles i:nth-child(1), .p-tiles i:nth-child(5) { background: #efeafc; }
+
+  /* ---- 8 · Law: centred serif, rules, two columns of text ---- */
+  [data-ind="law"] .ind-view { background: #12161d; }
+  .p-rule { left: 34%; right: 34%; top: 16%; height: 1px; background: rgba(255,255,255,.28); }
+  .p-rule-2 { top: 52%; left: 42%; right: 42%; }
+  .p-serif { top: 24%; width: 56%; height: 8%; border-radius: 2px; background: rgba(255,255,255,.9); }
+  .p-serif-2 { top: 36%; width: 38%; }
+  .p-cols { left: 12%; right: 12%; top: 62%; height: 24%; display: flex; gap: 8%; }
+  .p-cols i { flex: 1; border-radius: 2px; background: repeating-linear-gradient(to bottom, rgba(255,255,255,.16) 0 12%, transparent 12% 26%); }
+
+  /* ---- the closing callout ---- */
+  .ind-cta { margin-top: 56px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-radius: 24px; padding: clamp(28px, 4vw, 44px) clamp(28px, 4vw, 48px); }
+  .ind-cta h3 { font-size: clamp(20px, 2.2vw, 26px); font-weight: 600; color: #fff; letter-spacing: -.02em; }
+  .ind-cta p { margin-top: 10px; color: rgba(255,255,255,.6); font-size: 16px; max-width: 46ch; }
+  .btn-accent { background: var(--accent-orange); color: #fff; border-color: transparent; }
+  .btn-accent .dot { background: #fff; color: var(--accent-orange); }
+
+  /* ---- entrance: header first, then the grid left to right, row by row ---- */
+  .ind-head .reveal { transition-delay: .05s; }
+  .ind-head .ind-title.reveal { transition-delay: .15s; }
+  .ind-head .ind-lead.reveal { transition-delay: .25s; }
+  .ind-grid.reveal { opacity: 1; transform: none; transition: none; }
+  .ind-grid .ind { opacity: 0; translate: 0 22px; transition: opacity .55s ease, translate .55s cubic-bezier(.2,.7,.2,1), transform .38s cubic-bezier(.2,.7,.2,1), box-shadow .38s, border-color .38s, background .38s; }
+  .ind-grid.in .ind { opacity: 1; translate: 0 0; transition-delay: calc(.32s + var(--i) * .07s); }
 
   @media (max-width: 1100px) { .ind-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 560px)  { .ind-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 560px)  { .ind-grid { grid-template-columns: 1fr; } .ind-cta { flex-direction: column; align-items: flex-start; } }
+  @media (prefers-reduced-motion: reduce) {
+    .ind-grid .ind { opacity: 1; translate: none; transition: none; }
+  }
 
   /* ============ FAQ ============
      <details>/<summary>: keyboard accessible, findable by in-page search and
