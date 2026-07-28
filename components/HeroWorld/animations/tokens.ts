@@ -115,9 +115,17 @@ export const IDLE = {
 
 /** Captions, one per act. Copy edits never touch motion code. */
 export const CAPTIONS: ReadonlyArray<{ at: ActName; text: string }> = [
-  { at: 'canvas', text: 'A blank canvas.' },
-  { at: 'assemble', text: 'Every component, placed with intent.' },
-  { at: 'polish', text: 'Then it becomes premium.' },
-  { at: 'develop', text: 'Engineered, committed, deployed.' },
+  // One shape, learnable in a glance: the process label, a full stop, then
+  // three or four words naming what is literally on the display. Strategy,
+  // Design and Development therefore appear verbatim in the acts they name,
+  // and Launch is stamped by the closing line — so the four labels under the
+  // hero describe the animation rather than sitting beside it.
+  //
+  // The polish beat is the exception: there are five acts and only four
+  // labels, so it narrates the pixels instead of claiming a position.
+  { at: 'canvas', text: 'Strategy. A blank canvas.' },
+  { at: 'assemble', text: 'Design. Piece by piece.' },
+  { at: 'polish', text: 'Placeholders out. Real type in.' },
+  { at: 'develop', text: 'Development. Commit, build, deploy.' },
   { at: 'live', text: 'From idea to launch.' },
 ];

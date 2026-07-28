@@ -42,9 +42,12 @@ function Part({ cls, role, from, order, style, children }: PartProps) {
 
 const NAV_LINKS = [24, 33, 42] as const;
 const CARDS = [
-  { left: '0%', label: 'Design' },
-  { left: '34.75%', label: 'Build' },
-  { left: '69.5%', label: 'Launch' },
+  // Deliberately NOT the hero's process words. This is a client's site being
+  // built, not Vioniche's own — echoing Strategy/Design/Development/Launch
+  // here would read as the studio talking to itself.
+  { left: '0%', label: 'Plan' },
+  { left: '34.75%', label: 'Shape' },
+  { left: '69.5%', label: 'Finish' },
 ] as const;
 
 export default function SceneSite() {
@@ -85,13 +88,13 @@ export default function SceneSite() {
 
       {/* ---- real typography, revealed during polish ---- */}
       <span className={`${styles.type} ${styles.typeH1} ${styles.typeH1a}`} data-hw="type" data-for="h1a">
-        Built to
+        Everything
       </span>
       <span className={`${styles.type} ${styles.typeH1} ${styles.typeH1b}`} data-hw="type" data-for="h1b">
-        convert.
+        in order.
       </span>
       <span className={`${styles.type} ${styles.typeSub}`} data-hw="type" data-for="subline">
-        Design, development and launch — in one place.
+        Clear plans, careful work, on time.
       </span>
       <span className={`${styles.type} ${styles.typeBtn}`} data-hw="type" data-for="btnPrimary">
         Start a project
