@@ -219,82 +219,152 @@
   .ind:hover .ind-view { transform: scale(1.045); }
   .ind-view > span { position: absolute; }
 
-  /* ---- shared preview atoms ---- */
-  .p-topbar { left: 0; right: 0; top: 0; height: 11%; background: rgba(17,24,39,.05); }
-  .p-title  { left: 8%; width: 44%; height: 7%; border-radius: 3px; }
-  .p-title-lg { width: 62%; height: 11%; }
-  .p-sub    { height: 4%; border-radius: 3px; }
-  .p-btn    { border-radius: 20px; }
-  .p-center { left: 50%; transform: translateX(-50%); }
-  .p-right  { left: auto; right: 8%; }
+  /* ---- the live concept sites -------------------------------------------
+     Everything below animates transform, opacity or filter only. The page is
+     taller than its frame so it has somewhere to scroll to, and each phase is
+     a CSS transition keyed off [data-phase] — the React writes a string and
+     the compositor does the work. Type is in cqw so it scales with the card. */
+  .pv { position: absolute; inset: 0; overflow: hidden; container-type: inline-size; font-family: var(--font); }
 
-  /* ---- 1 · Fitness: dark, one big figure, timetable beneath ---- */
-  [data-ind="fitness"] .ind-view { background: #0e1114; }
-  .p-figure { inset: 0; background: radial-gradient(70% 90% at 68% 30%, #3d4650 0%, #1a1f25 55%, #0e1114 100%); }
-  [data-ind="fitness"] .p-kicker { left: 8%; top: 14%; width: 20%; height: 3.5%; border-radius: 3px; background: #ff5b1e; }
-  [data-ind="fitness"] .p-title { top: 23%; background: rgba(255,255,255,.92); }
-  [data-ind="fitness"] .p-btn { left: 8%; top: 42%; width: 26%; height: 8%; background: #ff5b1e; }
-  .p-rows { left: 8%; right: 8%; bottom: 9%; height: 30%; display: flex; flex-direction: column; justify-content: space-between; }
-  .p-rows i { height: 26%; border-radius: 4px; background: rgba(255,255,255,.11); }
+  .pv-page { position: absolute; inset: 0 0 auto; height: 152%; display: flex; flex-direction: column;
+             opacity: .55; transition: opacity .4s ease, transform 1.2s cubic-bezier(.33,.02,.2,1); will-change: transform, opacity; }
+  .pv[data-phase="ready"] .pv-page,
+  .pv[data-phase="loading"] .pv-page { opacity: 1; }          /* SSR + no-JS: finished site */
+  .pv[data-phase="fade"] .pv-page,
+  .pv[data-phase="point"] .pv-page,
+  .pv[data-phase="travel"] .pv-page,
+  .pv[data-phase="hover"] .pv-page,
+  .pv[data-phase="click"] .pv-page { opacity: 1; }
+  .pv[data-phase="scroll"] .pv-page,
+  .pv[data-phase="hold"] .pv-page,
+  .pv[data-phase="done"] .pv-page { opacity: 1; transform: translate3d(0, -26%, 0); }
 
-  /* ---- 2 · Healthcare: bright, centred, appointment-led ---- */
-  [data-ind="healthcare"] .ind-view { background: #fbfdff; }
-  [data-ind="healthcare"] .p-topbar { background: #eaf3fa; }
-  [data-ind="healthcare"] .p-title { top: 20%; width: 52%; background: #16324a; }
-  [data-ind="healthcare"] .p-sub { top: 31%; width: 38%; background: #b9cbd9; }
-  .p-portrait { left: 50%; top: 44%; width: 30%; aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%; background: linear-gradient(160deg, #cfe6f5, #7fb6d8); }
-  .p-center-btn { left: 50%; top: 38%; width: 26%; height: 6.5%; transform: translateX(-50%); background: #2f9bd4; }
-  .p-badges { left: 12%; right: 12%; bottom: 7%; height: 8%; display: flex; gap: 6%; }
-  .p-badges i { flex: 1; border-radius: 20px; background: #e6eef4; }
+  /* one shimmer pass, then gone for good */
+  .pv-shimmer { position: absolute; inset: 0; opacity: 0; pointer-events: none;
+                background: linear-gradient(105deg, transparent 34%, rgba(255,255,255,.55) 50%, transparent 66%);
+                transform: translate3d(-60%, 0, 0); }
+  .pv[data-phase="loading"] .pv-shimmer { opacity: 1; transform: translate3d(60%, 0, 0); transition: transform .3s linear; }
 
-  /* ---- 3 · Restaurant: warm, a dish, a menu with price leaders ---- */
-  [data-ind="restaurant"] .ind-view { background: #fdf7ee; }
-  .p-dish { right: 7%; top: 10%; width: 34%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(60% 60% at 40% 35%, #e8b06a, #a4622a 70%, #6d3d18); }
-  [data-ind="restaurant"] .p-title { top: 13%; width: 34%; background: #4a2c14; }
-  .p-menu { left: 8%; width: 44%; top: 27%; height: 40%; display: flex; flex-direction: column; justify-content: space-between; }
-  .p-menu i { height: 15%; border-radius: 3px; background: repeating-linear-gradient(to right, #d9c3a5 0 34%, transparent 34% 62%, #d9c3a5 62% 72%); }
-  [data-ind="restaurant"] .p-btn { left: 8%; bottom: 10%; width: 30%; height: 8%; background: #b4541f; }
+  /* ---- the pointer ---- */
+  .pv-cursor { position: absolute; width: 9cqw; height: 9cqw; left: 0; top: 0; opacity: 0; pointer-events: none;
+               filter: drop-shadow(0 2px 3px rgba(0,0,0,.3));
+               transform: translate3d(112cqw, 72.0cqw, 0);
+               transition: transform .9s cubic-bezier(.4,.05,.2,1), opacity .26s ease; }
+  .pv[data-phase="point"] .pv-cursor { opacity: 1; transition: opacity .26s ease; }
+  .pv[data-phase="travel"] .pv-cursor,
+  .pv[data-phase="hover"] .pv-cursor,
+  .pv[data-phase="scroll"] .pv-cursor,
+  .pv[data-phase="hold"] .pv-cursor { opacity: 1; transform: translate3d(var(--cta-x), var(--cta-y), 0); }
+  .pv[data-phase="click"] .pv-cursor { opacity: 1; transform: translate3d(var(--cta-x), var(--cta-y), 0) scale(.86); transition: transform .12s ease; }
+  .pv[data-phase="done"] .pv-cursor { opacity: 0; transform: translate3d(112cqw, 72.0cqw, 0); transition: transform .42s ease-in, opacity .42s ease; }
 
-  /* ---- 4 · Boutique: a product grid and almost nothing else ---- */
-  [data-ind="boutique"] .ind-view { background: #fff; }
-  [data-ind="boutique"] .p-topbar { background: transparent; box-shadow: inset 0 -1px 0 rgba(17,24,39,.07); }
-  .p-shelf { left: 8%; right: 8%; top: 20%; height: 58%; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 7%; }
-  .p-shelf i { border-radius: 4px; background: linear-gradient(150deg, #f0ebe6, #d8cfc6); }
-  .p-shelf i:nth-child(2) { background: linear-gradient(150deg, #e7e2df, #c6bdb6); }
-  .p-shelf i:nth-child(3) { background: linear-gradient(150deg, #efe9e4, #cfc6bd); }
-  .p-caption { left: 8%; bottom: 8%; width: 26%; height: 4%; border-radius: 3px; background: #ded7d0; }
+  /* ---- page furniture ---- */
+  .pv-bar { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 3.4cqw 5cqw; }
+  .pv-brand { font-size: 4.1cqw; font-weight: 700; letter-spacing: -.02em; }
+  .pv-nav { display: flex; gap: 3.2cqw; font-size: 3cqw; opacity: .62; }
 
-  /* ---- 5 · Beauty: one product, a treatment list beside it ---- */
-  [data-ind="beauty"] .ind-view { background: #fdf6f6; }
-  .p-bottle { left: 9%; top: 16%; width: 26%; height: 62%; border-radius: 60px 60px 12px 12px; background: linear-gradient(165deg, #f6dfe2, #d3a3ab 70%, #a97580); }
-  [data-ind="beauty"] .p-title { top: 20%; width: 32%; background: #6d4750; }
-  .p-list { right: 8%; width: 42%; top: 33%; height: 32%; display: flex; flex-direction: column; justify-content: space-between; }
-  .p-list i { height: 24%; border-radius: 3px; background: #ecd7da; }
-  .p-btn-right { right: 8%; bottom: 12%; width: 28%; height: 7.5%; background: #b8737f; }
+  .pv-hero { flex: none; position: relative; padding: 2cqw 5cqw 6cqw; }
+  .pv-h1 { font-size: 7.4cqw; font-weight: 700; letter-spacing: -.03em; line-height: 1.06; }
+  .pv-sub { font-size: 3.1cqw; margin-top: 2cqw; opacity: .66; line-height: 1.35; }
+  .pv-cta { display: inline-block; margin-top: 3.4cqw; font-size: 3cqw; font-weight: 600; padding: 2cqw 3.6cqw;
+            border-radius: 20px; transition: transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .25s, filter .25s; }
+  .pv[data-phase="hover"] .pv-cta,
+  .pv[data-phase="click"] .pv-cta,
+  .pv[data-phase="scroll"] .pv-cta { transform: translateY(-1.1cqw) scale(1.03); box-shadow: 0 3cqw 6cqw -2cqw rgba(0,0,0,.4); filter: brightness(1.08); }
 
-  /* ---- 6 · Real estate: a wide property hero, then listings ---- */
-  [data-ind="realestate"] .ind-view { background: #f7f9f8; }
-  .p-hero { left: 0; right: 0; top: 0; height: 52%; background: linear-gradient(170deg, #b9cfc4 0%, #6d8f80 55%, #3f584d 100%); }
-  .p-listings { left: 6%; right: 6%; top: 58%; height: 26%; display: flex; gap: 5%; }
-  .p-listings i { flex: 1; border-radius: 5px; background: #fff; box-shadow: inset 0 0 0 1px #dfe6e2; }
-  .p-price { left: 6%; bottom: 7%; width: 22%; height: 5%; border-radius: 3px; background: #4d6b5d; }
+  .pv-media { display: block; border-radius: 2cqw; }
+  .pv-second { flex: 1; padding: 4cqw 5cqw 5cqw; }
+  .pv-sect-title { display: block; font-size: 3.3cqw; font-weight: 700; letter-spacing: -.01em; }
+  .pv-rows { list-style: none; margin: 3cqw 0 0; padding: 0; display: flex; flex-direction: column; gap: 2.4cqw; }
+  .pv-rows li { display: flex; align-items: center; justify-content: space-between; gap: 2cqw; font-size: 2.9cqw; }
+  .pv-row-meta { opacity: .6; white-space: nowrap; }
 
-  /* ---- 7 · Education: a friendly grid of courses ---- */
-  [data-ind="education"] .ind-view { background: #f8f7fd; }
-  [data-ind="education"] .p-topbar { background: #ece9f9; }
-  [data-ind="education"] .p-title { top: 18%; width: 46%; background: #4a3f8f; }
-  .p-tiles { left: 8%; right: 8%; top: 33%; height: 52%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; gap: 6%; }
-  .p-tiles i { border-radius: 6px; background: #fff; box-shadow: inset 0 0 0 1px #e0dcf2; }
-  .p-tiles i:nth-child(1), .p-tiles i:nth-child(5) { background: #efeafc; }
+  /* row treatments */
+  .pv-rows-menu li { border-bottom: 1px dotted currentColor; padding-bottom: 1.4cqw; opacity: .92; }
+  .pv-rows-service li, .pv-rows-course li, .pv-rows-practice li { padding: 2.2cqw 2.6cqw; border-radius: 1.6cqw; }
+  .pv-rows-listing li, .pv-rows-product li { padding: 2.2cqw 2.6cqw; border-radius: 1.6cqw; }
 
-  /* ---- 8 · Law: centred serif, rules, two columns of text ---- */
-  [data-ind="law"] .ind-view { background: #12161d; }
-  .p-rule { left: 34%; right: 34%; top: 16%; height: 1px; background: rgba(255,255,255,.28); }
-  .p-rule-2 { top: 52%; left: 42%; right: 42%; }
-  .p-serif { top: 24%; width: 56%; height: 8%; border-radius: 2px; background: rgba(255,255,255,.9); }
-  .p-serif-2 { top: 36%; width: 38%; }
-  .p-cols { left: 12%; right: 12%; top: 62%; height: 24%; display: flex; gap: 8%; }
-  .p-cols i { flex: 1; border-radius: 2px; background: repeating-linear-gradient(to bottom, rgba(255,255,255,.16) 0 12%, transparent 12% 26%); }
+  /* ---- layouts: where the hero media sits ---- */
+  .pv[data-layout="full"] .pv-media { position: absolute; inset: 0; border-radius: 0; z-index: 0; }
+  .pv[data-layout="full"] .pv-copy { position: relative; z-index: 1; }
+  .pv[data-layout="right"] .pv-hero { display: flex; align-items: center; gap: 4cqw; }
+  .pv[data-layout="right"] .pv-media { order: 2; flex: none; width: 34cqw; aspect-ratio: 1; }
+  .pv[data-layout="left"] .pv-hero { display: flex; align-items: center; gap: 4cqw; }
+  .pv[data-layout="left"] .pv-media { flex: none; width: 28cqw; aspect-ratio: .62; border-radius: 14cqw 14cqw 2cqw 2cqw; }
+  .pv[data-layout="centre"] .pv-hero { text-align: center; }
+  .pv[data-layout="centre"] .pv-media { width: 20cqw; aspect-ratio: 1; border-radius: 50%; margin: 0 auto 3cqw; }
+  .pv[data-layout="grid"] .pv-media { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4cqw; height: 26cqw; margin-bottom: 3cqw; }
+  .pv[data-layout="grid"] .pv-media i { border-radius: 1.4cqw; }
+  .pv[data-layout="none"] .pv-hero { text-align: center; padding-top: 6cqw; }
+
+  /* ---- 1 · Ironhaus ---- */
+  [data-ind="fitness"] .pv { background: #0d1013; color: #fff; }
+  [data-ind="fitness"] .pv-media { background: radial-gradient(76% 96% at 70% 26%, #414c57 0%, #1a2026 52%, #0d1013 100%); }
+  [data-ind="fitness"] .pv-cta { background: #ff5b1e; color: #fff; }
+  [data-ind="fitness"] .pv-second { background: #0d1013; }
+  [data-ind="fitness"] .pv-rows li { border-bottom: 1px solid rgba(255,255,255,.12); padding-bottom: 1.6cqw; }
+  [data-ind="fitness"] .pv { --cta-x: 22cqw; --cta-y: 35.2cqw; }
+
+  /* ---- 2 · Brightwell ---- */
+  [data-ind="healthcare"] .pv { background: #fbfdff; color: #14304a; }
+  [data-ind="healthcare"] .pv-media { background: linear-gradient(158deg, #d3e8f7, #7cb3d8); }
+  [data-ind="healthcare"] .pv-cta { background: #2f9bd4; color: #fff; }
+  [data-ind="healthcare"] .pv-second { background: #f2f8fc; }
+  [data-ind="healthcare"] .pv-rows li { background: #fff; box-shadow: inset 0 0 0 1px #e0edf6; }
+  [data-ind="healthcare"] .pv { --cta-x: 46cqw; --cta-y: 41.2cqw; }
+
+  /* ---- 3 · Sedge ---- */
+  [data-ind="restaurant"] .pv { background: #fdf7ee; color: #43290f; }
+  [data-ind="restaurant"] .pv-media { border-radius: 50%; background: radial-gradient(62% 62% at 40% 34%, #ecb877, #a4622a 68%, #66381a); }
+  [data-ind="restaurant"] .pv-cta { background: #b4541f; color: #fff; }
+  [data-ind="restaurant"] .pv-second { background: #f7eddd; }
+  [data-ind="restaurant"] .pv { --cta-x: 20cqw; --cta-y: 39.0cqw; }
+
+  /* ---- 4 · Halden ---- */
+  [data-ind="boutique"] .pv { background: #fff; color: #1b1a19; }
+  [data-ind="boutique"] .pv-media i { background: linear-gradient(150deg, #efe9e4, #cdc3ba); }
+  [data-ind="boutique"] .pv-media i:last-child { background: linear-gradient(150deg, #e6e1de, #bfb5ae); }
+  [data-ind="boutique"] .pv-cta { background: #1b1a19; color: #fff; }
+  [data-ind="boutique"] .pv-second { background: #faf8f6; }
+  [data-ind="boutique"] .pv-rows li { background: #fff; box-shadow: inset 0 0 0 1px #ece7e2; }
+  [data-ind="boutique"] .pv { --cta-x: 22cqw; --cta-y: 49.5cqw; }
+
+  /* ---- 5 · Aurelle ---- */
+  [data-ind="beauty"] .pv { background: #fdf6f6; color: #5c3b43; }
+  [data-ind="beauty"] .pv-media { background: linear-gradient(165deg, #f7e2e5, #d2a2aa 68%, #a97580); }
+  [data-ind="beauty"] .pv-cta { background: #b8737f; color: #fff; }
+  [data-ind="beauty"] .pv-second { background: #f8ecec; }
+  [data-ind="beauty"] .pv-rows li { background: #fff; box-shadow: inset 0 0 0 1px #f0dcdf; }
+  [data-ind="beauty"] .pv { --cta-x: 48cqw; --cta-y: 37.5cqw; }
+
+  /* ---- 6 · Ashcombe ---- */
+  [data-ind="realestate"] .pv { background: #101c18; color: #fff; }
+  [data-ind="realestate"] .pv-media { background: linear-gradient(168deg, #9db9ab 0%, #55735f 52%, #1d2c24 100%); }
+  [data-ind="realestate"] .pv-cta { background: #dfe9e2; color: #16261e; }
+  [data-ind="realestate"] .pv-second { background: #0c1613; }
+  [data-ind="realestate"] .pv-rows li { background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,.09); }
+  [data-ind="realestate"] .pv { --cta-x: 26cqw; --cta-y: 35.2cqw; }
+
+  /* ---- 7 · Beanstalk ---- */
+  [data-ind="education"] .pv { background: #f9f8fe; color: #322a63; }
+  [data-ind="education"] .pv-media { background: linear-gradient(155deg, #ded7fb, #9b8ce4); border-radius: 3cqw; }
+  [data-ind="education"] .pv-cta { background: #5b49c8; color: #fff; }
+  [data-ind="education"] .pv-second { background: #f2effc; }
+  [data-ind="education"] .pv-rows li { background: #fff; box-shadow: inset 0 0 0 1px #e3ddf7; }
+  [data-ind="education"] .pv { --cta-x: 20cqw; --cta-y: 40.5cqw; }
+
+  /* ---- 8 · Marchmont ---- */
+  [data-ind="law"] .pv { background: #11151c; color: #f2f0ec; font-family: Georgia, "Times New Roman", serif; }
+  [data-ind="law"] .pv-h1 { font-weight: 400; letter-spacing: -.01em; }
+  [data-ind="law"] .pv-cta { background: transparent; color: #f2f0ec; box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); }
+  [data-ind="law"] .pv-second { background: #0d1117; }
+  [data-ind="law"] .pv-rows li { border-bottom: 1px solid rgba(255,255,255,.13); padding-bottom: 1.6cqw; }
+  [data-ind="law"] .pv { --cta-x: 44cqw; --cta-y: 39.0cqw; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pv-page, .pv-cursor, .pv-shimmer, .pv-cta { transition: none !important; }
+    .pv-cursor, .pv-shimmer { display: none; }
+  }
 
   /* ---- the closing callout ---- */
   .ind-cta { margin-top: 56px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-radius: 24px; padding: clamp(28px, 4vw, 44px) clamp(28px, 4vw, 48px); }
