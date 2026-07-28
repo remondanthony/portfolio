@@ -8,10 +8,10 @@
  */
 
 const STEPS = [
-  { no: '01', title: 'Understand First', body: 'Every project starts by understanding your business.' },
-  { no: '02', title: 'Design With Purpose', body: 'Every decision should solve a real problem.' },
-  { no: '03', title: 'Build With Precision', body: 'Fast, responsive and engineered for reliability.' },
-  { no: '04', title: 'Launch With Confidence', body: 'Every website is tested, refined and ready to grow.' },
+  { no: '01', title: 'Strategy First', body: 'Every project starts by understanding your business.' },
+  { no: '02', title: 'Thoughtful Design', body: 'Every decision should solve a real problem.' },
+  { no: '03', title: 'Precision Development', body: 'Fast, responsive and engineered for reliability.' },
+  { no: '04', title: 'Ready to Launch', body: 'Every website is tested, refined and ready to grow.' },
 ];
 
 export default function About() {

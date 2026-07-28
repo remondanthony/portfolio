@@ -15,9 +15,9 @@ export default function Process() {
               <circle cx="120" cy="404" r="7" fill="#ff5b1e" />
             </svg>
             <div className="stage s-discover"><h3>Discover</h3><ul><li>Client Brief</li><li>Market Research</li><li>Target Audience</li></ul></div>
-            <div className="stage s-define"><h3>Define</h3><ul><li>Business Goals</li><li>Website Requirements</li><li>Site Map</li></ul></div>
+            <div className="stage s-define"><h3>Strategy</h3><ul><li>Scope &amp; Priorities</li><li>Website Requirements</li><li>Site Map</li></ul></div>
             <div className="stage s-design"><h3>Design</h3><ul><li>Wireframes</li><li>UI Design</li><li>Responsive Layout</li></ul></div>
-            <div className="stage s-develop"><h3>Develop &amp; Deliver</h3><ul><li>Development</li><li>CMS &amp; Interactions</li><li>Live Deployment</li></ul></div>
+            <div className="stage s-develop"><h3>Build &amp; Launch</h3><ul><li>Development</li><li>CMS &amp; Interactions</li><li>Live Deployment</li></ul></div>
             <img className="how-phone" src="/how-phone.png" alt="Website mockup on a phone held in hand" />
           </div>
         </div>

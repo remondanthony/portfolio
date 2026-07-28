@@ -4,7 +4,7 @@ export default function Contact() {
       <section id="contact">
         <div className="wrap">
           <div className="reveal">
-            <span className="eyebrow"><span className="n">06</span> Contact</span>
+            <span className="eyebrow"><span className="n">07</span> Contact</span>
             <h2 className="title" style={{marginTop: '18px'}}>Let's build <b>something great.</b></h2>
           </div>
           <div className="contact-grid">

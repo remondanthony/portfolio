@@ -1,3 +1,17 @@
+/**
+ * Featured work.
+ *
+ * This section previously carried five invented projects — Ivory Clinic,
+ * Nimbus, Maison, Ora Studio, Zest. None of them existed. They are gone for
+ * the same reason the metrics went: a studio that fabricates its portfolio
+ * cannot credibly promise honesty anywhere else on the page.
+ *
+ * What is left is the one project that shipped, and a second panel that says
+ * plainly why there is only one. An empty slot owned out loud reads as
+ * confidence; the same slot filled with a concept dressed as a client reads
+ * as the opposite.
+ */
+
 export default function Work() {
   return (
     <>
@@ -5,17 +19,33 @@ export default function Work() {
         <div className="wrap">
           <div className="svc-head reveal">
             <div>
-              <span className="eyebrow"><span className="n">03</span> Selected work</span>
-              <h2 className="title" style={{marginTop: '18px'}}>Recent <b>projects.</b></h2>
+              <span className="eyebrow"><span className="n">03</span> Work</span>
+              <h2 className="title" style={{marginTop: '18px'}}>The work is <b>live.</b></h2>
             </div>
-            <p className="lead" style={{margin: '0'}}>A snapshot across industries — each one designed, built and launched by us.</p>
+            <p className="lead" style={{margin: '0'}}>One project, because one has shipped — designed, built and deployed by this studio, and running today.</p>
           </div>
-          <div className="work-grid">
-            <article className="work wide reveal"><div className="bg w-ivory"></div><div className="go">→</div><span className="cat">Healthcare · Landing Page</span><h3>Ivory Clinic</h3><p>A premium dental landing page with a chrome hero and a booking flow that lifted consultations.</p></article>
-            <article className="work narrow reveal"><div className="bg w-nimbus"></div><div className="go">→</div><span className="cat">SaaS · Product</span><h3>Nimbus</h3></article>
-            <article className="work narrow reveal"><div className="bg w-maison"></div><div className="go">→</div><span className="cat">Fashion · E-commerce</span><h3>Maison</h3></article>
-            <article className="work narrow reveal"><div className="bg w-ora"></div><div className="go">→</div><span className="cat">Photography · Portfolio</span><h3>Ora Studio</h3></article>
-            <article className="work narrow reveal"><div className="bg w-zest"></div><div className="go">→</div><span className="cat">Food &amp; Drink · Brand</span><h3>Zest</h3><p>A bold cold-pressed juice brand with a subscription store built for speed and repeat orders.</p></article>
+
+          <div className="proj-grid">
+            <article className="proj reveal">
+              <a className="proj-shot" href="https://born21.com" target="_blank" rel="noreferrer noopener">
+                <img src="/projects/born21.jpg" alt="Born21 — YouTube growth agency website built by VIONICHE" width={1280} height={800} loading="lazy" decoding="async" />
+              </a>
+              <div className="proj-meta">
+                <span className="proj-industry">YouTube Growth · Agency Site</span>
+                <h3>Born21</h3>
+                <p>Born21 is a YouTube growth agency in New York. We designed and built their site end to end — messaging, motion, case study pages and the front-end underneath.</p>
+                <a className="proj-link" href="https://born21.com" target="_blank" rel="noreferrer noopener">Visit born21.com <span className="dot">→</span></a>
+              </div>
+            </article>
+
+            <article className="proj proj-next reveal">
+              <div className="proj-meta">
+                <span className="proj-industry">Open</span>
+                <h3>The next project</h3>
+                <p>We could fill this page with concepts and call it a portfolio. The space stays empty until there is real work to put in it, and the next one could be yours.</p>
+                <a className="proj-link" href="#contact">Start a project <span className="dot">→</span></a>
+              </div>
+            </article>
           </div>
         </div>
       </section>
