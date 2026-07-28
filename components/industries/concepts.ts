@@ -24,6 +24,12 @@ export type Concept = {
   items: { label: string; meta: string }[];
   layout: Layout;
   rows: Rows;
+  /**
+   * Path under /concepts/. When absent the media slot falls back to its
+   * layered light-and-grain treatment, so the site is never broken by a
+   * missing image — it just looks less photographic.
+   */
+  photo?: string;
 };
 
 export const CONCEPTS: Concept[] = [

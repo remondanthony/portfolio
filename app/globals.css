@@ -285,6 +285,9 @@
                        radial-gradient(120% 108% at 50% 42%, transparent 52%, rgba(0,0,0,.42) 100%),
                        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
                      background-blend-mode: normal, overlay; }
+  /* A real photograph fills the slot and simply covers the fallback
+     treatment underneath — no conditional CSS, no flash of gradient. */
+  .pv-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .pv-second { flex: 1; padding: 4cqw 5cqw 5cqw; }
   .pv-sect-title { display: block; font-size: 3.3cqw; font-weight: 700; letter-spacing: -.01em; }
   .pv-rows { list-style: none; margin: 3cqw 0 0; padding: 0; display: flex; flex-direction: column; gap: 2.4cqw; }

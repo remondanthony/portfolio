@@ -34,7 +34,11 @@ export default function IndustryPreview({ c }: { c: Concept }) {
         <section className="pv-hero">
           {c.layout !== 'none' && (
             <span className="pv-media" aria-hidden="true">
-              {c.layout === 'grid' && <><i /><i /></>}
+              {c.photo ? (
+                <img className="pv-photo" src={c.photo} alt="" loading="lazy" decoding="async" />
+              ) : (
+                c.layout === 'grid' && <><i /><i /></>
+              )}
             </span>
           )}
           <div className="pv-copy">
