@@ -61,6 +61,11 @@
        nothing rendered in it. */
     --font-title: "Neue Montreal", "NeueMontreal", "PP Neue Montreal",
                   -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    /* Used only by the four concept canvases in Industries that call for a
+       serif voice. Iowan and Palatino are markedly better than Georgia on
+       macOS and iOS; everywhere else the stack falls through to Georgia,
+       which is what it always was. */
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
     --maxw: 1280px;
     --pad: clamp(20px, 5vw, 64px);
   }
@@ -171,255 +176,320 @@
   @media (max-width: 900px) { .proj-grid { grid-template-columns: 1fr; } }
 
   /* ============ INDUSTRIES ============
-     A dark section between two light ones, reusing the warm gradient .how
-     already uses — the brief asked for white copy, light-grey subtext and a
-     dark CTA surface, none of which work on #eef1f4, and the site already
-     alternates light and dark so this is existing language, not a new one.
+     An exhibition, not a grid of previews.
 
-     Every preview is drawn in CSS, and every one is a DIFFERENT layout. The
-     old version rotated a single wireframe's hue eight times, which read as
-     "we recolour a template" — precisely what this section must disprove. */
-  .industries { background: radial-gradient(125% 115% at 84% 90%, #5a2410 0%, #26120a 40%, #0b0809 76%); color: #fff; overflow: hidden; }
+     Each exhibit is a photograph of a business with a fragment of that
+     business's website floating off it. The photograph is the subject and the
+     website is the smaller object resting on it — roughly 70/30 by area, and
+     that ratio is arithmetic rather than judgement: every canvas is sized as a
+     percentage of its own plate, so the business cannot lose.
 
-  .ind-head { text-align: center; max-width: 44ch; margin: 0 auto; }
-  .ind-eyebrow { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-orange); }
-  .ind-title { font-size: clamp(30px, 4.6vw, 56px); font-weight: 300; letter-spacing: -.035em; color: #fff; margin-top: 18px; }
-  .ind-title em { font-style: normal; font-weight: 700; color: var(--accent-orange); }
-  .ind-lead { margin-top: 20px; font-size: 17px; line-height: 1.6; color: rgba(255,255,255,.62); }
-
-  .ind-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 34px 22px; margin-top: 64px; }
-
-  .ind {
-    cursor: pointer;
-    background: rgba(255,255,255,.035);
-    border: 1px solid rgba(255,255,255,.09);
-    border-radius: 22px;
-    padding: 14px 14px 24px;
-    transition: transform .38s cubic-bezier(.2,.7,.2,1), box-shadow .38s cubic-bezier(.2,.7,.2,1),
-                border-color .38s ease, background .38s ease;
+     The previous version put eight tiny working websites in eight browser
+     frames and animated a cursor across each one. All of that is gone. What
+     is left is static, which is why this whole section is a server component
+     with no JavaScript behind it. */
+  .industries {
+    background:
+      linear-gradient(180deg, rgba(4,4,6,.55) 0%, rgba(4,4,6,0) 34%),
+      radial-gradient(125% 115% at 84% 90%, #5a2410 0%, #26120a 40%, #0b0809 76%);
+    color: #fff;
+    overflow: hidden;
+    padding-block: clamp(88px, 11vw, 152px);
   }
-  .ind:hover {
-    transform: translateY(-8px) scale(1.02);
-    border-color: rgba(255,255,255,.22);
-    background: rgba(255,255,255,.06);
-    box-shadow: 0 40px 80px -40px rgba(0,0,0,.85);
+  /* One sheet of grain across eight different palettes is most of what makes
+     them read as one studio's work rather than eight themes. */
+  .industries::before {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    opacity: .05; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
   }
-  .ind h3 { font-size: 17px; font-weight: 600; margin: 16px 6px 0; color: #fff; }
-  .ind p { color: rgba(255,255,255,.56); font-size: 13.5px; line-height: 1.55; margin: 7px 6px 0; }
+  .industries .wrap { position: relative; z-index: 1; }
 
-  .ind-pill { display: inline-block; margin: 14px 0 0 6px; font-size: 9.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.16); border-radius: 20px; padding: 4px 10px; }
+  /* ---- wall text: left-aligned, because centred headers are landing pages
+     and left headers are magazines ---- */
+  .ind-head { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; align-items: end;
+              border-top: 1px solid rgba(255,255,255,.10); padding-top: 22px; }
+  .ind-head-l { grid-column: 1 / 8; }
+  .ind-eyebrow { display: inline-block; font-size: 12px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-orange); }
+  .ind-title { font-size: clamp(34px, 5.2vw, 64px); line-height: 1.02; font-weight: 300; letter-spacing: -.04em; color: #fff; margin-top: 18px; }
+  /* Weight 500, not 700: only Regular and Medium upright faces are licensed,
+     so 700 is synthesised and smears at this size. */
+  .ind-title em { font-style: normal; font-weight: 500; color: var(--accent-orange); }
+  .ind-lead { grid-column: 9 / 13; align-self: end; font-size: 15.5px; line-height: 1.62; color: rgba(255,255,255,.58); }
 
-  /* ---- the browser shell ---- */
-  .ind-frame { border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 18px 40px -26px rgba(0,0,0,.9); }
-  .ind-chrome { display: flex; align-items: center; gap: 4px; height: 24px; padding: 0 10px; background: #eceef1; }
-  .ind-chrome i { width: 5px; height: 5px; border-radius: 50%; background: #c8ccd2; }
-  .ind-url { flex: 1; height: 9px; margin-left: 9px; border-radius: 20px; background: #fff; }
+  .ind-rail { height: 1px; margin-top: clamp(48px, 5vw, 72px);
+              background: linear-gradient(90deg, transparent, rgba(255,255,255,.10) 12%, rgba(255,255,255,.10) 88%, transparent); }
 
-  .ind-view { position: relative; aspect-ratio: 4 / 3; overflow: hidden; transition: transform .45s cubic-bezier(.2,.7,.2,1); }
-  .ind:hover .ind-view { transform: scale(1.045); }
-  .ind-view > span { position: absolute; }
+  /* ---- the spread ----
+     Row gap is 0 on purpose: each exhibit carries its own margin-top, because
+     a uniform row gap is exactly what makes a page feel like a grid. */
+  .ind-spread { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; row-gap: 0;
+                margin-top: clamp(44px, 5vw, 68px); }
 
-  /* ---- the live concept sites -------------------------------------------
-     Everything below animates transform, opacity or filter only. The page is
-     taller than its frame so it has somewhere to scroll to, and each phase is
-     a CSS transition keyed off [data-phase] — the React writes a string and
-     the compositor does the work. Type is in cqw so it scales with the card. */
-  .pv { position: absolute; inset: 0; overflow: hidden; container-type: inline-size; font-family: var(--font); }
+  .exh { margin: 0; min-width: 0; }
 
-  .pv-page { position: absolute; inset: 0 0 auto; height: 152%; display: flex; flex-direction: column;
-             opacity: .55; transition: opacity .4s ease, transform 1.2s cubic-bezier(.33,.02,.2,1); will-change: transform, opacity; }
-  .pv[data-phase="ready"] .pv-page,
-  .pv[data-phase="loading"] .pv-page { opacity: 1; }          /* SSR + no-JS: finished site */
-  .pv[data-phase="fade"] .pv-page,
-  .pv[data-phase="point"] .pv-page,
-  .pv[data-phase="travel"] .pv-page,
-  .pv[data-phase="hover"] .pv-page,
-  .pv[data-phase="click"] .pv-page { opacity: 1; }
-  .pv[data-phase="scroll"] .pv-page,
-  .pv[data-phase="hold"] .pv-page,
-  .pv[data-phase="done"] .pv-page { opacity: 1; transform: translate3d(0, -26%, 0); }
+  /* The stage is never clipped — the canvas has to be able to hang off it. */
+  .exh-stage { position: relative; }
 
-  /* one shimmer pass, then gone for good */
-  .pv-shimmer { position: absolute; inset: 0; opacity: 0; pointer-events: none;
-                background: linear-gradient(105deg, transparent 34%, rgba(255,255,255,.55) 50%, transparent 66%);
-                transform: translate3d(-60%, 0, 0); }
-  .pv[data-phase="loading"] .pv-shimmer { opacity: 1; transform: translate3d(60%, 0, 0); transition: transform .3s linear; }
+  /* The float mount: a faintly lit board inset behind the plate, so the
+     photograph stands proud of it on three sides. A print-framing device
+     rather than a negative margin, and it holds the composition together
+     whatever the photograph turns out to be. */
+  .exh-mount { position: absolute; left: -16px; right: -16px; top: -14px; bottom: -24px; z-index: 0; border-radius: 4px;
+               border: 1px solid rgba(255,255,255,.07);
+               background: linear-gradient(178deg, rgba(255,255,255,.045), rgba(255,255,255,.01) 46%, rgba(255,255,255,.028));
+               transition: border-color .35s ease; }
 
-  /* ---- the pointer ---- */
-  .pv-cursor { position: absolute; width: 9cqw; height: 9cqw; left: 0; top: 0; opacity: 0; pointer-events: none;
-               filter: drop-shadow(0 2px 3px rgba(0,0,0,.3));
-               transform: translate3d(112cqw, 72.0cqw, 0);
-               transition: transform .9s cubic-bezier(.4,.05,.2,1), opacity .26s ease; }
-  .pv[data-phase="point"] .pv-cursor { opacity: 1; transition: opacity .26s ease; }
-  .pv[data-phase="travel"] .pv-cursor,
-  .pv[data-phase="hover"] .pv-cursor,
-  .pv[data-phase="scroll"] .pv-cursor,
-  .pv[data-phase="hold"] .pv-cursor { opacity: 1; transform: translate3d(var(--cta-x), var(--cta-y), 0); }
-  .pv[data-phase="click"] .pv-cursor { opacity: 1; transform: translate3d(var(--cta-x), var(--cta-y), 0) scale(.86); transition: transform .12s ease; }
-  .pv[data-phase="done"] .pv-cursor { opacity: 0; transform: translate3d(112cqw, 72.0cqw, 0); transition: transform .42s ease-in, opacity .42s ease; }
+  .exh-plate { position: relative; z-index: 1; overflow: hidden; border-radius: 3px; background: #16130f;
+               transform: translateY(0); transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease;
+               box-shadow: 0 30px 60px -34px rgba(0,0,0,.85); }
+  .exh-photo { display: block; width: 100%; height: 100%; object-fit: cover; }
 
-  /* ---- page furniture ---- */
-  .pv-bar { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 3.4cqw 5cqw; }
-  .pv-brand { font-size: 4.1cqw; font-weight: 700; letter-spacing: -.02em; }
-  .pv-nav { display: flex; gap: 3.2cqw; font-size: 3cqw; opacity: .62; }
+  /* Colour grading lives here rather than in the JPEGs, so the look can be
+     retuned without licensing anything again. Each industry sets --gr-tint. */
+  .exh-grade { position: absolute; inset: 0; pointer-events: none;
+               background-image:
+                 radial-gradient(120% 110% at 50% 38%, transparent 46%, rgba(0,0,0,.5) 100%),
+                 linear-gradient(180deg, transparent 52%, rgba(6,5,4,.44) 100%),
+                 var(--gr-tint, linear-gradient(0deg, rgba(255,255,255,0), rgba(255,255,255,0))); }
 
-  .pv-hero { flex: none; position: relative; padding: 2cqw 5cqw 6cqw; }
-  .pv-h1 { font-size: 7.4cqw; font-weight: 700; letter-spacing: -.03em; line-height: 1.06; }
-  .pv-sub { font-size: 3.1cqw; margin-top: 2cqw; opacity: .66; line-height: 1.35; }
-  .pv-cta { display: inline-block; margin-top: 3.4cqw; font-size: 3cqw; font-weight: 600; padding: 2cqw 3.6cqw;
-            border-radius: 20px; transition: transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .25s, filter .25s; }
-  .pv[data-phase="hover"] .pv-cta,
-  .pv[data-phase="click"] .pv-cta,
-  .pv[data-phase="scroll"] .pv-cta { transform: translateY(-1.1cqw) scale(1.03); box-shadow: 0 3cqw 6cqw -2cqw rgba(0,0,0,.4); filter: brightness(1.08); }
+  /* A local pool of shade under the floating sheet, sized to its own
+     footprint. A full-width scrim would flatten the lower third of every
+     photograph; this only darkens what the sheet actually sits on. */
+  .exh-seat { position: absolute; z-index: 2; pointer-events: none; opacity: .3;
+              background: radial-gradient(closest-side, rgba(0,0,0,.95), transparent 74%);
+              filter: blur(9px); transition: opacity .35s ease; }
 
-  /* A flat two-stop ramp reads as a graphic. Layering a key light, a falloff
-     and a fine grain over the base makes it read as a photograph at this size.
-     Each site sets --key (light direction/colour) and --base below. */
-  .pv-media { display: block; border-radius: 2cqw; position: relative; overflow: hidden;
-              background-image:
-                radial-gradient(58% 62% at var(--key-x, 32%) var(--key-y, 24%), var(--key, rgba(255,255,255,.34)) 0%, transparent 62%),
-                linear-gradient(var(--angle, 162deg), var(--base-a) 0%, var(--base-b) 58%, var(--base-c) 100%);
-              background-blend-mode: screen, normal; }
-  .pv-media::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
-                     background-image:
-                       radial-gradient(120% 108% at 50% 42%, transparent 52%, rgba(0,0,0,.42) 100%),
-                       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
-                     background-blend-mode: normal, overlay; }
-  /* A real photograph fills the slot and simply covers the fallback
-     treatment underneath — no conditional CSS, no flash of gradient. */
-  .pv-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-  .pv-second { flex: 1; padding: 4cqw 5cqw 5cqw; }
-  .pv-sect-title { display: block; font-size: 3.3cqw; font-weight: 700; letter-spacing: -.01em; }
-  .pv-rows { list-style: none; margin: 3cqw 0 0; padding: 0; display: flex; flex-direction: column; gap: 2.4cqw; }
-  .pv-rows li { display: flex; align-items: center; justify-content: space-between; gap: 2cqw; font-size: 2.9cqw; }
-  .pv-row-meta { opacity: .6; white-space: nowrap; }
-
-  /* row treatments */
-  .pv-rows-menu li { border-bottom: 1px dotted currentColor; padding-bottom: 1.4cqw; opacity: .92; }
-  .pv-rows-service li, .pv-rows-course li, .pv-rows-practice li { padding: 2.2cqw 2.6cqw; border-radius: 1.6cqw; }
-  .pv-rows-listing li, .pv-rows-product li { padding: 2.2cqw 2.6cqw; border-radius: 1.6cqw; }
-
-  /* ---- layouts: where the hero media sits ---- */
-  .pv[data-layout="full"] .pv-media { position: absolute; inset: 0; border-radius: 0; z-index: 0; }
-  .pv[data-layout="full"] .pv-copy { position: relative; z-index: 1; }
-  .pv[data-layout="right"] .pv-hero { display: flex; align-items: center; gap: 4cqw; }
-  .pv[data-layout="right"] .pv-media { order: 2; flex: none; width: 34cqw; aspect-ratio: 1; }
-  .pv[data-layout="left"] .pv-hero { display: flex; align-items: center; gap: 4cqw; }
-  .pv[data-layout="left"] .pv-media { flex: none; width: 28cqw; aspect-ratio: .62; border-radius: 14cqw 14cqw 2cqw 2cqw; }
-  .pv[data-layout="centre"] .pv-hero { text-align: center; }
-  .pv[data-layout="centre"] .pv-media { width: 20cqw; aspect-ratio: 1; border-radius: 50%; margin: 0 auto 3cqw; }
-  .pv[data-layout="grid"] .pv-media { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4cqw; height: 26cqw; margin-bottom: 3cqw; }
-  .pv[data-layout="grid"] .pv-media i { border-radius: 1.4cqw; }
-  .pv[data-layout="none"] .pv-hero { text-align: center; padding-top: 6cqw; }
-
-  /* ---- 1 · Ironhaus ---- */
-  [data-ind="fitness"] .pv { background: #0d1013; color: #fff; }
-  [data-ind="fitness"] .pv-media { --base-a: #48535f; --base-b: #1c232a; --base-c: #0b0e11; --key: rgba(255,150,90,.4); --key-x: 66%; --key-y: 20%; }
-  [data-ind="fitness"] .pv-h1 { font-size: 8.4cqw; font-weight: 800; letter-spacing: -.045em; }
-  [data-ind="fitness"] .pv-nav { text-transform: uppercase; letter-spacing: .1em; font-size: 2.5cqw; font-weight: 600; }
-  [data-ind="fitness"] .pv-sect-title { text-transform: uppercase; letter-spacing: .12em; }
-  [data-ind="fitness"] .pv-cta { background: #ff5b1e; color: #fff; }
-  [data-ind="fitness"] .pv-second { background: #0d1013; }
-  [data-ind="fitness"] .pv-rows li { border-bottom: 1px solid rgba(255,255,255,.12); padding-bottom: 1.6cqw; }
-  [data-ind="fitness"] .pv { --cta-x: 22cqw; --cta-y: 35.2cqw; }
-
-  /* ---- 2 · Brightwell ---- */
-  [data-ind="healthcare"] .pv { background: #fbfdff; color: #14304a; }
-  [data-ind="healthcare"] .pv-media { --base-a: #dceaf6; --base-b: #8fbcda; --base-c: #4d84ab; --key: rgba(255,255,255,.5); --key-x: 40%; --key-y: 22%; }
-  [data-ind="healthcare"] .pv-h1 { font-weight: 600; letter-spacing: -.025em; }
-  [data-ind="healthcare"] .pv-rows li { border-radius: 2.4cqw; }
-  [data-ind="healthcare"] .pv-cta { background: #2f9bd4; color: #fff; }
-  [data-ind="healthcare"] .pv-second { background: #f2f8fc; }
-  [data-ind="healthcare"] .pv-rows li { background: #fff; box-shadow: inset 0 0 0 1px #e0edf6; }
-  [data-ind="healthcare"] .pv { --cta-x: 46cqw; --cta-y: 41.2cqw; }
-
-  /* ---- 3 · Sedge ---- */
-  [data-ind="restaurant"] .pv { background: #fdf7ee; color: #43290f; }
-  [data-ind="restaurant"] .pv-media { border-radius: 50%; --base-a: #e8b06f; --base-b: #a1622c; --base-c: #5d3316; --key: rgba(255,236,200,.5); --key-x: 36%; --key-y: 28%; }
-  [data-ind="restaurant"] .pv-h1, [data-ind="restaurant"] .pv-brand, [data-ind="restaurant"] .pv-sect-title { font-family: Georgia, "Times New Roman", serif; font-weight: 400; letter-spacing: -.005em; }
-  [data-ind="restaurant"] .pv-nav { letter-spacing: .08em; text-transform: uppercase; font-size: 2.5cqw; }
-  [data-ind="restaurant"] .pv-cta { background: #b4541f; color: #fff; }
-  [data-ind="restaurant"] .pv-second { background: #f7eddd; }
-  [data-ind="restaurant"] .pv { --cta-x: 20cqw; --cta-y: 39.0cqw; }
-
-  /* ---- 4 · Halden ---- */
-  [data-ind="boutique"] .pv { background: #fff; color: #1b1a19; }
-  [data-ind="boutique"] .pv-media i { background: linear-gradient(150deg, #efe9e4, #cdc3ba); }
-  [data-ind="boutique"] .pv-media i:last-child { background: linear-gradient(150deg, #e6e1de, #bfb5ae); }
-  [data-ind="boutique"] .pv-cta { background: #1b1a19; color: #fff; letter-spacing: .06em; text-transform: uppercase; font-size: 2.5cqw; }
-  [data-ind="boutique"] .pv-h1 { font-weight: 400; letter-spacing: .01em; font-size: 6.6cqw; }
-  [data-ind="boutique"] .pv-nav { text-transform: uppercase; letter-spacing: .14em; font-size: 2.4cqw; }
-  [data-ind="boutique"] .pv-brand { letter-spacing: .12em; text-transform: uppercase; font-weight: 500; font-size: 3.4cqw; }
-  [data-ind="boutique"] .pv-second { background: #faf8f6; }
-  [data-ind="boutique"] .pv-rows li { background: #fff; box-shadow: inset 0 0 0 1px #ece7e2; }
-  [data-ind="boutique"] .pv { --cta-x: 22cqw; --cta-y: 49.5cqw; }
-
-  /* ---- 5 · Aurelle ---- */
-  [data-ind="beauty"] .pv { background: #faf6f0; color: #55483c; }
-  [data-ind="beauty"] .pv-media { --base-a: #eee0cf; --base-b: #cbb098; --base-c: #93765d; --key: rgba(255,248,236,.52); --key-x: 34%; --key-y: 22%; }
-  [data-ind="beauty"] .pv-h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 6.8cqw; letter-spacing: -.01em; }
-  [data-ind="beauty"] .pv-nav { letter-spacing: .1em; text-transform: uppercase; font-size: 2.5cqw; }
-  [data-ind="beauty"] .pv-cta { background: #6f5b47; color: #fdfaf6; }
-  [data-ind="beauty"] .pv-second { background: #f3ece2; }
-  [data-ind="beauty"] .pv-rows li { background: #fffdfa; box-shadow: inset 0 0 0 1px #e7dccd; }
-  [data-ind="beauty"] .pv { --cta-x: 48cqw; --cta-y: 37.5cqw; }
-
-  /* ---- 6 · Ashcombe ---- */
-  [data-ind="realestate"] .pv { background: #14140f; color: #f6f1e6; }
-  [data-ind="realestate"] .pv-media { --base-a: #6d6a5c; --base-b: #34342c; --base-c: #14140f; --key: rgba(226,192,122,.42); --key-x: 62%; --key-y: 26%; }
-  [data-ind="realestate"] .pv-h1, [data-ind="realestate"] .pv-brand { font-family: Georgia, "Times New Roman", serif; font-weight: 400; }
-  [data-ind="realestate"] .pv-nav { text-transform: uppercase; letter-spacing: .12em; font-size: 2.4cqw; }
-  [data-ind="realestate"] .pv-sect-title { color: #d9b877; letter-spacing: .1em; text-transform: uppercase; }
-  [data-ind="realestate"] .pv-cta { background: #cfa960; color: #1b1a12; letter-spacing: .05em; }
-  [data-ind="realestate"] .pv-second { background: #100f0b; }
-  [data-ind="realestate"] .pv-rows li { background: rgba(207,169,96,.07); box-shadow: inset 0 0 0 1px rgba(207,169,96,.2); }
-  [data-ind="realestate"] .pv { --cta-x: 26cqw; --cta-y: 35.2cqw; }
-
-  /* ---- 7 · Beanstalk ---- */
-  [data-ind="education"] .pv { background: #f9f8fe; color: #322a63; }
-  [data-ind="education"] .pv-media { --base-a: #e3ddfc; --base-b: #a396e8; --base-c: #6957c4; --key: rgba(255,255,255,.46); border-radius: 4cqw; }
-  [data-ind="education"] .pv-h1 { font-weight: 700; letter-spacing: -.03em; }
-  [data-ind="education"] .pv-cta { border-radius: 20px; }
-  [data-ind="education"] .pv-rows li { border-radius: 2.6cqw; }
-  [data-ind="education"] .pv-cta { background: #5b49c8; color: #fff; }
-  [data-ind="education"] .pv-second { background: #f2effc; }
-  [data-ind="education"] .pv-rows li { background: #fff; box-shadow: inset 0 0 0 1px #e3ddf7; }
-  [data-ind="education"] .pv { --cta-x: 20cqw; --cta-y: 40.5cqw; }
-
-  /* ---- 8 · Marchmont ---- */
-  [data-ind="law"] .pv { background: #1c1c1e; color: #eeece7; font-family: Georgia, "Times New Roman", serif; }
-  [data-ind="law"] .pv-h1 { font-weight: 400; letter-spacing: -.01em; }
-  [data-ind="law"] .pv-cta { background: transparent; color: #f2f0ec; box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); }
-  [data-ind="law"] .pv-second { background: #161618; }
-  [data-ind="law"] .pv-nav { text-transform: uppercase; letter-spacing: .13em; font-size: 2.4cqw; font-family: var(--font); }
-  [data-ind="law"] .pv-sect-title { letter-spacing: .1em; text-transform: uppercase; font-size: 2.9cqw; }
-  [data-ind="law"] .pv-rows li { border-bottom: 1px solid rgba(255,255,255,.13); padding-bottom: 1.6cqw; }
-  [data-ind="law"] .pv { --cta-x: 44cqw; --cta-y: 39.0cqw; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .pv-page, .pv-cursor, .pv-shimmer, .pv-cta { transition: none !important; }
-    .pv-cursor, .pv-shimmer { display: none; }
+  /* ---- the floating canvas ----
+     A crop of a page, never a small complete site. Its content row is cut by
+     the bottom edge and runs past the right edge, so it reads as a piece of
+     something larger. */
+  .exh-canvas {
+    position: absolute; z-index: 3; overflow: hidden; border-radius: 5px;
+    container-type: inline-size;
+    background: var(--cv-bg, #fff); color: var(--cv-ink, #14161a);
+    padding: clamp(13px, 5.4cqw, 21px);
+    display: flex; flex-direction: column;
+    transform: perspective(1400px) translate3d(0, 0, 0) rotateY(-3.2deg) rotateX(1.6deg);
+    transform-origin: 50% 100%;
+    backface-visibility: hidden;
+    box-shadow:
+      0 2px 4px -2px rgba(0,0,0,.35),
+      0 18px 34px -18px rgba(0,0,0,.55),
+      0 54px 90px -46px rgba(0,0,0,.72),
+      inset 0 0 0 1px var(--cv-edge, rgba(12,14,17,.08));
+    transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease;
+  }
+  /* One soft specular sweep, same direction on all eight: one room, one lamp. */
+  .exh-canvas::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
+    background: linear-gradient(128deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,.08) 15%, transparent 34%);
   }
 
-  /* ---- the closing callout ---- */
-  .ind-cta { margin-top: 56px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-radius: 24px; padding: clamp(28px, 4vw, 44px) clamp(28px, 4vw, 48px); }
-  .ind-cta h3 { font-size: clamp(20px, 2.2vw, 26px); font-weight: 600; color: #fff; letter-spacing: -.02em; }
+  .exh-c-mark { font-size: clamp(8.5px, 3.1cqw, 11px); letter-spacing: .22em; text-transform: uppercase; opacity: .55; font-weight: 500; }
+  /* 11ch forces every headline to wrap, whatever its length — the crop cannot
+     depend on a wrap that may or may not happen. */
+  .exh-c-line { font-size: clamp(18px, 9.2cqw, 30px); line-height: 1.05; letter-spacing: -.025em;
+                max-width: 11ch; margin-top: auto; margin-bottom: clamp(16px, 6.4cqw, 26px); }
+  /* Cut by the bottom edge — that is the crop. It used to also run off the
+     right, which clipped the price or the time down to a single letter and
+     read as a bug rather than as a fragment. One clean cut is enough. */
+  .exh-c-row { position: absolute; left: clamp(13px, 5.4cqw, 21px); right: clamp(13px, 5.4cqw, 21px); bottom: -.52em;
+               display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+               font-size: clamp(8.5px, 3.3cqw, 11.5px); font-style: normal;
+               padding-top: .62em; border-top: 1px solid var(--cv-rule, rgba(0,0,0,.12)); }
+  .exh-c-row i { font-style: normal; }
+  .exh-c-row b { font-weight: 400; color: var(--cv-meta, inherit); white-space: nowrap; }
+
+  /* ---- caption: identical on all eight. This is the "one studio" glue ----
+     margin-top has to clear whatever the canvas hangs below the plate, or the
+     sheet lands on top of the catalogue number. */
+  .exh-caption { margin-top: 34px; }
+  .exh[data-format="column"] .exh-caption { margin-top: 84px; }
+  .exh[data-format="bleed"] .exh-caption { margin-top: 76px; }
+  .exh-index { display: block; font-size: 11px; font-variant-numeric: tabular-nums; letter-spacing: .2em; color: rgba(255,255,255,.32); }
+  .exh-kicker { display: block; margin-top: 12px; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; font-weight: 500; color: var(--tint, var(--accent-orange)); }
+  .exh-caption h3 { font-size: clamp(21px, 2vw, 28px); font-weight: 400; letter-spacing: -.022em; line-height: 1.14; color: #fff; margin-top: 14px; }
+  /* Two lines are reserved whether or not the sentence uses them, so captions
+     aligned to a plate edge keep a shared baseline across the row. */
+  .exh-story { font-size: 15.5px; line-height: 1.62; color: rgba(255,255,255,.56); max-width: 34ch; margin-top: 12px;
+               min-height: 3.24em; text-wrap: pretty; }
+
+  /* ---- formats ---- */
+  .exh[data-format="wide"] .exh-plate { aspect-ratio: 3 / 2; }
+  .exh[data-format="wide"] .exh-canvas { width: min(38%, 300px); aspect-ratio: 5 / 4; right: -34px; bottom: -46px; }
+  .exh[data-format="wide"] .exh-seat { width: min(46%, 350px); height: 74px; right: -50px; bottom: -58px; }
+
+  /* Narrower than it was, and hung off a corner rather than centred. Centred
+     and 78% wide, the sheet read as a caption bar bolted across the bottom of
+     the photograph instead of an object resting on it. */
+  .exh[data-format="column"] .exh-plate { aspect-ratio: 4 / 5; }
+  .exh[data-format="column"] .exh-canvas { width: min(66%, 278px); aspect-ratio: 16 / 10; right: -24px; bottom: -50px; }
+  .exh[data-format="column"] .exh-seat { width: min(76%, 320px); height: 66px; right: -34px; bottom: -60px; }
+  /* Alternating the corner gives the pairs a rhythm; all four on the same side
+     would rebuild the grid the section is trying to escape. */
+  .exh[data-ind="healthcare"] .exh-canvas,
+  .exh[data-ind="boutique"] .exh-canvas { left: -24px; right: auto; }
+  .exh[data-ind="healthcare"] .exh-seat,
+  .exh[data-ind="boutique"] .exh-seat { left: -34px; right: auto; }
+  /* A sheet on the left leans the other way, so the implied light source stays
+     in one place across the whole section. */
+  .exh[data-ind="healthcare"] .exh-canvas,
+  .exh[data-ind="boutique"] .exh-canvas { transform: perspective(1400px) translate3d(0, 0, 0) rotateY(3.2deg) rotateX(1.6deg); }
+
+  .exh[data-format="bleed"] .exh-plate { aspect-ratio: 21 / 9; border-radius: 0; }
+  .exh[data-format="bleed"] .exh-mount { display: none; }
+  .exh[data-format="bleed"] .exh-canvas { width: min(26%, 330px); aspect-ratio: 5 / 4; right: 9%; bottom: -44px; }
+  .exh[data-format="bleed"] .exh-seat { width: min(32%, 390px); height: 72px; right: 7%; bottom: -56px; }
+
+  /* ---- the hang: placement per exhibit ---- */
+  @media (min-width: 1100px) {
+    .exh[data-ind="fitness"]    { grid-column: 1 / 13; grid-row: 1; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; }
+    .exh[data-ind="fitness"]    .exh-stage { grid-column: 1 / 9; }
+    .exh[data-ind="fitness"]    .exh-caption { grid-column: 10 / 13; align-self: end; margin-top: 0; }
+
+    .exh[data-ind="healthcare"] { grid-column: 1 / 6;  grid-row: 2; margin-top: clamp(80px, 9vw, 132px); margin-inline-start: -28px; }
+    .exh[data-ind="restaurant"] { grid-column: 8 / 13; grid-row: 2; margin-top: clamp(200px, 17vw, 280px); }
+
+    .exh[data-ind="boutique"]   { grid-column: 2 / 7;  grid-row: 3; margin-top: clamp(88px, 10vw, 150px); }
+    .exh[data-ind="beauty"]     { grid-column: 8 / 13; grid-row: 3; margin-top: clamp(30px, 4vw, 64px); }
+
+    /* The one exhibit that abandons the measure and owns the viewport. A
+       gallery hangs one work bigger than the rest and makes you stop. */
+    .exh[data-ind="realestate"] { grid-column: 1 / 13; grid-row: 4; margin-top: clamp(110px, 12vw, 180px);
+                                  display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; }
+    .exh[data-ind="realestate"] .exh-stage { grid-column: 1 / 13; margin-inline: calc(50% - 50vw); }
+    .exh[data-ind="realestate"] .exh-caption { grid-column: 1 / 6; }
+
+    .exh[data-ind="education"]  { grid-column: 1 / 13; grid-row: 5; margin-top: clamp(96px, 11vw, 168px);
+                                  display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; }
+    .exh[data-ind="education"]  .exh-caption { grid-column: 1 / 4; align-self: end; margin-top: 0; }
+    .exh[data-ind="education"]  .exh-stage { grid-column: 5 / 13; }
+
+    .exh[data-ind="law"]        { grid-column: 1 / 13; grid-row: 6; margin-top: clamp(88px, 10vw, 150px);
+                                  display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; }
+    .exh[data-ind="law"]        .exh-stage { grid-column: 1 / 9; }
+    .exh[data-ind="law"]        .exh-caption { grid-column: 10 / 13; align-self: center; margin-top: 0; }
+  }
+
+  /* ---- hover: 3px on the photograph, 8px on the website, 350ms ---- */
+  @media (hover: hover) {
+    .exh:hover .exh-plate { transform: translateY(-3px); box-shadow: 0 40px 76px -38px rgba(0,0,0,.7); }
+    .exh[data-ind="healthcare"]:hover .exh-canvas,
+    .exh[data-ind="boutique"]:hover .exh-canvas {
+      transform: perspective(1400px) translate3d(0, -8px, 0) rotateY(3.2deg) rotateX(1.6deg);
+    }
+    .exh:hover .exh-canvas {
+      transform: perspective(1400px) translate3d(0, -8px, 0) rotateY(-3.2deg) rotateX(1.6deg);
+      box-shadow:
+        0 3px 7px -3px rgba(0,0,0,.28),
+        0 24px 46px -22px rgba(0,0,0,.44),
+        0 74px 120px -56px rgba(0,0,0,.6),
+        inset 0 0 0 1px var(--cv-edge-hi, rgba(12,14,17,.14));
+    }
+    .exh:hover .exh-mount { border-color: rgba(255,255,255,.14); }
+    .exh:hover .exh-seat { opacity: .22; }
+  }
+
+  /* ---- per-industry identity ----
+     Personality lives in the canvas surface and the kicker tint. Craft is held
+     constant by the shared structure, radius, padding scale and shadow stack. */
+  .exh[data-ind="fitness"]    { --tint: #ff7a45; --cv-bg: #0d1013; --cv-ink: #fff; --cv-meta: #ff5b1e;
+                                --cv-rule: rgba(255,255,255,.14); --cv-edge: rgba(255,255,255,.2); --cv-edge-hi: rgba(255,255,255,.32);
+                                --gr-tint: linear-gradient(200deg, rgba(255,110,40,.16), transparent 62%); }
+  .exh[data-ind="fitness"]    .exh-c-line { font-weight: 500; letter-spacing: -.045em; text-transform: uppercase; }
+
+  .exh[data-ind="healthcare"] { --tint: #6fc2ea; --cv-bg: #fbfdff; --cv-ink: #14304a; --cv-meta: #2f9bd4;
+                                --cv-rule: #dceaf6; --gr-tint: linear-gradient(200deg, rgba(120,190,230,.14), transparent 60%); }
+  .exh[data-ind="healthcare"] .exh-c-line { font-weight: 500; letter-spacing: -.02em; }
+
+  .exh[data-ind="restaurant"] { --tint: #e0a06a; --cv-bg: #fdf7ee; --cv-ink: #43290f; --cv-meta: #b4541f;
+                                --cv-rule: rgba(67,41,15,.18); --gr-tint: linear-gradient(200deg, rgba(255,170,80,.15), transparent 62%); }
+  .exh[data-ind="restaurant"] .exh-c-line,
+  .exh[data-ind="restaurant"] .exh-c-mark { font-family: var(--serif); font-weight: 400; letter-spacing: -.005em; }
+
+  .exh[data-ind="boutique"]   { --tint: #d8d2cc; --cv-bg: #fff; --cv-ink: #1b1a19; --cv-meta: #1b1a19;
+                                --cv-rule: #ece7e2; --gr-tint: linear-gradient(200deg, rgba(255,255,255,.1), transparent 58%); }
+  .exh[data-ind="boutique"]   .exh-c-line { font-weight: 400; letter-spacing: .02em; }
+  .exh[data-ind="boutique"]   .exh-c-mark { letter-spacing: .3em; }
+
+  .exh[data-ind="beauty"]     { --tint: #d9c3aa; --cv-bg: #faf6f0; --cv-ink: #55483c; --cv-meta: #6f5b47;
+                                --cv-rule: #e7dccd; --gr-tint: linear-gradient(200deg, rgba(230,200,170,.14), transparent 60%); }
+  .exh[data-ind="beauty"]     .exh-c-line { font-family: var(--serif); font-weight: 400; }
+
+  .exh[data-ind="realestate"] { --tint: #cfa960; --cv-bg: #14140f; --cv-ink: #f6f1e6; --cv-meta: #cfa960;
+                                --cv-rule: rgba(207,169,96,.22); --cv-edge: rgba(207,169,96,.26); --cv-edge-hi: rgba(207,169,96,.4);
+                                --gr-tint: linear-gradient(200deg, rgba(207,169,96,.14), transparent 62%); }
+  .exh[data-ind="realestate"] .exh-c-line,
+  .exh[data-ind="realestate"] .exh-c-mark { font-family: var(--serif); font-weight: 400; }
+
+  .exh[data-ind="education"]  { --tint: #9b8bea; --cv-bg: #f9f8fe; --cv-ink: #322a63; --cv-meta: #5b49c8;
+                                --cv-rule: #e3ddf7; --gr-tint: linear-gradient(200deg, rgba(150,130,235,.14), transparent 60%); }
+  .exh[data-ind="education"]  .exh-c-line { font-weight: 500; letter-spacing: -.03em; }
+  .exh[data-ind="education"]  .exh-canvas { border-radius: 10px; }
+
+  .exh[data-ind="law"]        { --tint: #b8b2a6; --cv-bg: #1c1c1e; --cv-ink: #eeece7; --cv-meta: rgba(238,236,231,.55);
+                                --cv-rule: rgba(255,255,255,.14); --cv-edge: rgba(255,255,255,.19); --cv-edge-hi: rgba(255,255,255,.3);
+                                --gr-tint: linear-gradient(200deg, rgba(200,190,170,.1), transparent 60%); }
+  .exh[data-ind="law"]        .exh-c-line { font-family: var(--serif); font-weight: 400; }
+
+  /* ---- the closing callout: a rule, not a panel ---- */
+  .ind-cta { margin-top: clamp(96px, 10vw, 160px); border-top: 1px solid rgba(255,255,255,.12); padding-top: 40px;
+             display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+  .ind-cta h3 { font-size: clamp(20px, 2.2vw, 26px); font-weight: 400; color: #fff; letter-spacing: -.02em; }
   .ind-cta p { margin-top: 10px; color: rgba(255,255,255,.6); font-size: 16px; max-width: 46ch; }
   .btn-accent { background: var(--accent-orange); color: #fff; border-color: transparent; }
   .btn-accent .dot { background: #fff; color: var(--accent-orange); }
 
-  /* ---- entrance: header first, then the grid left to right, row by row ---- */
+  /* ---- entrance: one stage, not two. A staged rise would read as exactly
+     the scripted autoplay this rebuild removed. ---- */
   .ind-head .reveal { transition-delay: .05s; }
   .ind-head .ind-title.reveal { transition-delay: .15s; }
-  .ind-head .ind-lead.reveal { transition-delay: .25s; }
-  .ind-grid.reveal { opacity: 1; transform: none; transition: none; }
-  .ind-grid .ind { opacity: 0; translate: 0 22px; transition: opacity .55s ease, translate .55s cubic-bezier(.2,.7,.2,1), transform .38s cubic-bezier(.2,.7,.2,1), box-shadow .38s, border-color .38s, background .38s; }
-  .ind-grid.in .ind { opacity: 1; translate: 0 0; transition-delay: calc(.32s + var(--i) * .07s); }
+  .ind-lead.reveal { transition-delay: .25s; }
 
-  @media (max-width: 1100px) { .ind-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 560px)  { .ind-grid { grid-template-columns: 1fr; } .ind-cta { flex-direction: column; align-items: flex-start; } }
+  /* ---- narrower ---- */
+  @media (max-width: 1099px) {
+    .ind-head { display: block; }
+    .ind-lead { margin-top: 20px; max-width: 60ch; }
+    .ind-spread { grid-template-columns: repeat(2, 1fr); column-gap: clamp(20px, 3vw, 32px); row-gap: clamp(64px, 8vw, 104px); }
+    .exh { grid-column: span 1; margin-inline: 0; }
+    .exh[data-ind="realestate"] { grid-column: 1 / -1; }
+    .exh[data-ind="realestate"] .exh-plate { aspect-ratio: 16 / 9; }
+    .exh[data-format="wide"] .exh-plate,
+    .exh[data-format="column"] .exh-plate { aspect-ratio: 4 / 3; }
+    .exh[data-format="wide"] .exh-canvas,
+    .exh[data-format="column"] .exh-canvas { width: min(64%, 250px); aspect-ratio: 16 / 10; right: -18px; left: auto; bottom: -38px; margin-left: 0; }
+    .exh[data-format="wide"] .exh-seat,
+    .exh[data-format="column"] .exh-seat { width: min(72%, 280px); height: 56px; right: -26px; left: auto; bottom: -46px; margin-left: 0; }
+    .exh-caption { margin-top: 54px; }
+    .exh-story { min-height: 0; }
+  }
+
+  @media (max-width: 640px) {
+    .ind-spread { grid-template-columns: 1fr; row-gap: clamp(72px, 14vw, 96px); }
+    .exh[data-format="wide"] .exh-plate,
+    .exh[data-format="column"] .exh-plate,
+    .exh[data-ind="realestate"] .exh-plate { aspect-ratio: 5 / 4; }
+    .exh-mount { left: 14px; right: 14px; top: 18px; bottom: -12px; }
+    .exh[data-format="wide"] .exh-canvas,
+    .exh[data-format="column"] .exh-canvas,
+    .exh[data-format="bleed"] .exh-canvas { width: min(66%, 230px); right: -10px; bottom: -32px; }
+    .exh[data-format="wide"] .exh-seat,
+    .exh[data-format="column"] .exh-seat,
+    .exh[data-format="bleed"] .exh-seat { width: min(74%, 260px); height: 48px; right: -16px; bottom: -40px; }
+    .exh-caption { margin-top: 50px; }
+    .ind-cta { flex-direction: column; align-items: flex-start; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .ind-grid .ind { opacity: 1; translate: none; transition: none; }
+    .exh-plate, .exh-canvas, .exh-seat, .exh-mount { transition: none; }
+    .exh:hover .exh-plate { transform: none; }
+    /* Restate the resting transform rather than clearing it — `none` would
+       snap the sheet flat, which is a bigger motion than the hover. Both
+       leans need restating, or the mirrored pair keeps its lift. */
+    .exh:hover .exh-canvas { transform: perspective(1400px) translate3d(0, 0, 0) rotateY(-3.2deg) rotateX(1.6deg); }
+    .exh[data-ind="healthcare"]:hover .exh-canvas,
+    .exh[data-ind="boutique"]:hover .exh-canvas { transform: perspective(1400px) translate3d(0, 0, 0) rotateY(3.2deg) rotateX(1.6deg); }
   }
 
   /* ============ FAQ ============

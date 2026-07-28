@@ -1,79 +1,106 @@
-import IndustryPreview from './industries/IndustryPreview';
 import { CONCEPTS } from './industries/concepts';
 
 /**
- * Industries we build for.
+ * Industries, as an exhibition rather than a grid of previews.
  *
- * Each card holds a working concept site rather than a wireframe. They render
- * complete on the server; a scripted sequence runs once when the card first
- * enters the viewport — shimmer, fade, a cursor crossing to the primary
- * button, a click, a slow scroll to the section below. Then it stops for good.
+ * Each exhibit is a photograph of a business with a fragment of that
+ * business's website floating off it. The photograph is the subject; the
+ * website is the smaller object resting on it. That ratio is the whole idea —
+ * the visitor is meant to recognise the business first and want the site
+ * second.
  *
- * The copy is invented but checked: the restaurant was originally "Sorrel",
- * which is a real Michelin-starred restaurant, so it became Sedge. Concept
- * work that borrows a real business's name stops being concept work.
+ * There is no JavaScript in this section any more. The browser chrome, the
+ * travelling cursor, the shimmer and the self-scrolling page are all gone:
+ * they were what made eight concepts read as eight animations. What replaces
+ * them is static, which is why it can be a server component and why the whole
+ * section costs nothing to run.
+ *
+ * The floating canvas is deliberately a CROP, never a small complete site.
+ * Its content row is positioned to be cut by the bottom edge and to run past
+ * the right edge, so it reads as a piece of something larger. A tidy,
+ * fully-contained panel holding a wordmark, a headline and a row would just
+ * be a tiny website — the exact thing this rebuild exists to remove.
  */
-
-const LINES: Record<string, { name: string; line: string }> = {
-  fitness:    { name: 'Fitness & Wellness', line: 'Class schedules and memberships that convert.' },
-  healthcare: { name: 'Healthcare',         line: 'Trust first. Appointments second.' },
-  restaurant: { name: 'Restaurant',         line: 'Menus, reservations and ordering that feel effortless.' },
-  boutique:   { name: 'Boutique',           line: 'Products that deserve a premium storefront.' },
-  beauty:     { name: 'Beauty & Skincare',  line: 'Treatments booked as easily as they are browsed.' },
-  realestate: { name: 'Real Estate',        line: 'Listings that stay current and worth lingering on.' },
-  education:  { name: 'Education',          line: 'Courses and enrolment without the paperwork feeling.' },
-  law:        { name: 'Law Firm',           line: 'Authority, clarity and confidence.' },
-};
-
-const ORDER = ['fitness', 'healthcare', 'restaurant', 'boutique', 'beauty', 'realestate', 'education', 'law'];
-
 export default function Industries() {
   return (
-    <>
-      <section id="industries" className="industries">
-        <div className="wrap">
-          <header className="ind-head">
-            <span className="ind-eyebrow reveal">02 — Industries we build for</span>
-            <h2 className="ind-title reveal">Built for <em>ambitious</em> businesses.</h2>
-            <p className="ind-lead reveal">
-              Goals change from one industry to the next.
-              <br />
-              Your website should change with them.
-            </p>
-          </header>
-
-          <div className="ind-grid reveal">
-            {ORDER.map((key, n) => {
-              const c = CONCEPTS.find((x) => x.key === key)!;
-              const meta = LINES[key];
-              return (
-                <article className="ind" key={key} data-ind={key} style={{ ['--i' as string]: n }}>
-                  <div className="ind-frame">
-                    <div className="ind-chrome" aria-hidden="true">
-                      <i /><i /><i />
-                      <span className="ind-url" />
-                    </div>
-                    <div className="ind-view">
-                      <IndustryPreview c={c} />
-                    </div>
-                  </div>
-                  <span className="ind-pill">Concept</span>
-                  <h3>{meta.name}</h3>
-                  <p>{meta.line}</p>
-                </article>
-              );
-            })}
+    <section id="industries" className="industries">
+      <div className="wrap">
+        <header className="ind-head">
+          <div className="ind-head-l">
+            <span className="ind-eyebrow reveal">02 — Concept work</span>
+            <h2 className="ind-title reveal">
+              Picture <em>your</em> business here.
+            </h2>
           </div>
+          <p className="ind-lead reveal">
+            None of these are clients. Eight concepts, each shaped by what one
+            trade actually needs — yours would be drawn from your own business.
+          </p>
+        </header>
 
-          <aside className="ind-cta reveal">
-            <div>
-              <h3>Don&rsquo;t see your industry?</h3>
-              <p>We like solving a problem we haven&rsquo;t solved before. Tell us about yours.</p>
-            </div>
-            <a className="btn btn-accent" href="#contact">Discuss your project <span className="dot">&rarr;</span></a>
-          </aside>
+        <div className="ind-rail" aria-hidden="true" />
+
+        <div className="ind-spread">
+          {CONCEPTS.map((c, n) => (
+            <figure
+              className="exh reveal"
+              key={c.key}
+              data-ind={c.key}
+              data-format={c.format}
+              style={{ ['--i' as string]: n }}
+            >
+              <div className="exh-stage">
+                {/* The float mount: a faintly lit board inset behind the plate,
+                    so the photograph stands proud of it on three sides. A real
+                    print-framing device rather than a negative margin. */}
+                <span className="exh-mount" aria-hidden="true" />
+
+                <div className="exh-plate">
+                  <img
+                    className="exh-photo"
+                    src={c.photo}
+                    alt={c.alt}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span className="exh-grade" aria-hidden="true" />
+                </div>
+
+                {/* A local pool of shade under the floating sheet, sized to its
+                    own footprint. Holds the sheet against the photograph
+                    without darkening the whole lower third of the image. */}
+                <span className="exh-seat" aria-hidden="true" />
+
+                <div className="exh-canvas" aria-hidden="true">
+                  <span className="exh-c-mark">{c.brand}</span>
+                  <p className="exh-c-line">{c.headline}</p>
+                  <span className="exh-c-row">
+                    <i>{c.row.label}</i>
+                    <b>{c.row.meta}</b>
+                  </span>
+                </div>
+              </div>
+
+              <figcaption className="exh-caption">
+                <span className="exh-index">{String(n + 1).padStart(2, '0')}</span>
+                <span className="exh-kicker">Concept — {c.industry}</span>
+                <h3>{c.benefit}</h3>
+                <p className="exh-story">{c.story}</p>
+              </figcaption>
+            </figure>
+          ))}
         </div>
-      </section>
-    </>
+
+        <aside className="ind-cta reveal">
+          <div>
+            <h3>Don&rsquo;t see your industry?</h3>
+            <p>We like solving a problem we haven&rsquo;t solved before. Tell us about yours.</p>
+          </div>
+          <a className="btn btn-accent" href="#contact">
+            Discuss your project <span className="dot">&rarr;</span>
+          </a>
+        </aside>
+      </div>
+    </section>
   );
 }
