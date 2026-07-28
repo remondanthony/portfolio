@@ -15,12 +15,19 @@ const nextConfig = {
 
   images: {
     /**
-     * AVIF first, WebP as the fallback. The Industries artwork is eight
-     * 1.7-2MB PNGs; served through the optimiser one of them lands at about
-     * 32KB, so this is the difference between a 15MB section and a 300KB one.
-     * The source files are never touched.
+     * WebP only — Next's default, and deliberately left alone.
+     *
+     * AVIF was tried here and measured: on the Industries artwork it is about
+     * 27% smaller (50KB against 69KB at 1200px) but takes roughly a hundred
+     * times longer to encode — 20 seconds per variant against 0.2. Those
+     * images lazy-load, so the first visitor to reach an uncached size would
+     * watch an empty plate for twenty seconds while scrolling, to save 19KB.
+     * With eight images across six widths that is 48 variants each capable of
+     * stalling once. Not a trade worth making.
+     *
+     * The source PNGs are 1.7-2MB and are never touched; WebP alone still
+     * takes the section from about 15MB to under 600KB.
      */
-    formats: ['image/avif', 'image/webp'],
     /**
      * Next 16 only permits qualities listed here, and defaults to [75] alone.
      * The mockups contain real interface text — navigation labels, feature
