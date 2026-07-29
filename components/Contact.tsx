@@ -5,7 +5,7 @@ export default function Contact() {
         <div className="wrap">
           <div className="reveal">
             <span className="eyebrow"><span className="n">07</span> Contact</span>
-            <h2 className="title" style={{marginTop: '18px'}}>Let's build <b>something great.</b></h2>
+            <h2 className="title" style={{marginTop: '18px'}}>Let&rsquo;s build <b>your next website.</b></h2>
           </div>
           <div className="contact-grid">
             <div className="contact-info reveal">

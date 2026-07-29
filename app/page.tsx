@@ -7,7 +7,6 @@ import Marquee from '@/components/Marquee';
 import Process from '@/components/Process';
 import Services from '@/components/Services';
 import Faq from '@/components/Faq';
-import CallToAction from '@/components/CallToAction';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import BackToTop from '@/components/BackToTop';
@@ -25,8 +24,11 @@ import SiteEffects from '@/components/SiteEffects';
  *   Process ....... what happens if I say yes   (04, dark section, no eyebrow)
  *   Services ...... what do I actually get  (05 Why Vioniche)
  *   Faq ........... what am I still unsure about  (06 Common questions)
- *   CallToAction .. so, shall we
  *   Contact ....... here is how             (07 Contact)
+ *
+ * CallToAction sat between Faq and Contact and has been removed. It asked for
+ * the same thing Contact asks for, one screen earlier, so the page ended by
+ * making its closing argument twice. Contact is now the only close.
  *
  * Testimonials was removed rather than reordered. Its three quotes were
  * invented, and a fabricated review sits worse on this page than a missing
@@ -52,7 +54,6 @@ export default function Home() {
       <Services />
       <hr className="divider" />
       <Faq />
-      <CallToAction />
       <Contact />
       <Footer />
       <BackToTop />
