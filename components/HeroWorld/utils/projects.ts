@@ -21,11 +21,14 @@ export type Project = {
 
 export const PROJECTS: readonly Project[] = [
   {
-    id: 'born21',
-    domain: 'born21.com',
-    screen: '/projects/born21.jpg',
-    alt: 'Born21 — YouTube growth agency website built by VIONICHE',
-    sector: 'Media · Agency',
+    id: 'vioniche',
+    domain: 'vioniche.studio',
+    screen: '/my.png',
+    alt: 'The VIONICHE studio site — “Websites that look exceptional. Built to perform.”',
+    // domain and alt move with the screen. Leaving them would have put
+    // "born21.com" in the browser pill above a VIONICHE page, and described
+    // the wrong site to anyone using a screen reader.
+    sector: 'Web Studio',
   },
 ];
 
