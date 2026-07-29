@@ -367,7 +367,22 @@
      <details>/<summary>: keyboard accessible, findable by in-page search and
      working before hydration, none of which a JS accordion gives for free. */
   .faq-list { margin-top: 50px; border-top: 1px solid var(--hair); }
-  .faq { border-bottom: 1px solid var(--hair); }
+  .faq { border-bottom: 1px solid var(--hair); border-radius: 12px; transition: background .28s ease; }
+  /* A shade lighter than the page while open — enough to mark which answer you
+     are reading, not enough to read as a card. */
+  .faq[open] { background: var(--bg-soft); }
+
+  /* The panel used to snap open. ::details-content lets it be transitioned,
+     and interpolate-size is what makes height: auto animatable at all; it is
+     set here rather than on :root so it stays inside this section.
+     Browsers without ::details-content simply keep the instant open. */
+  .faq { interpolate-size: allow-keywords; }
+  .faq::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition: block-size .28s cubic-bezier(.2,.7,.2,1), content-visibility .28s allow-discrete;
+  }
+  .faq[open]::details-content { block-size: auto; }
   .faq summary { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 26px 4px; cursor: pointer; list-style: none; font-size: clamp(17px, 1.7vw, 20px); font-weight: 500; letter-spacing: -.01em; color: var(--ink); transition: color .2s; }
   .faq summary::-webkit-details-marker { display: none; }
   .faq summary:hover { color: var(--ink-2); }
@@ -378,6 +393,11 @@
   .faq-mark::before, .faq-mark::after { content: ""; position: absolute; left: 0; top: 7px; width: 15px; height: 1.5px; background: var(--ink); border-radius: 2px; transition: transform .28s cubic-bezier(.2,.7,.2,1); }
   .faq-mark::after { transform: rotate(90deg); }
   .faq[open] .faq-mark::after { transform: rotate(0deg); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq, .faq-mark::before, .faq-mark::after { transition: none; }
+    .faq::details-content { transition: none; }
+  }
 
   /* ---- the approach cards -------------------------------------------------
      Deliberately NOT a new card style: .card already carries the panel,

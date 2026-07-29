@@ -3,38 +3,44 @@
  *
  * Built on <details>/<summary> rather than a JS accordion: it is keyboard
  * accessible and findable by in-page search for free, it works before
- * hydration, and it needs no state. The only JS-shaped thing here is the
- * chevron, which is CSS.
+ * hydration, and it needs no state. The mark and the expand are both CSS.
  *
- * The answers deliberately explain HOW something works rather than quoting a
- * number. A studio with one shipped project cannot honestly promise a
- * turnaround or a price, and inventing one would undo the section.
+ * NOTE ON THE TIMELINE ANSWER: this copy was set by the client and quotes
+ * "2–6 weeks". The previous version deliberately refused to quote a duration,
+ * on the grounds that one shipped project is not a track record. Read as a
+ * forward commitment rather than a historical average it is defensible, but it
+ * is a number the studio will be held to, and it is the only claim on this
+ * page of that kind.
  */
 
 const FAQS = [
   {
     q: 'How long does a project take?',
-    a: 'It depends on scope, and we would rather say that than quote a number we would have to walk back. A focused marketing site moves in weeks; a CMS, a store or custom application logic adds to that. We set dates together once the scope is settled, and the biggest variable is usually how quickly content and feedback come back.',
+    a: 'Most projects are completed within 2–6 weeks, depending on the scope. After our discovery call, you’ll receive a clear timeline so you always know what happens next.',
   },
   {
     q: 'How much does a website cost?',
-    a: 'We quote per project rather than per hour, so you know the figure before anything starts. The number follows the scope: how many pages, whether you need a CMS, how much of the design is bespoke, and what has to be built rather than configured. After one call we can give you a realistic range, and once scope is agreed, a fixed price.',
+    a: 'Every project is quoted individually because every business has different goals. Once we understand your requirements, we’ll provide a fixed proposal with no hidden costs.',
   },
   {
     q: 'What happens after the site goes live?',
-    a: 'We stay close in the weeks after launch, fixing anything that surfaces and making sure your team is comfortable running the site day to day. Beyond that, ongoing support is arranged separately and is always optional.',
+    a: 'Launching your website isn’t the end of the project. We monitor everything closely, fix any unexpected issues, and make sure your website performs exactly as intended.',
   },
   {
-    q: 'Do you handle hosting?',
-    a: 'We can set it up and manage it, or you can host it yourself. Static sites and Next.js builds run well on platform hosting like Vercel — fast, inexpensive and close to no upkeep. Accounts are created in your name, so the domain, the hosting and the code stay yours.',
+    q: 'Do you help with hosting and domains?',
+    a: 'Yes. We can help you choose, purchase and configure your hosting and domain. If you already have them, we’ll work with your existing setup.',
   },
   {
     q: 'Do I need a maintenance plan?',
-    a: 'Not always. A static marketing site can sit for a long time with very little attention, while anything with a CMS, integrations or payments benefits from someone keeping dependencies current and watching for errors. We will tell you honestly which one you have, and only suggest a plan if it earns its place.',
+    a: 'Not necessarily. Your website is built to be easy to manage, but if you’d rather stay hands-off, we also offer ongoing maintenance and support whenever you need it.',
   },
   {
-    q: 'You have one project live. Why work with you?',
-    a: 'Born21 is the site we have shipped and put our name to. It was designed, built and deployed by the same people who would work on yours, and anything else you see here is labelled as a concept because that is what it is. Judge us on that project, on this site, and on the first conversation.',
+    q: 'Why trust a new studio?',
+    a: 'Vioniche may be a new studio, but every project receives direct attention from the person designing and building it. We focus on thoughtful design, custom development and long-term partnerships rather than rushing through high volumes of work.',
+  },
+  {
+    q: 'What happens after we contact you?',
+    a: 'We’ll start with a short conversation about your business, goals and timeline. If we’re a good fit, we’ll prepare a clear proposal outlining the scope, timeline and next steps—no pressure and no obligation.',
   },
 ];
 
@@ -48,7 +54,7 @@ export default function Faq() {
               <span className="eyebrow"><span className="n">06</span> Common questions</span>
               <h2 className="title" style={{marginTop: '18px'}}>The questions we <b>get asked first.</b></h2>
             </div>
-            <p className="lead" style={{margin: '0'}}>Straight answers on timing, cost and what happens after launch. If something isn&rsquo;t covered here, ask us directly.</p>
+            <p className="lead" style={{margin: '0'}}>Honest answers about timelines, pricing and everything that happens after launch. If you still have a question, we&rsquo;re only a message away.</p>
           </div>
 
           <div className="faq-list reveal">
