@@ -107,7 +107,7 @@ export const CONCEPTS: Concept[] = [
     story: 'Levels, fees and start dates, all upfront.',
     photo: '/concepts/education.png',
     alt: 'A course website design headed “Learn Today. Lead Tomorrow.”, shown on a screen on a study desk.',
-    format: 'wide',
+    format: 'pair',
   },
   {
     key: 'law',
@@ -116,6 +116,6 @@ export const CONCEPTS: Concept[] = [
     story: 'Practice areas, people and costs, without hedging.',
     photo: '/concepts/law.png',
     alt: 'A law firm website design headed “Legal Confidence. Every Step.”, shown on a screen in a panelled office.',
-    format: 'wide',
+    format: 'pair',
   },
 ];
