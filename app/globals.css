@@ -190,7 +190,7 @@
     /* Tighter than the site default. This section is long by nature — eight
        exhibits — so it earns its air from the gutters between them rather than
        from a deep margin at each end. */
-    padding-block: clamp(56px, 6vw, 84px);
+    padding-block: clamp(40px, 4.4vw, 60px);
   }
   /* Grain on the room, not on the artwork — it sits under .wrap, so it never
      touches a plate. */
@@ -206,21 +206,21 @@
   .ind-head { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; align-items: end;
               border-top: 1px solid rgba(255,255,255,.10); padding-top: 22px; }
   .ind-head-l { grid-column: 1 / 8; }
-  .ind-eyebrow { display: inline-block; font-size: 11.5px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-orange); }
-  .ind-title { font-size: clamp(30px, 4.7vw, 58px); line-height: 1.03; font-weight: 300; letter-spacing: -.04em; color: #fff; margin-top: 13px; }
+  .ind-eyebrow { display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--accent-orange); }
+  .ind-title { font-size: clamp(26px, 4vw, 49px); line-height: 1.04; font-weight: 300; letter-spacing: -.04em; color: #fff; margin-top: 10px; }
   /* Weight 500, not 700: only Regular and Medium upright faces are licensed,
      so 700 is synthesised and smears at this size. */
   .ind-title em { font-style: normal; font-weight: 500; color: var(--accent-orange); }
-  .ind-lead { grid-column: 9 / 13; align-self: end; font-size: 15px; line-height: 1.5; color: rgba(255,255,255,.58); }
+  .ind-lead { grid-column: 9 / 13; align-self: end; font-size: 14px; line-height: 1.45; color: rgba(255,255,255,.58); }
 
-  .ind-rail { height: 1px; margin-top: clamp(30px, 3.2vw, 46px);
+  .ind-rail { height: 1px; margin-top: clamp(20px, 2.2vw, 32px);
               background: linear-gradient(90deg, transparent, rgba(255,255,255,.10) 12%, rgba(255,255,255,.10) 88%, transparent); }
 
   /* ---- the spread ----
      Row gap is 0 on purpose: each exhibit carries its own margin-top, because
      a uniform row gap is exactly what makes a page feel like a grid. */
-  .ind-spread { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; row-gap: 0;
-                margin-top: clamp(28px, 3vw, 42px); }
+  .ind-spread { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 20px; row-gap: 0;
+                margin-top: clamp(18px, 2vw, 28px); }
 
   .exh { margin: 0; min-width: 0; }
   .exh-stage { position: relative; }
@@ -237,53 +237,54 @@
   /* ---- caption: identical on all eight. This is the "one studio" glue ---- */
   /* The caption repeats eight times, so every pixel trimmed here is worth
      eight. The index and kicker now share a line instead of stacking. */
-  .exh-caption { margin-top: 20px; }
-  .exh-index { font-size: 10.5px; font-variant-numeric: tabular-nums; letter-spacing: .2em; color: rgba(255,255,255,.32); }
-  .exh-kicker { margin-left: 12px; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; font-weight: 500; color: var(--tint, var(--accent-orange)); }
-  .exh-caption h3 { font-size: clamp(19px, 1.8vw, 25px); font-weight: 400; letter-spacing: -.022em; line-height: 1.15; color: #fff; margin-top: 10px; }
+  .exh-caption { margin-top: 14px; }
+  .exh-index { font-size: 10px; font-variant-numeric: tabular-nums; letter-spacing: .18em; color: rgba(255,255,255,.32); }
+  .exh-kicker { margin-left: 10px; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; font-weight: 500; color: var(--tint, var(--accent-orange)); }
+  .exh-caption h3 { font-size: clamp(16.5px, 1.55vw, 21px); font-weight: 400; letter-spacing: -.022em; line-height: 1.14; color: #fff; margin-top: 8px; }
   /* The two-line reservation is gone. It kept baselines level across a row,
      but it also forced a blank line under every story short enough to fit on
      one — eight times over, that was pure height for no gain. */
-  .exh-story { font-size: 14.5px; line-height: 1.5; color: rgba(255,255,255,.56); max-width: 40ch; margin-top: 7px;
+  .exh-story { font-size: 13.5px; line-height: 1.45; color: rgba(255,255,255,.56); max-width: 42ch; margin-top: 5px;
                text-wrap: pretty; }
 
   /* ---- the hang: placement per exhibit ----
-     Six full-width rows became five mixed ones. Four exhibits that each owned
-     the whole measure now pair up, which is where most of the height went:
-     two exhibits sharing a row cost one row, not two.
+     Two exhibits per row could not meet the height target. Eight 3:2 plates
+     stacked one per row are 1881px on their own, before a single caption,
+     which is already past the two-viewport budget. The only lever left was
+     columns: more exhibits per row means fewer rows, and fewer rows is the
+     only thing that moves a number like that.
 
-     Every nested stage and caption pins itself to `grid-row: 1`. Without it,
-     education broke — its caption sits in columns 1-4 but comes after the
-     stage in the DOM, and sparse auto-placement will not go backwards to fill
-     a column it has already passed, so the caption dropped to a second row and
-     silently added its own height to the section. */
+     So: one featured opener, then a row of four, then a row of three. The
+     mixed card widths are deliberate — a uniform four-up grid of eight would
+     read as the template gallery this section was rebuilt to escape.
+
+     Every nested stage and caption pins to `grid-row: 1`. Without it a caption
+     placed in an earlier column than its stage drops to a second row, because
+     sparse auto-placement will not go backwards. That silently cost 200px
+     before it was caught. */
   @media (min-width: 1100px) {
-    /* The opener. Widest of the small plates, caption alongside. */
-    .exh[data-ind="fitness"]    { grid-column: 1 / 13; grid-row: 1; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; }
-    /* Seven columns, not six: at six the plate fell to about 42vh, under the
-       50-55vh the opener is meant to hold, and it stopped reading as the
-       featured exhibit at all. */
-    .exh[data-ind="fitness"]    .exh-stage { grid-column: 1 / 8; grid-row: 1; }
-    .exh[data-ind="fitness"]    .exh-caption { grid-column: 9 / 13; grid-row: 1; align-self: end; margin-top: 0; }
+    /* The opener: six columns, 566x377, which is 42vh on a 900px viewport. */
+    .exh[data-ind="fitness"]    { grid-column: 1 / 13; grid-row: 1; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 20px; }
+    .exh[data-ind="fitness"]    .exh-stage { grid-column: 1 / 7; grid-row: 1; }
+    .exh[data-ind="fitness"]    .exh-caption { grid-column: 8 / 13; grid-row: 1; align-self: end; margin-top: 0; }
 
-    /* Three paired rows. The two empty columns between them are the gutter
-       that keeps this reading as a spread rather than as a two-up grid. */
-    .exh[data-ind="healthcare"] { grid-column: 1 / 6;  grid-row: 2; margin-top: clamp(40px, 4.4vw, 64px); }
-    .exh[data-ind="restaurant"] { grid-column: 8 / 13; grid-row: 2; margin-top: clamp(76px, 8vw, 116px); }
+    /* Four across, three columns each: 273x182. */
+    .exh[data-ind="healthcare"] { grid-column: 1 / 4;  grid-row: 2; }
+    .exh[data-ind="restaurant"] { grid-column: 4 / 7;  grid-row: 2; }
+    .exh[data-ind="boutique"]   { grid-column: 7 / 10; grid-row: 2; }
+    .exh[data-ind="beauty"]     { grid-column: 10 / 13; grid-row: 2; }
 
-    .exh[data-ind="boutique"]   { grid-column: 1 / 6;  grid-row: 3; margin-top: clamp(46px, 5vw, 72px); }
-    .exh[data-ind="beauty"]     { grid-column: 8 / 13; grid-row: 3; margin-top: clamp(14px, 1.8vw, 26px); }
+    /* Three across, four columns each: 371x247. The larger row closes the
+       section, so the eye finishes on the bigger artwork rather than the
+       smaller. */
+    .exh[data-ind="realestate"] { grid-column: 1 / 5;  grid-row: 3; }
+    .exh[data-ind="education"]  { grid-column: 5 / 9;  grid-row: 3; }
+    .exh[data-ind="law"]        { grid-column: 9 / 13; grid-row: 3; }
 
-    /* Still the largest plate in the section, so it still stops the eye — but
-       its caption now sits beside it rather than beneath, and it no longer
-       runs the full twelve columns. It was 768px tall on its own. */
-    .exh[data-ind="realestate"] { grid-column: 1 / 13; grid-row: 4; margin-top: clamp(56px, 6vw, 86px);
-                                  display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; }
-    .exh[data-ind="realestate"] .exh-stage { grid-column: 1 / 9; grid-row: 1; }
-    .exh[data-ind="realestate"] .exh-caption { grid-column: 10 / 13; grid-row: 1; align-self: end; margin-top: 0; }
-
-    .exh[data-ind="education"]  { grid-column: 1 / 6;  grid-row: 5; margin-top: clamp(46px, 5vw, 72px); }
-    .exh[data-ind="law"]        { grid-column: 8 / 13; grid-row: 5; margin-top: clamp(14px, 1.8vw, 26px); }
+    .exh[data-ind="healthcare"], .exh[data-ind="restaurant"],
+    .exh[data-ind="boutique"], .exh[data-ind="beauty"] { margin-top: clamp(26px, 2.8vw, 40px); }
+    .exh[data-ind="realestate"], .exh[data-ind="education"],
+    .exh[data-ind="law"] { margin-top: clamp(26px, 2.8vw, 40px); }
   }
 
   /* ---- hover: lift, deeper shadow, brighter edge. 350ms, nothing more ----
@@ -311,12 +312,16 @@
   .exh[data-ind="law"]        { --tint: #c9a86a; }
 
   /* ---- the closing callout: a rule, not a panel ---- */
-  .ind-cta { margin-top: clamp(48px, 5vw, 76px); border-top: 1px solid rgba(255,255,255,.12); padding-top: 26px;
-             display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap; }
-  .ind-cta h3 { font-size: clamp(18px, 1.9vw, 23px); font-weight: 400; color: #fff; letter-spacing: -.02em; }
-  .ind-cta p { margin-top: 6px; color: rgba(255,255,255,.6); font-size: 15px; line-height: 1.5; max-width: 52ch; }
+  .ind-cta { margin-top: clamp(30px, 3.2vw, 46px); border-top: 1px solid rgba(255,255,255,.12); padding-top: 16px;
+             display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .ind-cta h3 { font-size: clamp(16px, 1.65vw, 20px); font-weight: 400; color: #fff; letter-spacing: -.02em; }
+  .ind-cta p { margin-top: 4px; color: rgba(255,255,255,.6); font-size: 13.5px; line-height: 1.45; max-width: 56ch; }
   .btn-accent { background: var(--accent-orange); color: #fff; border-color: transparent; }
   .btn-accent .dot { background: #fff; color: var(--accent-orange); }
+  /* Scoped to this section's callout only, so the site's button scale is
+     untouched everywhere else. */
+  .ind-cta .btn { font-size: 14px; padding: 11px 10px 11px 20px; }
+  .ind-cta .btn .dot { width: 24px; height: 24px; font-size: 12px; }
 
   /* ---- entrance: one stage, not two ---- */
   .ind-head .reveal { transition-delay: .05s; }
@@ -324,22 +329,32 @@
   .ind-lead.reveal { transition-delay: .25s; }
 
   /* ---- narrower ---- */
+  /* Below the hang, column count steps down with width rather than dropping
+     straight to one. Eight 3:2 plates in a single column is the tallest
+     arrangement possible, so every step that keeps two or three across is
+     worth real height. */
   @media (max-width: 1099px) {
     .ind-head { display: block; }
-    .ind-lead { margin-top: 14px; max-width: 60ch; }
-    .ind-spread { grid-template-columns: repeat(2, 1fr); column-gap: clamp(18px, 2.6vw, 28px); row-gap: clamp(38px, 4.4vw, 60px); }
+    .ind-lead { margin-top: 12px; max-width: 60ch; }
+    .ind-spread { grid-template-columns: repeat(3, 1fr); column-gap: clamp(14px, 2vw, 20px); row-gap: clamp(26px, 3.2vw, 40px); }
     .exh { grid-column: span 1; }
-    .exh[data-ind="realestate"] { grid-column: 1 / -1; }
-    .exh-caption { margin-top: 18px; }
+    /* The opener keeps its scale but gives up its side caption. */
+    .exh[data-ind="fitness"] { grid-column: 1 / -1; display: block; }
+    .exh[data-ind="fitness"] .exh-stage { max-width: 62%; }
+    .exh-caption { margin-top: 14px; }
   }
 
-  /* One column of eight 3:2 plates has a height floor: the plates alone are
-     most of it, and they cannot shrink without the mockups becoming unreadable
-     on a phone. So the savings here come from the gaps and the furniture. */
-  @media (max-width: 640px) {
-    .ind-spread { grid-template-columns: 1fr; row-gap: clamp(26px, 5.5vw, 38px); }
-    .exh-caption { margin-top: 14px; }
-    .ind-cta { padding-top: 22px; gap: 18px; }
+  @media (max-width: 780px) {
+    .ind-spread { grid-template-columns: repeat(2, 1fr); }
+    .exh[data-ind="fitness"] .exh-stage { max-width: 100%; }
+  }
+
+  /* One column is the last resort: below this the plates are too narrow for
+     the mockups to be read at all. */
+  @media (max-width: 460px) {
+    .ind-spread { grid-template-columns: 1fr; row-gap: clamp(22px, 5vw, 32px); }
+    .exh-caption { margin-top: 12px; }
+    .ind-cta { padding-top: 16px; gap: 16px; }
     .ind-cta p { max-width: none; }
   }
 

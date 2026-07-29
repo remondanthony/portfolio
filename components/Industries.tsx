@@ -27,14 +27,14 @@ import { CONCEPTS, type Format } from './industries/concepts';
 
 /**
  * What the plate actually measures, so the browser picks the right source.
- * These track the grid: 8 columns for the closer, 7 for the opener, 5 for a
- * paired card. Wrong values here do not break the layout, they just make the
+ * These track the grid: 6 columns for the opener, 4 for a wide card, 3 for a
+ * small one. Wrong values here do not break the layout, they just make the
  * browser fetch a size it does not need.
  */
 const SIZES: Record<Format, string> = {
-  full: '(min-width: 1100px) 760px, (min-width: 640px) 100vw, 92vw',
-  wide: '(min-width: 1100px) 662px, (min-width: 640px) 50vw, 92vw',
-  pair: '(min-width: 1100px) 466px, (min-width: 640px) 50vw, 92vw',
+  feature: '(min-width: 1100px) 566px, (min-width: 640px) 50vw, 92vw',
+  cardWide: '(min-width: 1100px) 371px, (min-width: 640px) 33vw, 92vw',
+  card: '(min-width: 1100px) 273px, (min-width: 640px) 25vw, 92vw',
 };
 
 export default function Industries() {

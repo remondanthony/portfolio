@@ -17,8 +17,8 @@
  * client, or quotes a number.
  */
 
-/** How much of the measure an exhibit takes, and where its caption sits. */
-export type Format = 'wide' | 'pair' | 'full';
+/** How many columns an exhibit takes, and so how large its plate is. */
+export type Format = 'feature' | 'card' | 'cardWide';
 
 export type Concept = {
   key: string;
@@ -51,7 +51,7 @@ export const CONCEPTS: Concept[] = [
     story: 'Timetable, trial and pricing, no phone call.',
     photo: '/concepts/fitness.png',
     alt: 'A gym website design headed “Train Stronger”, shown on a screen in a dark weights room.',
-    format: 'wide',
+    format: 'feature',
   },
   {
     key: 'healthcare',
@@ -60,7 +60,7 @@ export const CONCEPTS: Concept[] = [
     story: 'Who you’ll see, what it costs, when to come.',
     photo: '/concepts/healthcare.png',
     alt: 'A clinic website design headed “Care Without The Wait”, shown on a screen in a bright consulting room.',
-    format: 'pair',
+    format: 'card',
   },
   {
     key: 'restaurant',
@@ -71,7 +71,7 @@ export const CONCEPTS: Concept[] = [
     // rather than renamed, so re-exporting over it keeps working.
     photo: '/concepts/resturant.png',
     alt: 'A restaurant website design headed “Dining Reimagined”, shown on a screen on a candlelit table.',
-    format: 'pair',
+    format: 'card',
   },
   {
     key: 'boutique',
@@ -80,7 +80,7 @@ export const CONCEPTS: Concept[] = [
     story: 'Stock, sizing and returns, all on the page.',
     photo: '/concepts/boutique.png',
     alt: 'A fashion website design headed “Timeless Pieces”, shown on a screen in a pale boutique interior.',
-    format: 'pair',
+    format: 'card',
   },
   {
     key: 'beauty',
@@ -89,7 +89,7 @@ export const CONCEPTS: Concept[] = [
     story: 'Ingredients, patch tests and routine, in plain words.',
     photo: '/concepts/beauty.png',
     alt: 'A skincare website design headed “Glow With Confidence”, shown on a screen beside cream jars and a candle.',
-    format: 'pair',
+    format: 'card',
   },
   {
     key: 'realestate',
@@ -98,7 +98,7 @@ export const CONCEPTS: Concept[] = [
     story: 'Listings kept current, and worth a slow look.',
     photo: '/concepts/realestate.png',
     alt: 'An estate agency website design headed “Find Extraordinary Homes”, shown on a screen on a dark marble desk.',
-    format: 'full',
+    format: 'cardWide',
   },
   {
     key: 'education',
@@ -107,7 +107,7 @@ export const CONCEPTS: Concept[] = [
     story: 'Levels, fees and start dates, all upfront.',
     photo: '/concepts/education.png',
     alt: 'A course website design headed “Learn Today. Lead Tomorrow.”, shown on a screen on a study desk.',
-    format: 'pair',
+    format: 'cardWide',
   },
   {
     key: 'law',
@@ -116,6 +116,6 @@ export const CONCEPTS: Concept[] = [
     story: 'Practice areas, people and costs, without hedging.',
     photo: '/concepts/law.png',
     alt: 'A law firm website design headed “Legal Confidence. Every Step.”, shown on a screen in a panelled office.',
-    format: 'pair',
+    format: 'cardWide',
   },
 ];
