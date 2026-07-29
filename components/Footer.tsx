@@ -10,7 +10,7 @@ export default function Footer() {
             </div>
             <div className="foot-col"><h4>Studio</h4><a href="#work">Work</a><a href="#services">Services</a><a href="#process">Process</a><a href="#about">About</a></div>
             <div className="foot-col"><h4>Services</h4><a href="#services">Web Design</a><a href="#services">Development</a><a href="#services">E-commerce</a><a href="#services">Web Apps</a></div>
-            <div className="foot-col"><h4>Connect</h4><a href="mailto:hello@vioniche.studio">Email</a><a href="#">Twitter / X</a><a href="#">Dribbble</a><a href="#">LinkedIn</a></div>
+            <div className="foot-col"><h4>Connect</h4><a href="mailto:hello@vioniche.studio">Email</a><a href="#">Twitter / X</a><a href="#">Instagram</a><a href="#">LinkedIn</a></div>
           </div>
           <div className="foot-bottom">
             <span>© 2026 VIONICHE Web Studio. All rights reserved.</span>
