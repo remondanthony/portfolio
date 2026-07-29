@@ -6,17 +6,17 @@
  * hydration, and it needs no state. The mark and the expand are both CSS.
  *
  * NOTE ON THE TIMELINE ANSWER: this copy was set by the client and quotes
- * "2–6 weeks". The previous version deliberately refused to quote a duration,
- * on the grounds that one shipped project is not a track record. Read as a
- * forward commitment rather than a historical average it is defensible, but it
- * is a number the studio will be held to, and it is the only claim on this
- * page of that kind.
+ * "within 7 days". It is the tightest commitment anywhere on the site, and it
+ * is the one line most likely to be quoted back during a project. The caveat
+ * that carries it — "depending on the project scope and how quickly content
+ * and feedback are provided" — is doing real work, so keep it if this answer
+ * is ever shortened.
  */
 
 const FAQS = [
   {
     q: 'How long does a project take?',
-    a: 'Most projects are completed within 2–6 weeks, depending on the scope. After our discovery call, you’ll receive a clear timeline so you always know what happens next.',
+    a: 'Most websites are launched within 7 days, depending on the project scope and how quickly content and feedback are provided. Before we begin, you’ll receive a clear timeline so you always know what happens next.',
   },
   {
     q: 'How much does a website cost?',
