@@ -29,8 +29,15 @@ export default function Contact() {
                 </select>
               </div>
               <div className="field"><label htmlFor="msg">Project details</label><textarea id="msg" name="msg" placeholder="Tell us what you're building…" required></textarea></div>
+              {/* Honeypot. Off-screen rather than display:none, because some
+                  bots skip hidden fields but almost all fill every input they
+                  can see in the DOM. Never shown, never focusable, not read. */}
+              <div className="hp" aria-hidden="true">
+                <label htmlFor="company">Company</label>
+                <input id="company" name="company" type="text" tabIndex={-1} autoComplete="off" />
+              </div>
               <button type="submit" className="btn btn-dark" style={{alignSelf: 'flex-start'}}>Send message <span className="dot">→</span></button>
-              <div className="form-ok" id="formOk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{width: '18px', height: '18px'}}><polyline points="20 6 9 17 4 12" /></svg>Thanks — we'll reply within one business day.</div>
+              <div className="form-ok" id="formOk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{width: '18px', height: '18px'}}><polyline points="20 6 9 17 4 12" /></svg><span data-status-text>Thanks &mdash; we&rsquo;ll reply within one business day.</span></div>
             </form>
           </div>
         </div>

@@ -513,6 +513,13 @@
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
   .form-ok { display: none; align-items: center; gap: 10px; background: #eef4f0; border: 1px solid #cfe6da; color: #1a7a55; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 600; }
   .form-ok.show { display: flex; }
+  /* The same box also carries the fallback message, so it must stop looking
+     like a confirmation when nothing has been confirmed. */
+  .form-ok[data-tone="warn"] { background: #fdf6ea; border-color: #efdcbb; color: #8a6420; }
+  .form-ok[data-tone="warn"] svg { display: none; }
+
+  /* Honeypot: off-screen, never focusable, never announced. */
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
   /* ============ FOOTER ============ */
   footer { border-top: 1px solid var(--hair); padding-block: 60px 36px; }

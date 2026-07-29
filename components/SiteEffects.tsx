@@ -139,18 +139,91 @@ export default function SiteEffects() {
     }
 
     // ---- contact form ----
+    /**
+     * This used to call preventDefault(), show "Thanks — we'll reply within one
+     * business day" and do nothing else. The message was never sent anywhere.
+     *
+     * It now posts to /api/contact. The success note appears only when the send
+     * actually succeeded. If the endpoint has no mail credentials yet, or the
+     * provider fails, it opens the visitor's mail client with everything they
+     * typed already in it — so the enquiry survives either way rather than
+     * being swallowed behind a thank-you.
+     */
     if (form) {
-      const onSubmit = (e: Event) => {
+      const status = document.getElementById('formOk');
+      const submit = form.querySelector('button[type=submit]') as HTMLElement | null;
+
+      const say = (text: string, tone: 'ok' | 'warn' | 'error') => {
+        if (!status) return;
+        const label = status.querySelector('[data-status-text]');
+        if (label) label.textContent = text;
+        else status.textContent = text;
+        status.dataset.tone = tone;
+        status.classList.add('show');
+      };
+
+      const mailtoFallback = (d: Record<string, string>) => {
+        const to = 'hello@vioniche.studio';
+        const subject = `New enquiry — ${d.name}${d.type ? ` (${d.type})` : ''}`;
+        const lines = [`Name: ${d.name}`, `Email: ${d.email}`, `Type: ${d.type || '—'}`, '', d.msg];
+        window.location.href =
+          `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+      };
+
+      const onSubmit = async (e: Event) => {
         e.preventDefault();
         if (!form.checkValidity()) {
           form.reportValidity();
           return;
         }
-        document.getElementById('formOk')?.classList.add('show');
-        const submit = form.querySelector('button[type=submit]') as HTMLElement | null;
-        if (submit) submit.style.display = 'none';
-        form.reset();
+
+        const fd = new FormData(form);
+        const data = {
+          name: String(fd.get('name') || ''),
+          email: String(fd.get('email') || ''),
+          type: String(fd.get('type') || ''),
+          msg: String(fd.get('msg') || ''),
+          company: String(fd.get('company') || ''), // honeypot
+        };
+
+        // innerHTML, not textContent: the button holds an arrow span that
+        // textContent would flatten away and never restore.
+        if (submit) {
+          submit.setAttribute('disabled', 'true');
+          submit.dataset.label ??= submit.innerHTML;
+          submit.textContent = 'Sending…';
+        }
+
+        try {
+          const r = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+          const out = await r.json().catch(() => ({}));
+
+          if (r.ok && out.ok) {
+            say('Thanks — we’ll reply within one business day.', 'ok');
+            if (submit) submit.style.display = 'none';
+            form.reset();
+            return;
+          }
+
+          // Anything else: hand the message to their mail client rather than
+          // pretending it went somewhere.
+          say('Opening your email app so this reaches us…', 'warn');
+          mailtoFallback(data);
+        } catch {
+          say('Network problem — opening your email app instead…', 'warn');
+          mailtoFallback(data);
+        } finally {
+          if (submit && submit.style.display !== 'none') {
+            submit.removeAttribute('disabled');
+            if (submit.dataset.label) submit.innerHTML = submit.dataset.label;
+          }
+        }
       };
+
       form.addEventListener('submit', onSubmit);
       cleanups.push(() => form.removeEventListener('submit', onSubmit));
     }
