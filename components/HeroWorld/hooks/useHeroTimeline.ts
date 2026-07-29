@@ -31,6 +31,12 @@ export function useHeroTimeline(scopeRef: React.RefObject<HTMLElement | null>) {
     const scope = scopeRef.current;
     if (!scope) return;
 
+    // The <head> script already turned off the browser's scroll restoration,
+    // but the pin is only correct if it is created from a standing start —
+    // anything that scrolled the page between then and now would have the
+    // build open mid-scrub. Cheap to assert, so assert it.
+    if (!window.location.hash) window.scrollTo(0, 0);
+
     const ctx = gsap.context(() => {
       const tl = buildMasterTimeline(gsap, scope);
 
@@ -175,7 +181,21 @@ export function useHeroTimeline(scopeRef: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener('load', refresh);
-    return () => window.removeEventListener('load', refresh);
+
+    // Back/forward can hand the page back from the bfcache fully rendered and
+    // already scrolled, skipping mount entirely — so neither the head script
+    // nor the layout effect above gets a say. This is the only hook that fires.
+    const onShow = (e: PageTransitionEvent) => {
+      if (!e.persisted) return;
+      if (!window.location.hash) window.scrollTo(0, 0);
+      ScrollTrigger.refresh();
+    };
+    window.addEventListener('pageshow', onShow);
+
+    return () => {
+      window.removeEventListener('load', refresh);
+      window.removeEventListener('pageshow', onShow);
+    };
   }, []);
 
   return { resolved, reduced };
