@@ -565,15 +565,20 @@
      6vw already exceeds 80 from 1334px up. */
   @media (min-width: 821px) { .hero-blank { padding-block: clamp(80px, 6vw, 88px); } }
   /* How-We-Design section (dark, matched to sample) */
-  .how { background: radial-gradient(125% 115% at 84% 90%, #5a2410 0%, #26120a 40%, #0b0809 76%); color: #fff; padding-block: clamp(56px, 8vw, 104px); overflow: hidden; }
+  /* scroll-margin-top because the top padding came down to 76px and the sticky
+     navigation is 74px: without it, following the "Process" link in the nav or
+     the footer lands with the heading tucked under the bar. The old 104px
+     padding was hiding that. */
+  .how { background: radial-gradient(125% 115% at 84% 90%, #5a2410 0%, #26120a 40%, #0b0809 76%); color: #fff; padding-block: clamp(42px, 5.6vw, 76px); overflow: hidden; scroll-margin-top: 86px; }
   .how .wrap { position: relative; }
   .how-title { text-align: center; font-size: clamp(30px, 4.6vw, 54px); font-weight: 700; letter-spacing: -.02em; line-height: 1.08; color: #fff; }
   .how-title em { font-style: normal; color: var(--accent-orange); }
-  .how-grid { position: relative; width: 114.5%; aspect-ratio: 900 / 560; margin-top: clamp(28px, 4vw, 56px); }
+  .how-lead { text-align: center; max-width: 520px; margin: 14px auto 0; font-size: clamp(14.5px, 1.35vw, 16.5px); line-height: 1.55; color: rgba(255,255,255,.62); }
+  .how-grid { position: relative; width: 114.5%; aspect-ratio: 900 / 560; margin-top: clamp(18px, 2.4vw, 32px); }
   .how-line { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
   .how-phone { position: absolute; right: 1%; top: 16%; height: 84%; width: auto; z-index: 1; filter: drop-shadow(0 26px 48px rgba(0,0,0,.55)); }
   .stage { position: absolute; z-index: 2; }
-  .stage h3 { font-size: clamp(17px, 2vw, 24px); font-weight: 500; color: #cfc7c0; margin: 0 0 14px; letter-spacing: -.01em; }
+  .stage h3 { font-size: clamp(19px, 2.25vw, 27px); font-weight: 500; color: #e4ddd7; margin: 0 0 12px; letter-spacing: -.012em; }
   .stage ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
   .stage li { display: flex; align-items: center; gap: 11px; font-size: clamp(11px, 1.15vw, 13.5px); font-weight: 500; color: #f0ebe7; }
   .stage li::before { content: "\2713"; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 5px; background: var(--accent-orange); color: #fff; font-size: 11px; font-weight: 800; flex: none; }
@@ -586,7 +591,7 @@
     .how-line { display: none; }
     .how-phone { position: static; grid-column: 1 / -1; justify-self: center; height: auto; width: min(310px, 84%); margin: 16px auto 0; filter: drop-shadow(0 22px 40px rgba(0,0,0,.55)); -webkit-mask: none; mask: none; }
     .stage { position: static; }
-    .stage h3 { font-size: 18px; }
+    .stage h3 { font-size: 20px; }
     .stage li { font-size: 14px; }
   }
   .logo-img { width: 30px; height: 30px; object-fit: contain; flex: none; display: block; }
