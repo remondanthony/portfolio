@@ -772,45 +772,84 @@
    The image itself is never animated. It sits still inside .float, and every
    transform the timeline applies lands on .stage, .float or .tilt above it —
    so what moves is a composited layer, not pixels. */
+/* The reference box. Exactly the render's own 3:2, centred in whatever shape
+   .stage happens to be, and the container every cqw below resolves against. */
+.macFrame {
+  position: absolute;
+  /* Width-driven, not inset-driven: with inset:0 on all four sides the box
+     fills its parent and aspect-ratio is ignored, which left the frame at
+     1.459 instead of 1.5 and put every percentage below a few points out. */
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  aspect-ratio: 1536 / 1024;
+  container-type: inline-size;
+}
+
 .macImg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: fill;
   pointer-events: none;
   user-select: none;
 }
 
 /* ---------- the live display ----------------------------------------------
-   The laptop's screen in mac.png is a quadrilateral, not a rectangle — the
-   machine is seen from slightly off-axis. Measured off the asset at full size
-   (1536x1024): TL 658,282  TR 1316,250  BR 1300,668  BL 628,692.
+   The laptop's screen in mac.png is not a rectangle. It is a plane seen from
+   off-axis, so its four corners form a genuine quadrilateral: measured off the
+   asset at full size (1536x1024) by detecting the inner edge of the dark bezel
+   rather than by eye, they sit at
 
-   Position comes from TL as a percentage, so it tracks the image at every
-   width. The shear comes from matrix(), whose four components here are pure
-   RATIOS of the quad's own edge vectors to the element's own box — no pixel
-   lengths anywhere — which is what makes the whole thing scale without a
-   single line of JavaScript or a breakpoint.
+       TL  676, 291     TR  1320, 241
+       BL  636, 690     BR  1293, 690
 
-       a,b = top edge / width   = (658, -32) / 658.8
-       c,d = left edge / height = (-30, 410) / 411.1
+   and the two vertical edges differ in length by 12%. No affine transform can
+   express that — the previous version approximated it with matrix() and was
+   about 50px out at the bottom-right, which is why the content read as a
+   rectangle floating over the render rather than as pixels on the display.
 
-   The quad is very slightly non-affine, so the far corner lands about 1% out.
-   The overlay is sized a touch beyond the opening to absorb that: it is better
-   to run a hair under the bezel, which is dark and rounded and hides it, than
-   to leave a sliver of the render's own baked-in screenshot showing through. */
+   What is applied here is the real thing: a plane rotated in three axes and
+   projected. The parameters were solved numerically against those four
+   corners and land on them exactly — 0.0000px residual at all four.
+
+   Every value is scale-invariant, which is what lets one rule serve every
+   viewport with no JavaScript and no breakpoint. The angles are angles. The
+   position and size are percentages of the canvas. The perspective distance is
+   in cqw, resolved against .stage, which is the container the render fills —
+   so it grows and shrinks with the machine.
+
+   Transform order matters and is deliberate: CSS applies the list right to
+   left, so this is rotateZ, then rotateX, then rotateY, then the projection,
+   which is the order the fit assumed. */
 .macScreen {
   position: absolute;
-  left: 42.7%;
-  top: 27.2%;
-  width: 43.4%;
-  height: 40.9%;
+  left: 44.0104%;
+  top: 28.4180%;
+  width: 46.5222%;
+  height: 39.2734%;
   transform-origin: 0 0;
-  transform: matrix(0.9988, -0.0486, -0.073, 0.9973, 0, 0);
+  transform:
+    perspective(248.821cqw)
+    rotateY(-37.5331deg)
+    rotateX(14.0772deg)
+    rotateZ(-3.6754deg);
   overflow: hidden;
-  border-radius: 3px;
+  /* The display's own corner radius, measured at about 14 source pixels and
+     expressed against the canvas so it scales with everything else. It is
+     applied in the element's local space and projected with it, which is what
+     keeps the corners sitting on the bezel's curve instead of cutting across
+     it. */
+  border-radius: 0.95cqw;
   background: #fff;
-  container-type: inline-size;
   isolation: isolate;
+  backface-visibility: hidden;
+  /* Load-bearing. Every scene inside sizes its type and spacing in cqw, and
+     without this they resolve against .stage — the whole canvas, roughly twice
+     as wide — so the website rendered at double size and burst out of the
+     display. This makes the screen itself the container they measure. */
+  container-type: inline-size;
 }

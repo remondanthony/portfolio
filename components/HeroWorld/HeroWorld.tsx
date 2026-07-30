@@ -73,6 +73,13 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
                   MacBook — lid, bezel, notch, base, sheen, cast shadow — and
                   the CSS phone are gone: all of it, including both shadows and
                   the perspective, is in this file. */}
+              {/* An exactly 3:2 frame, centred in the stage. Everything the
+                  screen's geometry depends on is a percentage of the render,
+                  so the render's box has to BE the reference box — .stage's
+                  own ratio drifts with its width and height bounds, and
+                  object-fit was quietly letterboxing inside it, which put
+                  every percentage a few points out. */}
+              <div className={styles.macFrame}>
               <Image
                 className={styles.macImg}
                 src="/mac.png"
@@ -92,6 +99,7 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
                 <SceneGuides />
                 <SceneSite />
                 <SceneLive project={project} />
+              </div>
               </div>
             </div>
 
