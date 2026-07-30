@@ -596,7 +596,7 @@
     display: grid;
     /* 46/54. The machine's anchor starts at 46% to match, so the two columns
        are solved together rather than guessed independently. */
-    grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
+    grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
     column-gap: clamp(32px, 5vw, 88px);
     align-items: center;
   }
@@ -607,6 +607,29 @@
      stage, glow, captions — is bounded by the column instead of the section,
      and the feature strip below can never be painted over. */
   .hero-visual { position: relative; align-self: stretch; min-height: clamp(280px, 30vw, 470px); }
+  /* A second, much softer pool under the whole device group. mac.png carries
+     its own contact shadow; this one is ambient — it sits beneath both devices
+     and is what stops the pair reading as pasted onto the page. Deliberately
+     on .hero-visual rather than on the rotated stage, so it stays flat on the
+     floor instead of tilting with the hardware. */
+  .hero-visual::after {
+    content: "";
+    position: absolute;
+    left: 12%;
+    right: 2%;
+    bottom: 12%;
+    height: 16%;
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      rgba(24, 20, 18, 0.13) 0%,
+      rgba(24, 20, 18, 0.06) 44%,
+      transparent 74%
+    );
+    filter: blur(30px);
+  }
 
   .hero-badge {
     display: inline-flex;
