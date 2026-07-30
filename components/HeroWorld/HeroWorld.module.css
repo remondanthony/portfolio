@@ -30,19 +30,6 @@
   contain: layout style;
 }
 
-/* The hero's own bottom scrim lives on .hero-blank::before at z-index 0, and a
-   real child paints above a pseudo-element at equal z-index. This reproduces
-   that exact gradient on top of the film instead, so the approved rule stays
-   untouched and .hero-services keeps its designed contrast. */
-.vignette {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  /* Was a dark scrim holding white copy against a near-black hero. The copy is
-     dark-on-white now and lives in its own column, so the scrim has nothing
-     left to do — and inside a bounded box it only drew an edge. */
-  background: none;
-}
 
 /* ---------- depth: three planes that travel at different rates ---------- */
 
@@ -154,8 +141,16 @@
      is a level machine seen from slightly off-axis. Turning it in 3D is what
      produces the product-render look; 1.5deg of in-plane tilt on top keeps it
      from feeling mechanically square. */
-  transform: perspective(2600px) rotateY(-9deg) rotate(1.5deg);
-  transform-origin: 55% 55%;
+  /* No tilt here any more. mac.png is already a 3/4 product render with its
+     own perspective, angles and lighting; rotating it again would compound
+     two perspectives and read as a warped photograph.
+
+     The nudge is not decorative. The hardware sits right of centre inside the
+     canvas — its midpoint is at 56% of the image, not 50% — so centring the
+     canvas in the column leaves the device visibly off to the right and
+     running into the viewport edge. This puts the DEVICE in the middle of its
+     column, which is what the eye actually measures. */
+  transform: translateX(-16%);
 }
 
 .stage {
@@ -173,13 +168,16 @@
      backdrop behind copy: the brief asks for 55-60% of the hero width, and the
      right column is 54% of it. The vh bound stays — it is what stopped a wide,
      short display producing a machine taller than the space it stands in. */
-  /* The vw term is the one that matters on a narrow desktop: it sizes the
-     machine against the viewport, not against its column, so shrinking the
-     column cannot pull it in — only this can. At 50vw the phone's shadow
-     reached 1026 against a 1024 edge and was clipped. 45vw clears it with
-     room, and the px and vh bounds still govern everywhere wider. */
-  width: min(700px, 45vw, 65vh);
-  aspect-ratio: 16 / 10;
+  /* Sized to the CANVAS, not to the device. mac.png is 1536x1024 but the
+     hardware inside it only spans x 325..1396 and y 225..833 — 70% of the
+     width and 59% of the height, the rest being transparent padding and the
+     shadow's falloff. Sizing this box as if it were the machine rendered the
+     machine 30% too small.
+     So the box is deliberately wider than its column: the overflow is
+     transparent, and what a visitor sees is the device at the right scale.
+     .world stopped clipping earlier, which is what makes that possible. */
+  width: min(960px, 66vw, 104vh);
+  aspect-ratio: 1536 / 1024;
   perspective: 1800px;
   perspective-origin: 50% 46%;
   container-type: inline-size;
@@ -202,178 +200,17 @@
   will-change: transform;
 }
 
-/* ---------- the MacBook ---------- */
-
-.laptop {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-}
 
 /* Soft contact shadow on the "desk". */
-/* The ground shadow.
-   Not a box-shadow: a box-shadow is a hard offset copy of the element's own
-   rectangle, and no amount of blur makes it read as a product sitting on a
-   surface. This is a painted ellipse instead, wider than the machine and
-   blurred well past its own edge, so what reaches the page is falloff rather
-   than a boundary.
 
-   Two layers, which is what sells it. The tight one is the contact shadow —
-   small, dark, concentrated under the hinge where the machine actually meets
-   the surface. The broad one is ambient occlusion: much wider, far lighter,
-   and it is what makes the machine look like it is floating a little above
-   the page rather than pasted onto it.
 
-   Only opacity is animated (tl.to at act 0), so geometry is free to change
-   here without touching the timeline. */
-.shadow {
-  position: absolute;
-  left: -6%;
-  right: -6%;
-  top: 99%;
-  height: 15%;
-  border-radius: 50%;
-  opacity: 0.86;
-  /* Offset toward the hinge rather than centred on the whole footprint: the
-     lid leans back, so the weight is at the rear. */
-  background: radial-gradient(
-    ellipse 46% 66% at 50% 20%,
-    rgba(24, 20, 18, 0.6) 0%,
-    rgba(24, 20, 18, 0.3) 40%,
-    rgba(24, 20, 18, 0.1) 66%,
-    transparent 84%
-  );
-  filter: blur(24px);
-}
 
-/* The contact patch. Small, tight and darker, directly under the hinge — the
-   detail that stops a floating object looking like it is levitating. */
-.shadow::after {
-  content: "";
-  position: absolute;
-  left: 22%;
-  right: 22%;
-  top: 6%;
-  height: 30%;
-  border-radius: 50%;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(24, 20, 18, 0.52) 0%,
-    rgba(24, 20, 18, 0.22) 44%,
-    transparent 74%
-  );
-  filter: blur(11px);
-}
 
-/* Aluminium lid.
-   Four inset lines do the work an Apple render does with geometry: a bright
-   top edge catching the key light, a dark bottom edge in shadow, and two
-   faint vertical edges where the machined sides roll away from the viewer. */
-.lid {
-  position: absolute;
-  inset: -2.4% -1.8%;
-  border-radius: 15px;
-  background:
-    linear-gradient(158deg, #56504c 0%, #2e2724 26%, #1b1613 58%, #3a312d 100%);
-  box-shadow:
-    0 52px 110px rgba(0, 0, 0, 0.62),
-    0 14px 34px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.26),
-    inset 1px 0 0 rgba(255, 255, 255, 0.08),
-    inset -1px 0 0 rgba(255, 255, 255, 0.08),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.62);
-}
 
-/* The hairline where the anodised edge catches the room. */
-.lidEdge {
-  position: absolute;
-  inset: -2.4% -1.8%;
-  border-radius: 15px;
-  pointer-events: none;
-  background: linear-gradient(
-    100deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    transparent 18%,
-    transparent 82%,
-    rgba(255, 255, 255, 0.09) 100%
-  );
-  mix-blend-mode: screen;
-}
 
-/* Inner black frame the display sits in. Thin, like the real thing. */
-.bezel {
-  position: absolute;
-  inset: 0;
-  border-radius: 8px;
-  background: #0a0908;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.09),
-    inset 0 0 22px rgba(0, 0, 0, 0.9);
-  overflow: hidden;
-}
 
-.notch {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 13%;
-  height: 2.6%;
-  border-radius: 0 0 6px 6px;
-  transform: translateX(-50%);
-  background: #0d0b0a;
-  z-index: 4;
-}
 
-/* Base wedge, laid back in 3D so the lid reads as standing up. */
-.base {
-  position: absolute;
-  left: -3.5%;
-  right: -3.5%;
-  top: 100%;
-  height: 4.4%;
-  margin-top: 2.6%;
-  border-radius: 0 0 9px 9px;
-  background: linear-gradient(to bottom, #4f4845 0%, #322a26 30%, #17120f 100%);
-  box-shadow: 0 26px 48px rgba(0, 0, 0, 0.55);
-  clip-path: polygon(1.5% 0, 98.5% 0, 100% 100%, 0 100%);
-}
 
-/* The lip cut into the front edge. */
-.baseLip {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 13%;
-  height: 38%;
-  transform: translateX(-50%);
-  border-radius: 0 0 6px 6px;
-  background: rgba(0, 0, 0, 0.42);
-}
-
-/* Diagonal glass reflection. Sits above everything on the display. */
-.sheen {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-  opacity: 0.42;
-  background: linear-gradient(
-    108deg,
-    rgba(255, 255, 255, 0.22) 0%,
-    rgba(255, 255, 255, 0.07) 5%,
-    rgba(255, 255, 255, 0.02) 12%,
-    transparent 26%
-  );
-}
-
-/* ---------- the display: a clean white product surface ---------- */
-
-.screen {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  background: #ffffff;
-}
 
 /* ============================================================
    THE IDLE WORKSPACE
@@ -893,7 +730,7 @@
   /* Sized to its own container now rather than to what is left of the
      viewport after the copy: the copy is above it in flow, so .hero-visual
      already reserves the space and the machine simply fills it. */
-  .stage { width: min(88%, 78vw); }
+  .stage { width: min(132%, 116vw); }
   .captionWrap { top: 4%; }
   .caption { font-size: 10px; }
   .buildLayer { inset: -8% -6%; }
@@ -905,168 +742,14 @@
   .componentCard { display: none; }
 }
 
-/* ---------- the phone -------------------------------------------------------
-   Sits beside the laptop and overlaps its lower-right corner, as in the
-   reference. A sibling of .laptop inside .float, so it inherits the idle
-   breath and the pointer parallax without needing a tween of its own — no new
-   ScrollTrigger, no second timeline.
 
-   Everything is sized in cqw against .stage, which is a container, so the
-   whole device scales with the machine at every viewport rather than needing
-   a breakpoint per size. Only cqw: cqh does not resolve under
-   container-type: inline-size, which has bitten this codebase before. */
-.phone {
-  position: absolute;
-  /* Lifted and pulled in so it overlaps the lid rather than standing beside
-     the base — the difference between two devices in one composition and two
-     devices that happen to be adjacent. */
-  /* Roughly half the device hangs past the machine's right edge. At -5cqw it
-     sat across the display instead, which reads as a phone lying on the
-     keyboard rather than standing in front of it. */
-  right: -11cqw;
-  bottom: -9cqw;
-  width: 18.3cqw;          /* +18% */
-  aspect-ratio: 1 / 2.03;
-  border-radius: 3cqw;
-  background: #15171a;
-  padding: 0.62cqw;
-  z-index: 3;
-  /* Counter-clockwise, against the machine's clockwise tilt. Two objects
-     leaning the same way read as one skewed image; leaning into each other
-     reads as an arrangement. */
-  transform: rotate(-7deg);
-  transform-origin: 50% 70%;
-  box-shadow:
-    0 0 0 0.12cqw rgba(255, 255, 255, 0.55),
-    0 1.6cqw 2.6cqw -1.1cqw rgba(24, 20, 18, 0.26),
-    0 5.5cqw 8cqw -3.4cqw rgba(24, 20, 18, 0.3);
-}
 
-/* Its own ground shadow, on the page rather than on the machine. Sits behind
-   the device and rotates with it, so the pair casts one consistent light. */
-.phone::before {
-  content: "";
-  position: absolute;
-  left: -34%;
-  right: -34%;
-  bottom: -7%;
-  height: 16%;
-  border-radius: 50%;
-  z-index: -1;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(24, 20, 18, 0.24) 0%,
-    rgba(24, 20, 18, 0.1) 46%,
-    transparent 76%
-  );
-  filter: blur(10px);
-}
 
-.phoneNotch {
-  position: absolute;
-  top: 0.9cqw;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4.4cqw;
-  height: 0.75cqw;
-  border-radius: 1cqw;
-  background: #000;
-  z-index: 2;
-}
 
-.phoneScreen {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border-radius: 2.1cqw;
-  overflow: hidden;
-  background: #fdfdfd;
-  padding: 2.3cqw 1.35cqw 1.35cqw;
-  display: flex;
-  flex-direction: column;
-  font-family: var(--font);
-  color: #101317;
-}
 
-.phoneBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.phoneBrand {
-  font-size: 0.92cqw;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-}
-.phoneMenu {
-  display: grid;
-  gap: 0.16cqw;
-}
-.phoneMenu i {
-  display: block;
-  width: 1.15cqw;
-  height: 0.1cqw;
-  background: #101317;
-  border-radius: 1px;
-}
 
-.phoneKicker {
-  margin: 1.5cqw 0 0;
-  font-size: 0.6cqw;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #ff5b1e;
-}
-.phoneHead {
-  margin: 0.55cqw 0 0;
-  font-size: 1.42cqw;
-  font-weight: 500;
-  line-height: 1.14;
-  letter-spacing: -0.03em;
-}
-.phoneSub {
-  margin: 0.15cqw 0 0;
-  font-size: 1.42cqw;
-  font-weight: 500;
-  line-height: 1.14;
-  letter-spacing: -0.03em;
-  color: #ff5b1e;
-}
 
-.phoneCta {
-  margin-top: 1.15cqw;
-  align-self: flex-start;
-  font-size: 0.62cqw;
-  font-weight: 500;
-  color: #fff;
-  background: #101317;
-  border-radius: 2cqw;
-  padding: 0.6cqw 1.15cqw;
-}
 
-/* The image block. Echoes the warm interior shot in the laptop's mockup
-   without shipping a second copy of it. */
-.phoneShot {
-  margin-top: 1.35cqw;
-  flex: 1;
-  border-radius: 1cqw;
-  background:
-    radial-gradient(80% 60% at 30% 22%, rgba(255, 255, 255, 0.72), transparent 62%),
-    linear-gradient(155deg, #e9e0d5 0%, #d9cbba 52%, #c9b8a4 100%);
-}
-
-.phoneRows {
-  margin-top: 1.15cqw;
-  display: grid;
-  gap: 0.5cqw;
-}
-.phoneRows span {
-  height: 0.42cqw;
-  border-radius: 1px;
-  background: #e6e8ec;
-}
-.phoneRows span:nth-child(2) { width: 78%; }
-.phoneRows span:nth-child(3) { width: 55%; }
 
 /* Below the two-column layout the phone would sit on top of the laptop's
    base rather than beside it, so it steps aside. */
@@ -1076,9 +759,58 @@
    phone reached 1058 against a 1024 edge. Pulled in so it still overlaps the
    machine without leaving the page. */
 @media (max-width: 1180px) {
-  .phone { right: -5cqw; bottom: -7cqw; }
 }
 
 @media (max-width: 820px) {
-  .phone { right: -4cqw; bottom: -6cqw; width: 17cqw; }
+}
+
+/* ---------- the supplied render -------------------------------------------
+   mac.png is the hardware: MacBook, phone, perspective, product lighting and
+   both shadows. It fills .stage, which now carries the PNG's own 1536x1024
+   ratio so nothing is distorted at any width.
+
+   The image itself is never animated. It sits still inside .float, and every
+   transform the timeline applies lands on .stage, .float or .tilt above it —
+   so what moves is a composited layer, not pixels. */
+.macImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---------- the live display ----------------------------------------------
+   The laptop's screen in mac.png is a quadrilateral, not a rectangle — the
+   machine is seen from slightly off-axis. Measured off the asset at full size
+   (1536x1024): TL 658,282  TR 1316,250  BR 1300,668  BL 628,692.
+
+   Position comes from TL as a percentage, so it tracks the image at every
+   width. The shear comes from matrix(), whose four components here are pure
+   RATIOS of the quad's own edge vectors to the element's own box — no pixel
+   lengths anywhere — which is what makes the whole thing scale without a
+   single line of JavaScript or a breakpoint.
+
+       a,b = top edge / width   = (658, -32) / 658.8
+       c,d = left edge / height = (-30, 410) / 411.1
+
+   The quad is very slightly non-affine, so the far corner lands about 1% out.
+   The overlay is sized a touch beyond the opening to absorb that: it is better
+   to run a hair under the bezel, which is dark and rounded and hides it, than
+   to leave a sliver of the render's own baked-in screenshot showing through. */
+.macScreen {
+  position: absolute;
+  left: 42.7%;
+  top: 27.2%;
+  width: 43.4%;
+  height: 40.9%;
+  transform-origin: 0 0;
+  transform: matrix(0.9988, -0.0486, -0.073, 0.9973, 0, 0);
+  overflow: hidden;
+  border-radius: 3px;
+  background: #fff;
+  container-type: inline-size;
+  isolation: isolate;
 }

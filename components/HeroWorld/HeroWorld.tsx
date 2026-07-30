@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import Image from 'next/image';
 import styles from './HeroWorld.module.css';
 import SceneWorkspace from './scenes/SceneWorkspace';
 import SceneGuides from './scenes/SceneGuides';
@@ -8,7 +9,6 @@ import SceneDepth from './scenes/SceneDepth';
 import SceneSite from './scenes/SceneSite';
 import SceneBuild from './scenes/SceneBuild';
 import SceneLive from './scenes/SceneLive';
-import ScenePhone from './scenes/ScenePhone';
 import { useHeroTimeline } from './hooks/useHeroTimeline';
 import { usePointerParallax } from './hooks/usePointerParallax';
 import { CAPTIONS } from './animations/tokens';
@@ -65,41 +65,34 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
           supposed to read as a bright white workspace. The hero copy and the
           service labels render above .world entirely, so they still get the
           full scrim they were designed against. */}
-      <div className={styles.vignette} />
-
       <div className={styles.stageAnchor} data-hw="stageAnchor">
         <div className={styles.stage} data-hw="stage">
           <div className={styles.tilt} ref={tiltRef} data-hw="tilt">
             <div className={styles.float} data-hw="float">
-              <span className={styles.shadow} data-hw="shadow" />
+              {/* The hardware. Every CSS device part that used to draw a
+                  MacBook — lid, bezel, notch, base, sheen, cast shadow — and
+                  the CSS phone are gone: all of it, including both shadows and
+                  the perspective, is in this file. */}
+              <Image
+                className={styles.macImg}
+                src="/mac.png"
+                alt=""
+                fill
+                sizes="(min-width: 1100px) 960px, (min-width: 640px) 66vw, 116vw"
+                quality={82}
+                priority
+              />
 
-              <div className={styles.laptop} data-hw="laptop">
-                <span className={styles.lid} />
-                <span className={styles.lidEdge} />
-
-                <div className={styles.bezel}>
-                  {/* The display. Everything below is inside the glass. */}
-                  <div className={styles.screen} data-hw="screen">
-                    <SceneWorkspace />
-                    <SceneGuides />
-                    <SceneSite />
-                    <SceneLive project={project} />
-                  </div>
-                  <span className={styles.sheen} data-hw="sheen" />
-                </div>
-
-                <span className={styles.notch} />
-
-                <span className={styles.base}>
-                  <span className={styles.baseLip} />
-                </span>
+              {/* The display opening. Sheared into the screen's plane and
+                  clipped to it; see the note on .macScreen for where the
+                  numbers come from. Inside is the same set of scenes the
+                  timeline has always driven, untouched. */}
+              <div className={styles.macScreen} data-hw="screen">
+                <SceneWorkspace />
+                <SceneGuides />
+                <SceneSite />
+                <SceneLive project={project} />
               </div>
-
-              {/* Sibling of the laptop, not a child of it: the phone has to
-                  overlap the lid and hang past the base, and anything inside
-                  .laptop is clipped by the bezel. It rides .float, so it
-                  breathes with the machine rather than beside it. */}
-              <ScenePhone />
             </div>
 
             {/* Scene 4 happens in the room, not on the artboard. */}
