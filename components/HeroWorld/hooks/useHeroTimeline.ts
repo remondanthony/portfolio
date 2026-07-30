@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { buildMasterTimeline } from '../animations/buildMasterTimeline';
-import { ACT, ARRIVE, CAPTIONS, IDLE, PIN_DISTANCE, RISE, RUNTIME } from '../animations/tokens';
+import { ACT, CAPTIONS, IDLE, PIN_DISTANCE, RUNTIME } from '../animations/tokens';
 import { all, one } from '../utils/select';
 import { useReducedMotion } from './useReducedMotion';
 
@@ -57,82 +57,26 @@ export function useHeroTimeline(scopeRef: React.RefObject<HTMLElement | null>) {
 
          Because these tweens live on the scrubbed timeline they also reverse —
          scrolling back up returns the stage to the machine alone. */
-      const hero = scope.parentElement;
+      /* The hero section, found by class rather than by parentElement: the
+         machine now renders inside its own column in the layout, so the parent
+         is that column and pinning it would pin the wrong box. */
+      const hero = scope.closest<HTMLElement>('.hero-blank');
 
-      /**
-       * The arrival order, as a sequence rather than a flat stagger.
-       *
-       * A single stagger over the whole block would treat a 108px headline and
-       * an 11px label as the same weight. Sequencing them — and giving bigger
-       * type a longer rise — is what makes this read as composed rather than
-       * animated. Transform and opacity only: no blur, no mask. Those announce
-       * themselves, and the brief was not to overpower the copy.
-       */
-      const q = (sel: string) => hero?.querySelector<HTMLElement>(sel) ?? null;
+      /* ---- the copy used to arrive here ------------------------------------
+         The headline, tagline and service labels were hidden at RUNTIME and
+         tweened in at the end of the build, as the payoff of the film. Both
+         that sequence and the --lift tween that lifted the machine clear of
+         the arriving copy on mobile are gone.
 
-      const sequence: Array<{ el: HTMLElement; rise: number }> = [];
-      const push = (el: HTMLElement | null, rise: number) => {
-        if (el) sequence.push({ el, rise });
-      };
+         Neither was solving a problem that still exists. The copy has its own
+         column now and is visible from the first frame, as the layout intends,
+         so there is nothing to reveal and nothing for the machine to avoid.
+         Its entrance is a CSS animation on load — no tween, no ScrollTrigger,
+         nothing added to this timeline.
 
-      push(q('.hero-lead'), RISE.headline);
-      push(q('.hero-tag h2'), RISE.tagline);
-      push(q('.hero-tag p'), RISE.body);
-
-      // Each service block arrives as a unit, its number a beat ahead of its
-      // name — the one internal detail, small enough to be felt not noticed.
-      const labels = hero
-        ? Array.from(hero.querySelectorAll<HTMLElement>('.hero-services > div'))
-        : [];
-
-      /* ---- the machine makes room (mobile) --------------------------------
-         On a phone the copy stacks below rather than beside, so the machine
-         cannot simply stay put — it holds the centre through the build, then
-         rises 181px into the band above the copy as that copy arrives.
-
-         The tween writes a custom property, never a transform. Only the
-         mobile rule consumes --lift, so the media query decides whether this
-         does anything, and nothing has to be re-evaluated when the viewport
-         crosses the breakpoint. It also leaves the anchor's own transform
-         untouched, which a y-tween here would otherwise overwrite. */
-      const anchor = one(scope, 'stageAnchor');
-      if (anchor) {
-        tl.fromTo(
-          anchor,
-          { '--lift': 0 },
-          { '--lift': 1, duration: 2.1, ease: 'power2.inOut' },
-          ARRIVE.at - 0.3
-        );
-      }
-
-      if (sequence.length || labels.length) {
-        const arriving = [
-          ...sequence.map((s) => s.el),
-          ...labels.flatMap((d) => Array.from(d.children) as HTMLElement[]),
-        ];
-        // Hidden at RUNTIME, never in the stylesheet: a bundle that fails to
-        // load must leave the hero readable rather than blank.
-        gsap.set(arriving, { opacity: 0 });
-
-        sequence.forEach(({ el, rise }, i) => {
-          const at = ARRIVE.at + i * ARRIVE.step;
-          gsap.set(el, { y: rise });
-          tl.to(el, { opacity: 1, y: 0, duration: ARRIVE.duration, ease: 'power3.out' }, at);
-        });
-
-        labels.forEach((block, i) => {
-          const at = ARRIVE.at + (sequence.length + i) * ARRIVE.step;
-          Array.from(block.children).forEach((child, j) => {
-            const el = child as HTMLElement;
-            gsap.set(el, { y: RISE.label });
-            tl.to(
-              el,
-              { opacity: 1, y: 0, duration: ARRIVE.duration, ease: 'power3.out' },
-              at + j * ARRIVE.numberLead
-            );
-          });
-        });
-      }
+         The old selectors (.hero-lead, .hero-tag, .hero-services) no longer
+         exist in the markup, so leaving this in place would have been dead
+         code that silently matched nothing. */
 
       if (reduced) {
         // No pin, no scrub, no scroll cost. Resolve to the finished frame.

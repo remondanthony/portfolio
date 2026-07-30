@@ -31,10 +31,20 @@ export const RUNTIME = 14.4;
  * How much scroll the pinned build consumes.
  *
  * This is the one number that trades "time to read each beat" against "how
- * long before the visitor reaches #about". 380% ≈ 3.8 viewport heights, which
- * gives each act roughly three quarters of a screen of travel.
+ * long before the visitor reaches #about".
+ *
+ * It was 440% — roughly four and a half screens, about 4,000px at a normal
+ * laptop height, before the page would move on. That was right when the hero
+ * was a full-screen film and the machine was the only thing in it. It is wrong
+ * now that the hero is a marketing layout with copy, a feature strip and a
+ * tagline that all have to be reachable: at 440% a visitor scrolled four
+ * screens of laptop before seeing the word "Performance".
+ *
+ * 120% keeps every act and every tween exactly as written — RUNTIME is
+ * unchanged, so the timeline is identical — and simply scrubs it across one
+ * extra screen instead of four and a half.
  */
-export const PIN_DISTANCE = '+=440%';
+export const PIN_DISTANCE = '+=120%';
 
 /**
  * How long after a component locks before it refines itself.

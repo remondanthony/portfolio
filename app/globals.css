@@ -106,22 +106,20 @@
      is kept as a no-op so any stale class cannot move the bar. */
   header.nav.hide { transform: none; }
   @media (prefers-reduced-motion: reduce) { header.nav { transition: background .3s, border-color .3s; } }
-  /* transparent over hero → white; solid when scrolled → dark */
-  header.nav .logo { color: #fff; text-shadow: 0 1px 10px rgba(0,0,0,.18); }
-  header.nav .logo small { color: rgba(255,255,255,.72); }
-  header.nav nav.links a { color: rgba(255,255,255,.9); text-shadow: 0 1px 10px rgba(0,0,0,.18); }
-  header.nav nav.links a:hover { color: #fff; background: rgba(255,255,255,.16); }
-  header.nav.scrolled .logo { color: var(--ink); text-shadow: none; }
-  header.nav.scrolled .logo small { color: var(--muted); }
-  header.nav.scrolled nav.links a { color: var(--ink-2); text-shadow: none; }
+  /* Colour only — the .scrolled behaviour, its threshold and every listener are
+     untouched. This block used to render the bar white-on-transparent because
+     it sat over a near-black hero, and flipped to dark once past it. The hero
+     is white now, so white type on it is invisible; the bar is dark from the
+     first frame and .scrolled adds only its background, blur and hairline. */
+  header.nav .logo { color: var(--ink); }
+  header.nav .logo small { color: var(--muted); }
+  header.nav nav.links a { color: var(--ink-2); }
+  header.nav nav.links a:hover { color: var(--ink); background: rgba(12,14,17,.05); }
   header.nav.scrolled nav.links a:hover { color: var(--ink); background: rgba(255,255,255,.6); }
-  /* Folioblox-style CTA: white pill, dark text, orange arrow */
-  .nav-right .btn-dark { background: #fff; color: var(--pill); box-shadow: 0 8px 22px -8px rgba(0,0,0,.3); }
-  .nav-right .btn-dark:hover { background: #fff; }
+  .nav-right .btn-dark { background: var(--pill); color: #fff; box-shadow: 0 8px 22px -8px rgba(12,14,17,.28); }
+  .nav-right .btn-dark:hover { background: var(--pill); }
   .nav-right .btn-dark .dot { background: var(--accent-orange); color: #fff; }
-  header.nav.scrolled .nav-right .btn-dark { border-color: var(--hair); box-shadow: 0 6px 18px -8px rgba(0,0,0,.2); }
-  header.nav .hamburger { border-color: rgba(255,255,255,.55); color: #fff; }
-  header.nav.scrolled .hamburger { border-color: var(--hair); color: var(--ink); }
+  header.nav .hamburger { border-color: var(--hair); color: var(--ink); }
   .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 74px; }
   .logo { display: inline-flex; align-items: center; gap: 11px; font-weight: 700; font-size: 18px; letter-spacing: -.02em; }
   .logo small { display: block; font-size: 9px; letter-spacing: .28em; color: var(--muted); font-weight: 500; margin-top: 1px; }
@@ -553,58 +551,200 @@
     .svc-grid, .row2, .foot-grid { grid-template-columns: 1fr; }
     .foot-bottom { flex-direction: column; align-items: flex-start; }
   }
-    /* hero overlay text (Folioblox-style placement) */
-  .hero-wrap { position: relative; z-index: 1; max-width: var(--maxw); margin: 0 auto; height: 100%; color: #fff; }
-  .hero-blank::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(to bottom, transparent 44%, rgba(16,4,0,.62) 100%); }
-  /* 12% rather than flush to the top: the headline no longer has to be
-     crushed under the navbar to clear the machine, because the machine
-     moved down with it. Solved as a pair — see .stageAnchor. */
-  .hero-lead { position: absolute; left: var(--pad); top: 12%; text-shadow: 0 2px 26px rgba(0,0,0,.28); }
-  /* The vh term is what keeps the headline clear of the MacBook. "Ideas
-     Become" is far wider than "Creative", and it extends past the viewport's
-     centre line — so a centred machine can never clear it horizontally, and
-     the headline must instead finish ABOVE it. Room between navbar and
-     machine is (0.32vh - lid overhang - 99); two lines at line-height .9
-     occupy 1.8x the size, and 9.2vh sits under that ceiling from 720px of
-     viewport height upward. */
-  .hero-title { font-size: clamp(40px, min(9.4vw, 9.2vh), 133px); font-weight: 800; line-height: .9; letter-spacing: -.04em; margin-top: 10px; }
-  /* Sits beside the MacBook, not above it. Narrowed because the clear space
-     to the right of the machine is a constant ~325px once .hero-wrap hits
-     its 1280px cap, and 33ch overran that straight across the display. */
-  .hero-tag { position: absolute; right: var(--pad); top: 52%; max-width: min(300px, 24vw); text-shadow: 0 2px 22px rgba(0,0,0,.32); }
-  .hero-tag h2 { font-size: clamp(22px, 2.7vw, 33px); font-weight: 700; letter-spacing: -.02em; line-height: 1.12; }
-  .hero-tag p { color: rgba(255,255,255,.74); margin-top: 14px; font-size: clamp(14px, 1.4vw, 18px); line-height: 1.5; }
-  .hero-services { position: absolute; left: var(--pad); right: var(--pad); bottom: 0; display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; gap: 18px; text-shadow: 0 2px 14px rgba(0,0,0,.6); }
-  /* #01 #02 hold the left, #03 #04 hold the right, and the empty middle
-     column is the corridor the MacBook stands in. Desktop only — the
-     820px rule below restores the original two-column stack untouched. */
-  @media (min-width: 821px) {
-    .hero-services > div:nth-child(3) { grid-column: 4; }
-    .hero-services > div:nth-child(4) { grid-column: 5; }
+  /* ============ HERO ============
+     Two columns: copy left, the animated machine right. The machine's timeline
+     is untouched — only its anchor, scale and pinned distance changed — so
+     everything here is layout and theme.
+
+     The section is min-height rather than a fixed 100vh: it now carries a
+     feature strip and a tagline as well as the copy and the machine, and a
+     hard 100vh would clip them on a short laptop. It still fills the screen on
+     anything taller. */
+  .hero-blank {
+    min-height: 100vh;
+    margin-top: -75px;
+    position: relative;
+    overflow: hidden;
+    background: #fbfbfc;
+    display: flex;
+    flex-direction: column;
+    padding: calc(75px + clamp(18px, 3vw, 40px)) var(--pad) clamp(20px, 3vw, 34px);
   }
-  .hero-services .hs-n { color: #ff8043; font-weight: 800; font-size: 16px; text-shadow: 0 1px 10px rgba(0,0,0,.55); }
-  .hero-services .hs-t { display: block; margin-top: 8px; font-weight: 600; font-size: clamp(15px, 1.5vw, 19px); color: #fff; }
-  @media (max-width: 820px) {
-    .hero-wrap { height: 100%; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 42px var(--pad) 30px; }
-    .hero-lead, .hero-tag, .hero-services { position: static; }
-    .hero-title { margin-top: 6px; font-size: clamp(38px, 11vw, 54px); }
-    .hero-tag { margin-top: 12px; max-width: none; }
-    .hero-tag h2 { font-size: clamp(19px, 5vw, 26px); }
-    .hero-tag p { margin-top: 7px; font-size: 14px; }
-    .hero-services { margin-top: 16px; grid-template-columns: 1fr 1fr; gap: 11px 14px; }
-    .hero-services .hs-t { margin-top: 5px; }
+  /* A light grid, the white-theme counterpart of the dark room's one. Sits
+     under everything and never takes a click. */
+  .hero-blank::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(12,14,17,.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(12,14,17,.028) 1px, transparent 1px);
+    background-size: 68px 68px;
+    -webkit-mask-image: radial-gradient(120% 90% at 62% 40%, #000 30%, transparent 78%);
+    mask-image: radial-gradient(120% 90% at 62% 40%, #000 30%, transparent 78%);
   }
 
-  .hero-blank { height: 100vh; margin-top: -75px; position: relative; overflow: hidden; background: #0b0809; }
-  /* The hero inherits section's generic padding-block, which parks ~128px of
-     dead space above the copy and below the service row. Reclaiming most of
-     it lifts the copy and frees the middle of the frame for the MacBook.
-     Desktop only: the mobile hero stacks its copy and is already tuned. */
-  /* The 80px floor is the navbar's height plus clearance. At 1024 the 6vw
-     term computes to 61px, which put the top of the headline above the
-     navbar's baseline and clipped it. Wider viewports are unaffected —
-     6vw already exceeds 80 from 1334px up. */
-  @media (min-width: 821px) { .hero-blank { padding-block: clamp(80px, 6vw, 88px); } }
+  .hero-wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    flex: 1;
+    display: grid;
+    /* 46/54. The machine's anchor starts at 46% to match, so the two columns
+       are solved together rather than guessed independently. */
+    grid-template-columns: minmax(0, 46fr) minmax(0, 54fr);
+    align-items: center;
+  }
+
+  .hero-copy { max-width: 34rem; }
+
+  /* The machine's container. .world is inset:0 of this, so the whole scene —
+     stage, glow, captions — is bounded by the column instead of the section,
+     and the feature strip below can never be painted over. */
+  .hero-visual { position: relative; align-self: stretch; min-height: clamp(280px, 30vw, 470px); }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -.005em;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--hair);
+    border-radius: 30px;
+    padding: 7px 15px 7px 12px;
+    box-shadow: 0 1px 2px rgba(12,14,17,.04);
+  }
+  .hero-badge svg { width: 14px; height: 14px; fill: var(--accent-orange); flex: none; }
+
+  .hero-title {
+    margin-top: 22px;
+    font-size: clamp(34px, 4.5vw, 62px);
+    font-weight: 700;
+    line-height: 1.04;
+    letter-spacing: -.04em;
+    color: var(--ink);
+  }
+  .hero-title em { font-style: normal; color: var(--accent-orange); }
+
+  .hero-sub {
+    margin-top: 20px;
+    font-size: clamp(15px, 1.25vw, 17.5px);
+    line-height: 1.6;
+    color: var(--ink-2);
+    max-width: 30rem;
+  }
+
+  .hero-actions { margin-top: 30px; display: flex; gap: 14px; flex-wrap: wrap; }
+  /* The secondary button is a white pill on a white page, so it needs a real
+     border and a shadow to read as a control rather than as text. */
+  .hero-secondary { background: #fff; box-shadow: 0 1px 2px rgba(12,14,17,.05); }
+  .hero-secondary .dot { background: var(--bg); color: var(--ink); }
+
+  /* ---- feature strip ---- */
+  .hero-strip {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: var(--maxw);
+    margin: clamp(18px, 2.4vw, 34px) auto 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    background: rgba(255,255,255,.72);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--hair);
+    border-radius: 18px;
+    box-shadow: 0 18px 40px -32px rgba(12,14,17,.3);
+    overflow: hidden;
+  }
+  .hero-feat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px clamp(12px, 1.4vw, 22px);
+    border-left: 1px solid var(--hair);
+  }
+  .hero-feat:first-child { border-left: 0; }
+  .hero-feat svg { width: 22px; height: 22px; color: var(--accent-orange); flex: none; }
+  .hero-feat strong { display: block; font-size: 14.5px; font-weight: 600; color: var(--ink); letter-spacing: -.01em; }
+  .hero-feat span { display: block; margin-top: 2px; font-size: 12.5px; line-height: 1.35; color: var(--muted); }
+
+  .hero-note {
+    position: relative;
+    z-index: 1;
+    margin: clamp(14px, 1.8vw, 24px) auto 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .hero-note i { font-style: normal; color: var(--accent-orange); margin: 0 10px; }
+
+  /* ---- entrance ----
+     CSS, not GSAP. The brief asks for a fade-up on load, which is a one-shot
+     with no scroll dependency — putting it on the scrubbed timeline would tie
+     it to scroll position, and giving it its own ScrollTrigger would be a
+     second trigger for no reason. Keyframes cost nothing and run off the main
+     thread.
+
+     opacity and translate only, both compositor properties, and the elements
+     hold their final layout the whole time — so nothing here can shift the
+     page or cost CLS. */
+  @keyframes heroRise {
+    from { opacity: 0; transform: translate3d(0, 18px, 0); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0); }
+  }
+  @keyframes heroFade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  .hero-badge, .hero-title, .hero-sub, .hero-actions, .hero-strip, .hero-note {
+    animation: heroRise .75s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .hero-badge   { animation-delay: .05s; }
+  .hero-title   { animation-delay: .13s; }
+  .hero-sub     { animation-delay: .23s; }
+  .hero-actions { animation-delay: .31s; }
+  .hero-strip   { animation-delay: .46s; }
+  .hero-note    { animation-delay: .56s; }
+  /* The machine gets a plain fade: it is mid-scrub from the first frame and a
+     translate here would fight the timeline's own transform on .stage. */
+  .hero-visual  { animation: heroFade .9s ease both .18s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-badge, .hero-title, .hero-sub, .hero-actions,
+    .hero-strip, .hero-note, .hero-visual { animation: none; }
+  }
+
+  /* ---- narrower: the machine steps below the copy rather than shrinking
+     into a column too small to read.
+     900, not 1024: at 1024 there is still room for two columns, and stacking
+     there pushed the feature strip a full screen below the fold for no gain. */
+  @media (max-width: 900px) {
+    .hero-blank { min-height: 0; }
+    .hero-wrap { grid-template-columns: 1fr; }
+    .hero-copy { max-width: none; text-align: center; margin-inline: auto; }
+    .hero-sub { margin-inline: auto; }
+    .hero-actions { justify-content: center; }
+    .hero-visual { min-height: clamp(210px, 42vw, 330px); margin-top: 22px; }
+    .hero-strip { grid-template-columns: repeat(3, 1fr); }
+    .hero-feat:nth-child(4) { border-left: 0; }
+  }
+  @media (max-width: 640px) {
+    .hero-strip { grid-template-columns: repeat(2, 1fr); }
+    .hero-feat:nth-child(odd) { border-left: 0; }
+    .hero-feat { padding: 14px 14px; }
+    .hero-feat strong { font-size: 13.5px; }
+    .hero-feat span { font-size: 11.5px; }
+    .hero-note { font-size: 13px; }
+    .hero-title { font-size: clamp(30px, 8.5vw, 42px); }
+  }
   /* How-We-Design section (dark, matched to sample) */
   /* scroll-margin-top because the top padding came down to 76px and the sticky
      navigation is 74px: without it, following the "Process" link in the nav or
@@ -636,5 +776,6 @@
     .stage li { font-size: 14px; }
   }
   .logo-img { width: 30px; height: 30px; object-fit: contain; flex: none; display: block; }
-  header.nav .logo-img { filter: brightness(0) invert(1); }
-  header.nav.scrolled .logo-img { filter: none; }
+  /* The mark was inverted to white for the dark hero. It is the real logo now
+     at every scroll position. */
+  header.nav .logo-img { filter: none; }
