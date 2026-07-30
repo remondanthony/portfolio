@@ -699,7 +699,10 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 26px clamp(14px, 1.5vw, 24px);
+    /* Back to 18px. It was raised to 26 last pass on a misread of the
+       reference's strip height — measured as a ratio the reference strip is
+       6.2% of its own width tall, and 26px padding made this one 8.6%. */
+    padding: 18px clamp(12px, 1.4vw, 22px);
     border-left: 1px solid var(--hair);
   }
   .hero-feat:first-child { border-left: 0; }
