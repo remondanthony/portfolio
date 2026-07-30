@@ -163,7 +163,7 @@ export default function SiteEffects() {
       };
 
       const mailtoFallback = (d: Record<string, string>) => {
-        const to = 'development0098@gmail.com';
+        const to = 'admin@vioniche.com';
         const subject = `New enquiry — ${d.name}${d.type ? ` (${d.type})` : ''}`;
         const lines = [`Name: ${d.name}`, `Email: ${d.email}`, `Type: ${d.type || '—'}`, '', d.msg];
         window.location.href =

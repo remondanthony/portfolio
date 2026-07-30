@@ -10,7 +10,7 @@
  * nothing to keep updated. Set two environment variables in Vercel:
  *
  *   RESEND_API_KEY   from resend.com, free tier is 3,000 emails a month
- *   CONTACT_TO       where enquiries should land, e.g. development0098@gmail.com
+ *   CONTACT_TO       where enquiries should land, e.g. admin@vioniche.com
  *
  * With those unset the route answers 503 and a machine-readable
  * `reason: "not-configured"`, which the form uses to fall back to opening the

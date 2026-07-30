@@ -18,7 +18,7 @@ export default function Footer() {
                 the share they were copied from and is not wanted in a footer. */}
             <div className="foot-col">
               <h4>Connect</h4>
-              <a href="mailto:development0098@gmail.com">Email</a>
+              <a href="mailto:admin@vioniche.com">Email</a>
               <a href="https://x.com/vionicheweb" target="_blank" rel="noreferrer noopener">Twitter / X</a>
               <a href="https://www.instagram.com/vioniche1" target="_blank" rel="noreferrer noopener">Instagram</a>
               <a href="https://www.linkedin.com/company/135774364/" target="_blank" rel="noreferrer noopener">LinkedIn</a>
