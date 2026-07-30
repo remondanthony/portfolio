@@ -796,6 +796,7 @@
   object-fit: fill;
   pointer-events: none;
   user-select: none;
+  z-index: 2;
 }
 
 /* ---------- the live display ----------------------------------------------
@@ -847,9 +848,45 @@
   background: #fff;
   isolation: isolate;
   backface-visibility: hidden;
+  /* Explicit stacking: render 2, live screen 3, phone 5. The render carries a
+     z-index now, and a positioned sibling on z-index:auto would lose to it
+     regardless of DOM order — which is exactly what hid the screen. */
+  z-index: 3;
   /* Load-bearing. Every scene inside sizes its type and spacing in cqw, and
      without this they resolve against .stage — the whole canvas, roughly twice
      as wide — so the website rendered at double size and burst out of the
      display. This makes the screen itself the container they measure. */
   container-type: inline-size;
+}
+
+/* The phone, re-asserted above the live screen.
+   A second copy of the render clipped to the handset's outline, traced off the
+   asset: its left edge is the only side that matters, because that is where it
+   crosses the laptop's display. That edge is not the dark frame — the handset
+   has a pale metallic band down its side, and tracing to the frame instead let
+   a 20px strip of the render's own baked screenshot show through beside it. The other three run wide into background the
+   clip cannot harm — the screen quad ends at x 1320 and this starts covering
+   from x 1204, so the animation is hidden everywhere the phone stands.
+
+   Percentages of the 1536x1024 render, so the mask scales with everything
+   else. */
+.macPhone {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  z-index: 5;
+  pointer-events: none;
+  clip-path: polygon(
+    80.47% 43.46%,
+    79.95% 54.69%,
+    79.69% 67.38%,
+    80.08% 77.15%,
+    80.86% 82.81%,
+    92.45% 82.81%,
+    92.45% 41.20%,
+    88.50% 42.00%,
+    83.00% 42.75%
+  );
 }

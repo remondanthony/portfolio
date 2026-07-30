@@ -100,6 +100,27 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
                 <SceneSite />
                 <SceneLive project={project} />
               </div>
+
+              {/* The phone, brought back to the front.
+                  It is not a separate object — it is painted into mac.png,
+                  which means the screen layer above sits on top of it and the
+                  animation ran across the handset. This is the same render
+                  again, perfectly aligned, clipped to the phone's own outline
+                  and stacked above the screen. Inside that outline the
+                  original pixels win, so the phone occludes the animation the
+                  way a real object in front of a laptop would.
+
+                  Same src, so it is one network request and one decode: the
+                  browser serves the second copy from cache. */}
+              <Image
+                className={styles.macPhone}
+                src="/mac.png"
+                alt=""
+                fill
+                sizes="(min-width: 1100px) 960px, (min-width: 640px) 66vw, 116vw"
+                quality={82}
+                priority
+              />
               </div>
             </div>
 
