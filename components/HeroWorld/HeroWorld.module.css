@@ -859,43 +859,28 @@
   container-type: inline-size;
 }
 
-/* The phone, re-asserted above the live screen.
-   A second copy of the render clipped to the handset's outline, traced off the
-   asset: its left edge is the only side that matters, because that is where it
-   crosses the laptop's display. That edge is not the dark frame — the handset
-   has a pale metallic band down its side, and tracing to the frame instead let
-   a 20px strip of the render's own baked screenshot show through beside it. The other three run wide into background the
-   clip cannot harm — the screen quad ends at x 1320 and this starts covering
-   from x 1204, so the animation is hidden everywhere the phone stands.
+/* The phone.
+   Its own render, stacked above the live screen so it occludes the animation
+   the way an object standing in front of a laptop does. No mask is needed any
+   more: the handset has real transparency around it, which is what the clipped
+   second copy of mac.png was faking. That copy and its thirteen hand-traced
+   polygon points are gone.
 
-   Percentages of the 1536x1024 render, so the mask scales with everything
-   else. */
+   Sized and placed so the device inside this canvas lands over the one baked
+   into mac.png and hides it completely. All percentages of the render's frame,
+   so it tracks the machine at every width. */
 .macPhone {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
+  /* Deliberately larger than the handset it replaces. The frame is rotated
+     2deg, so percentages read off its bounding box drift by a couple of points
+     — enough that a mask sized to the measurement still let the baked phone's
+     outline show past it. Extra margin is cheaper than chasing that. */
+  left: 69.5%;
+  top: 32.5%;
+  width: 31%;
+  height: auto;
+  aspect-ratio: 1086 / 1448;
   z-index: 5;
   pointer-events: none;
-  /* Traced point by point off the asset at 5x. The corner is the reason a
-     straight edge cannot work: the silhouette runs x=1240 at y=445 but x=1208
-     by y=485, a 32px sweep over 40px of height. A single line through that
-     either cuts into the laptop's display above or leaves the phone's own
-     flank uncovered below, and both were tried before this. */
-  clip-path: polygon(
-    80.73% 43.46%,
-    83.33% 42.87%,
-    87.24% 42.19%,
-    91.15% 41.50%,
-    92.45% 41.31%,
-    92.45% 82.81%,
-    79.56% 82.52%,
-    78.78% 77.15%,
-    78.13% 67.38%,
-    77.99% 54.69%,
-    78.26% 50.78%,
-    78.65% 47.36%,
-    79.30% 45.41%
-  );
+  user-select: none;
 }

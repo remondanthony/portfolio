@@ -82,7 +82,7 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
               <div className={styles.macFrame}>
               <Image
                 className={styles.macImg}
-                src="/mac.png"
+                src="/mac-nophone.png"
                 alt=""
                 fill
                 sizes="(min-width: 1100px) 960px, (min-width: 640px) 66vw, 116vw"
@@ -101,23 +101,26 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
                 <SceneLive project={project} />
               </div>
 
-              {/* The phone, brought back to the front.
-                  It is not a separate object — it is painted into mac.png,
-                  which means the screen layer above sits on top of it and the
-                  animation ran across the handset. This is the same render
-                  again, perfectly aligned, clipped to the phone's own outline
-                  and stacked above the screen. Inside that outline the
-                  original pixels win, so the phone occludes the animation the
-                  way a real object in front of a laptop would.
+              {/* The phone.
+                  A separate render now, not the one painted into mac.png. It
+                  is placed to fully cover that baked-in handset — 77% to 93%
+                  across and 39% to 84% down, against the baked one's 78.4-91.1
+                  and 41.8-82.8 — so only one phone is ever visible, and it
+                  overlaps the display exactly as a real one standing in front
+                  of the laptop would.
 
-                  Same src, so it is one network request and one decode: the
-                  browser serves the second copy from cache. */}
+                  Sourced from mob-cutout.png rather than mob.png: the supplied
+                  file is opaque RGB on a near-white checkerboard, which would
+                  have dropped a pale box over the machine. The cutout is the
+                  same pixels with that background flood-filled away from the
+                  edges, so the phone's own white screen — enclosed by its
+                  frame, never reached from outside — stays intact. */}
               <Image
                 className={styles.macPhone}
-                src="/mac.png"
+                src="/mob-cutout.png"
                 alt=""
-                fill
-                sizes="(min-width: 1100px) 960px, (min-width: 640px) 66vw, 116vw"
+                width={1086}
+                height={1448}
                 quality={82}
                 priority
               />
