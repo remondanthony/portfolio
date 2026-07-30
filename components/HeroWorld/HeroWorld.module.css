@@ -878,15 +878,24 @@
   object-fit: fill;
   z-index: 5;
   pointer-events: none;
+  /* Traced point by point off the asset at 5x. The corner is the reason a
+     straight edge cannot work: the silhouette runs x=1240 at y=445 but x=1208
+     by y=485, a 32px sweep over 40px of height. A single line through that
+     either cuts into the laptop's display above or leaves the phone's own
+     flank uncovered below, and both were tried before this. */
   clip-path: polygon(
-    80.47% 43.46%,
-    79.95% 54.69%,
-    79.69% 67.38%,
-    80.08% 77.15%,
-    80.86% 82.81%,
+    80.73% 43.46%,
+    83.33% 42.87%,
+    87.24% 42.19%,
+    91.15% 41.50%,
+    92.45% 41.31%,
     92.45% 82.81%,
-    92.45% 41.20%,
-    88.50% 42.00%,
-    83.00% 42.75%
+    79.56% 82.52%,
+    78.78% 77.15%,
+    78.13% 67.38%,
+    77.99% 54.69%,
+    78.26% 50.78%,
+    78.65% 47.36%,
+    79.30% 45.41%
   );
 }
