@@ -15,14 +15,19 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
+  /* Was overflow:hidden with contain:paint. Both clip to this box, which is
+     fine for a full-bleed backdrop and wrong for a bounded column: the machine
+     is rotated and scaled up now, so its corners and its shadow fall outside
+     and were being sliced off square. Layout and style containment stay — only
+     paint containment goes. */
+  overflow: visible;
   /* Transparent, not white. .world is now a box inside the layout rather than
      the full-bleed backdrop it used to be, so painting its own background —
      even the same near-white — drew a visible rectangle around the machine
      wherever the warm wash met the hero's plain white. The hero owns the
      backdrop; this only owns the machine. */
   background: none;
-  contain: layout paint style;
+  contain: layout style;
 }
 
 /* The hero's own bottom scrim lives on .hero-blank::before at z-index 0, and a
@@ -136,6 +141,21 @@
   justify-items: center;
   align-items: center;
   pointer-events: none;
+  /* The composition's resting angle.
+     It lives here, and it has to: GSAP owns .stage's transform outright and
+     .float's as well, so a rotation on either is parsed and overwritten by the
+     first tween. Nothing in the timeline touches this element, which makes it
+     the one safe host — and because it is an ancestor, the angle composes with
+     every animated transform below instead of competing with it.
+
+     Mostly rotateY, barely any rotate. A 7deg in-plane rotation was tried
+     first, as asked, and it reads as a laptop that has fallen over rather than
+     one photographed on a desk — and it is not what the reference shows, which
+     is a level machine seen from slightly off-axis. Turning it in 3D is what
+     produces the product-render look; 1.5deg of in-plane tilt on top keeps it
+     from feeling mechanically square. */
+  transform: perspective(2600px) rotateY(-9deg) rotate(1.5deg);
+  transform-origin: 55% 55%;
 }
 
 .stage {
@@ -153,7 +173,12 @@
      backdrop behind copy: the brief asks for 55-60% of the hero width, and the
      right column is 54% of it. The vh bound stays — it is what stopped a wide,
      short display producing a machine taller than the space it stands in. */
-  width: min(660px, 48vw, 62vh);
+  /* The vw term is the one that matters on a narrow desktop: it sizes the
+     machine against the viewport, not against its column, so shrinking the
+     column cannot pull it in — only this can. At 50vw the phone's shadow
+     reached 1026 against a 1024 edge and was clipped. 45vw clears it with
+     room, and the px and vh bounds still govern everywhere wider. */
+  width: min(700px, 45vw, 65vh);
   aspect-ratio: 16 / 10;
   perspective: 1800px;
   perspective-origin: 50% 46%;
@@ -186,23 +211,58 @@
 }
 
 /* Soft contact shadow on the "desk". */
+/* The ground shadow.
+   Not a box-shadow: a box-shadow is a hard offset copy of the element's own
+   rectangle, and no amount of blur makes it read as a product sitting on a
+   surface. This is a painted ellipse instead, wider than the machine and
+   blurred well past its own edge, so what reaches the page is falloff rather
+   than a boundary.
+
+   Two layers, which is what sells it. The tight one is the contact shadow —
+   small, dark, concentrated under the hinge where the machine actually meets
+   the surface. The broad one is ambient occlusion: much wider, far lighter,
+   and it is what makes the machine look like it is floating a little above
+   the page rather than pasted onto it.
+
+   Only opacity is animated (tl.to at act 0), so geometry is free to change
+   here without touching the timeline. */
 .shadow {
   position: absolute;
-  /* Tighter and softer than the dark-room version: a broad black ellipse that
-     read as depth on #0b0809 reads as dirt on #fbfbfc. */
-  left: 10%;
-  right: 10%;
-  top: 101%;
-  height: 8%;
+  left: -6%;
+  right: -6%;
+  top: 99%;
+  height: 15%;
   border-radius: 50%;
   opacity: 0.86;
+  /* Offset toward the hinge rather than centred on the whole footprint: the
+     lid leans back, so the weight is at the rear. */
+  background: radial-gradient(
+    ellipse 46% 66% at 50% 20%,
+    rgba(24, 20, 18, 0.6) 0%,
+    rgba(24, 20, 18, 0.3) 40%,
+    rgba(24, 20, 18, 0.1) 66%,
+    transparent 84%
+  );
+  filter: blur(24px);
+}
+
+/* The contact patch. Small, tight and darker, directly under the hinge — the
+   detail that stops a floating object looking like it is levitating. */
+.shadow::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  top: 6%;
+  height: 30%;
+  border-radius: 50%;
   background: radial-gradient(
     ellipse at center,
-    rgba(0, 0, 0, 0.72) 0%,
-    rgba(0, 0, 0, 0.34) 38%,
+    rgba(24, 20, 18, 0.52) 0%,
+    rgba(24, 20, 18, 0.22) 44%,
     transparent 74%
   );
-  filter: blur(18px);
+  filter: blur(11px);
 }
 
 /* Aluminium lid.
@@ -857,18 +917,49 @@
    container-type: inline-size, which has bitten this codebase before. */
 .phone {
   position: absolute;
-  right: -3cqw;
-  bottom: -7cqw;
-  width: 15.5cqw;
+  /* Lifted and pulled in so it overlaps the lid rather than standing beside
+     the base — the difference between two devices in one composition and two
+     devices that happen to be adjacent. */
+  /* Roughly half the device hangs past the machine's right edge. At -5cqw it
+     sat across the display instead, which reads as a phone lying on the
+     keyboard rather than standing in front of it. */
+  right: -11cqw;
+  bottom: -9cqw;
+  width: 18.3cqw;          /* +18% */
   aspect-ratio: 1 / 2.03;
-  border-radius: 2.6cqw;
+  border-radius: 3cqw;
   background: #15171a;
-  padding: 0.55cqw;
+  padding: 0.62cqw;
   z-index: 3;
+  /* Counter-clockwise, against the machine's clockwise tilt. Two objects
+     leaning the same way read as one skewed image; leaning into each other
+     reads as an arrangement. */
+  transform: rotate(-7deg);
+  transform-origin: 50% 70%;
   box-shadow:
-    0 0 0 0.12cqw rgba(255, 255, 255, 0.5),
-    0 1.4cqw 2.4cqw -1cqw rgba(12, 14, 17, 0.3),
-    0 5cqw 7cqw -3cqw rgba(12, 14, 17, 0.34);
+    0 0 0 0.12cqw rgba(255, 255, 255, 0.55),
+    0 1.6cqw 2.6cqw -1.1cqw rgba(24, 20, 18, 0.26),
+    0 5.5cqw 8cqw -3.4cqw rgba(24, 20, 18, 0.3);
+}
+
+/* Its own ground shadow, on the page rather than on the machine. Sits behind
+   the device and rotates with it, so the pair casts one consistent light. */
+.phone::before {
+  content: "";
+  position: absolute;
+  left: -34%;
+  right: -34%;
+  bottom: -7%;
+  height: 16%;
+  border-radius: 50%;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(24, 20, 18, 0.24) 0%,
+    rgba(24, 20, 18, 0.1) 46%,
+    transparent 76%
+  );
+  filter: blur(10px);
 }
 
 .phoneNotch {
@@ -979,6 +1070,15 @@
 
 /* Below the two-column layout the phone would sit on top of the laptop's
    base rather than beside it, so it steps aside. */
+/* Between the two-column breakpoint and a comfortable desktop the column is
+   narrow enough that -11cqw pushed the phone and its shadow past the viewport,
+   where .hero-blank's overflow:hidden sliced them off. Measured at 1024: the
+   phone reached 1058 against a 1024 edge. Pulled in so it still overlaps the
+   machine without leaving the page. */
+@media (max-width: 1180px) {
+  .phone { right: -5cqw; bottom: -7cqw; }
+}
+
 @media (max-width: 820px) {
-  .phone { right: -1cqw; bottom: -5cqw; width: 14cqw; }
+  .phone { right: -4cqw; bottom: -6cqw; width: 17cqw; }
 }
