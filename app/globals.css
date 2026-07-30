@@ -568,7 +568,7 @@
     background: #fbfbfc;
     display: flex;
     flex-direction: column;
-    padding: calc(75px + clamp(30px, 4.4vw, 62px)) var(--pad) clamp(30px, 4vw, 48px);
+    padding: calc(75px + clamp(14px, 2.2vw, 34px)) var(--pad) clamp(24px, 3vw, 38px);
   }
   /* A light grid, the white-theme counterpart of the dark room's one. Sits
      under everything and never takes a click. */
@@ -590,7 +590,11 @@
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: var(--maxw);
+    /* Wider than the site's --maxw, and only here. The reference puts the
+       headline 84px from the edge of a 1536 viewport; --maxw of 1280 put it at
+       128. Raising the token would have moved every other section, so the hero
+       carries its own measure. */
+    max-width: 1368px;
     margin: 0 auto;
     flex: 1;
     display: grid;
@@ -598,10 +602,13 @@
        are solved together rather than guessed independently. */
     grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
     column-gap: clamp(32px, 5vw, 88px);
-    align-items: center;
+    /* The copy sits nearer the top than the middle in the reference — its
+       badge is about 90px under the navigation, where vertical centring put it
+       at 155. The visual still stretches the full height. */
+    align-items: start;
   }
 
-  .hero-copy { max-width: 34rem; }
+  .hero-copy { max-width: 34rem; padding-top: clamp(20px, 3.6vw, 56px); }
 
   /* The machine's container. .world is inset:0 of this, so the whole scene —
      stage, glow, captions — is bounded by the column instead of the section,
@@ -676,7 +683,7 @@
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: var(--maxw);
+    max-width: 1368px;
     margin: clamp(34px, 4.4vw, 62px) auto 0;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -692,7 +699,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 18px clamp(12px, 1.4vw, 22px);
+    padding: 26px clamp(14px, 1.5vw, 24px);
     border-left: 1px solid var(--hair);
   }
   .hero-feat:first-child { border-left: 0; }

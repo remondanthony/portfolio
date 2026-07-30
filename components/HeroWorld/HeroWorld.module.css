@@ -150,7 +150,7 @@
      canvas in the column leaves the device visibly off to the right and
      running into the viewport edge. This puts the DEVICE in the middle of its
      column, which is what the eye actually measures. */
-  transform: translateX(-24%) rotate(2deg);
+  transform: translateX(-44%) translateY(-16%) rotate(2deg);
 }
 
 .stage {
@@ -176,7 +176,7 @@
      So the box is deliberately wider than its column: the overflow is
      transparent, and what a visitor sees is the device at the right scale.
      .world stopped clipping earlier, which is what makes that possible. */
-  width: min(1040px, 71vw, 112vh);
+  width: min(1380px, 90vw, 126vh);
   aspect-ratio: 1536 / 1024;
   perspective: 1800px;
   perspective-origin: 50% 46%;
