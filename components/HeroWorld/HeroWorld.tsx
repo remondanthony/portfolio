@@ -82,7 +82,7 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
               <div className={styles.macFrame}>
               <Image
                 className={styles.macImg}
-                src="/mac-nophone.png"
+                src="/mac.png"
                 alt=""
                 fill
                 sizes="(min-width: 1100px) 960px, (min-width: 640px) 66vw, 116vw"

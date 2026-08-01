@@ -875,9 +875,18 @@
      2deg, so percentages read off its bounding box drift by a couple of points
      — enough that a mask sized to the measurement still let the baked phone's
      outline show past it. Extra margin is cheaper than chasing that. */
-  left: 69.5%;
-  top: 32.5%;
-  width: 31%;
+  /* Rotated to match the handset it hides.
+     The two lean opposite ways: the one baked into mac.png tips its top to the
+     right, mob.png's tips its top to the left. Nested by bounding box they
+     look covered — and they are, low down — but at the top the baked corner
+     swings out past this one, which is the outline that kept reappearing.
+     Turning this clockwise puts the two silhouettes on the same axis so one
+     genuinely contains the other at every height. */
+  left: 68.6%;
+  top: 31.4%;
+  width: 32.5%;
+  transform: rotate(5.5deg);
+  transform-origin: 50% 70%;
   height: auto;
   aspect-ratio: 1086 / 1448;
   z-index: 5;
