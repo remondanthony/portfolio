@@ -909,5 +909,12 @@
      percentage and vw terms both resolve past 1000px — the machine came out
      757px wide and ran into the feature strip. */
   .stage { width: min(151%, 132vw, 520px); }
-  .stageAnchor { transform: translateX(-6%) translateY(-9%) rotate(2deg); }
+  /* A length, not a percentage. The percentage resolved against the anchor —
+     which is the column, and grows from 342px to 719px across this range —
+     while the machine itself stays about 517px wide throughout. So one value
+     could never centre it at both ends: at 390 it left 21px on the left and
+     2px on the right, at 767 it overshot the other way.
+     31px is the constant it needs: the hardware sits at 56.03% of the render
+     against the canvas centre of 50%, and 6.03% of ~517px is 31. */
+  .stageAnchor { transform: translateX(-31px) translateY(-9%) rotate(2deg); }
 }

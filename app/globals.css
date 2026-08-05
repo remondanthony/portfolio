@@ -830,6 +830,16 @@
     .hero-note i { margin: 0 7px; }
   }
 
+  /* The phone hangs below the laptop, and below .hero-visual with it — 37px
+     into the feature strip at 390, 34px at 414. It is the handset that
+     overlaps, not the machine, whose own base clears by 25px.
+     The extra gap is scoped to 560 and down because that is where the overlap
+     exists: by 600 the strip already sits 57px clear and widening it there
+     would only open a hole. Nothing moves but the strip. */
+  @media (max-width: 560px) {
+    .hero-strip { margin-top: 92px; }
+  }
+
   /* How-We-Design section (dark, matched to sample) */
   /* scroll-margin-top because the top padding came down to 76px and the sticky
      navigation is 74px: without it, following the "Process" link in the nav or
