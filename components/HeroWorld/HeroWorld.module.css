@@ -893,3 +893,21 @@
   pointer-events: none;
   user-select: none;
 }
+
+/* ---- phones: below 768px only ---------------------------------------------
+   The device is the focal point on a phone, so it grows and rises. Only
+   geometry: the timeline, the scrub and every tween are untouched, and the
+   tilt and both shadows come along because they live on the same hosts. */
+@media (max-width: 767px) {
+  /* Sized so the DEVICE fits the phone, not the canvas. The render is 70%
+     hardware and 30% transparent padding, and at 158% the machine ran off the
+     right edge and was clipped by the hero's overflow.
+     The nudge is the same one the desktop rule makes for the same reason: the
+     hardware sits at 56% of the canvas, not 50%, so centring the canvas leaves
+     the machine visibly off to the right. */
+  /* The px cap is the one that bites at the top of the range. At 767 the
+     percentage and vw terms both resolve past 1000px — the machine came out
+     757px wide and ran into the feature strip. */
+  .stage { width: min(151%, 132vw, 520px); }
+  .stageAnchor { transform: translateX(-6%) translateY(-9%) rotate(2deg); }
+}

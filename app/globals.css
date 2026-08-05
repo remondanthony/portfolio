@@ -779,6 +779,57 @@
     .hero-note { font-size: 13px; }
     .hero-title { font-size: clamp(30px, 8.5vw, 42px); }
   }
+
+  /* ---- phones: below 768px only -------------------------------------------
+     A separate block rather than edits to the ones above, so tablet (768-1023)
+     and desktop are provably untouched. It sits last, so at equal specificity
+     it wins over the 900 and 640 rules for the properties it names and leaves
+     everything else they set intact.
+
+     The rhythm is the brief's: 24 above the badge, 20 below it, 24 to the
+     description, 32 to the buttons, 40 to the device, 32 to the strip. */
+  @media (max-width: 767px) {
+    .nav-inner { height: 72px; }
+    .logo { font-size: 16.5px; }
+    .logo-img { width: 26px; height: 26px; }
+
+    .hero-blank { padding: 96px 24px 24px; }
+    .hero-copy { max-width: 360px; padding-top: 0; }
+
+    .hero-badge { margin-bottom: 20px; font-size: 12.5px; padding: 6px 13px 6px 10px; }
+    .hero-badge svg { width: 13px; height: 13px; }
+
+    /* 38px, not the 52-56 asked for. "Help Brands Grow." is seventeen
+       characters; at 54px it measures about 476px against 342px of usable
+       width, so it would wrap to four lines or overflow. This is the largest
+       size that still holds the three lines the brief requires. */
+    .hero-title { font-size: 38px; line-height: 0.94; letter-spacing: -.045em; margin-top: 0; }
+
+    .hero-sub { margin-top: 24px; font-size: 18px; line-height: 1.6; max-width: 342px; }
+
+    .hero-actions { margin-top: 32px; flex-direction: column; align-items: center; gap: 16px; }
+    .hero-actions .btn {
+      width: 100%; max-width: 320px; height: 60px;
+      justify-content: center; padding-inline: 22px;
+    }
+
+    .hero-visual { margin-top: 40px; min-height: clamp(250px, 62vw, 340px); }
+
+    /* The strip is where the height is. At the icon and type sizes the brief
+       asks for it measured 342px — three rows of two — against 250 before,
+       which is most of the reason the hero grew rather than shrank. Pulled
+       back hard: it is the one block that can give without costing the
+       headline, the buttons or the device their requested size. */
+    .hero-strip { margin-top: 32px; border-radius: 24px; }
+    .hero-feat { padding: 12px 12px; gap: 10px; }
+    .hero-feat svg { width: 22px; height: 22px; }
+    .hero-feat strong { font-size: 13.5px; letter-spacing: -.015em; }
+    .hero-feat span { font-size: 11.5px; line-height: 1.3; margin-top: 1px; }
+
+    .hero-note { margin-top: 18px; font-size: 12.5px; max-width: none; }
+    .hero-note i { margin: 0 7px; }
+  }
+
   /* How-We-Design section (dark, matched to sample) */
   /* scroll-margin-top because the top padding came down to 76px and the sticky
      navigation is 74px: without it, following the "Process" link in the nav or
