@@ -813,7 +813,11 @@
       justify-content: center; padding-inline: 22px;
     }
 
-    .hero-visual { margin-top: 40px; min-height: clamp(250px, 62vw, 340px); }
+    /* The gap the eye sees is not this margin. The machine sits centred in
+       this box and lifted, so it starts about 43px below the box's own top —
+       40px of margin was reading as 83px of emptiness. The margin goes; the
+       remaining few pixels come from the lift, in the module. */
+    .hero-visual { margin-top: 0; min-height: clamp(250px, 62vw, 340px); }
 
     /* The strip is where the height is. At the icon and type sizes the brief
        asks for it measured 342px — three rows of two — against 250 before,

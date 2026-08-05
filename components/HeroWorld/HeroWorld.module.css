@@ -916,5 +916,5 @@
      2px on the right, at 767 it overshot the other way.
      31px is the constant it needs: the hardware sits at 56.03% of the render
      against the canvas centre of 50%, and 6.03% of ~517px is 31. */
-  .stageAnchor { transform: translateX(-31px) translateY(-9%) rotate(2deg); }
+  .stageAnchor { transform: translateX(-31px) translateY(-13%) rotate(2deg); }
 }
