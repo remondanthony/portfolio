@@ -356,6 +356,124 @@
     .ind-cta p { max-width: none; }
   }
 
+  /* ---- concepts as a carousel, below 768px only ---------------------------
+     The same container the grid uses becomes a scroll-snap track. Nothing here
+     touches a rule desktop or tablet reads, and the controls below are hidden
+     outright above this width.
+
+     The swipe is CSS. scroll-snap gives native momentum and the platform's own
+     feel for free, which no scroll-driven JavaScript matches, and it keeps
+     working if the bundle never loads. */
+  @media (max-width: 767px) {
+    .ind-spread {
+      display: flex;
+      grid-template-columns: none;
+      gap: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      /* Full-bleed, so a card can reach both edges while its content stays on
+         the section's own measure. */
+      margin-inline: calc(var(--pad) * -1);
+      padding-inline: var(--pad);
+      scroll-padding-inline: var(--pad);
+    }
+    .ind-spread::-webkit-scrollbar { display: none; }
+
+    .exh {
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      margin-top: 0;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 26px;
+      padding: 18px 18px 22px;
+    }
+    /* Artwork first, then the caption — the mockup is the reason to stop
+       swiping, and it is the order desktop reads in too.
+       Deliberately NOT reordered with flex `order`: `.exh[data-ind="fitness"]`
+       above sets `display: block` at (0,2,0), which outranks any `display`
+       this rule could set, so a flex-only swap would apply to seven cards and
+       skip the opener. Normal block flow is the one thing all eight agree on. */
+    .exh-stage { margin-top: 0; }
+    .exh-caption { margin-top: 14px; }
+    .exh-plate { border-radius: 16px; }
+    .exh-story { min-height: 0; }
+
+    /* ---- arrows and dots ---- */
+    .ind-ctrl {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .ind-arrow {
+      width: 42px; height: 42px; flex: none;
+      display: grid; place-items: center;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.05);
+      color: #fff;
+      cursor: pointer;
+      transition: opacity .2s ease, border-color .2s ease;
+    }
+    .ind-arrow svg { width: 18px; height: 18px; }
+    .ind-arrow:disabled { opacity: .3; cursor: default; }
+    .ind-arrow:not(:disabled):active { border-color: var(--accent-orange); }
+
+    .ind-dots { display: flex; align-items: center; gap: 8px; }
+    .ind-dots button {
+      width: 7px; height: 7px; padding: 0; border: 0; border-radius: 50%;
+      background: rgba(255,255,255,.26); cursor: pointer;
+      transition: background .25s ease, width .25s ease;
+    }
+    .ind-dots button.is-on { width: 22px; border-radius: 20px; background: var(--accent-orange); }
+
+    /* ---- industry chips ---- */
+    .ind-chips {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      margin-inline: calc(var(--pad) * -1);
+      padding-inline: var(--pad);
+    }
+    .ind-chips::-webkit-scrollbar { display: none; }
+    .ind-chips button {
+      flex: none;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -.01em;
+      color: rgba(255,255,255,.7);
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 30px;
+      padding: 9px 16px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .ind-chips button.is-on {
+      color: var(--accent-orange);
+      border-color: var(--accent-orange);
+      background: rgba(255,91,30,.1);
+    }
+
+    .ind-cta { margin-top: 34px; }
+  }
+
+  /* The carousel's furniture does not exist anywhere else. */
+  @media (min-width: 768px) {
+    .ind-ctrl, .ind-chips { display: none; }
+  }
+
+
   @media (prefers-reduced-motion: reduce) {
     .exh-plate { transition: none; }
     .exh:hover .exh-plate { transform: none; }

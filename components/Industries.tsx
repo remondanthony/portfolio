@@ -1,5 +1,4 @@
-import Image from 'next/image';
-import { CONCEPTS, type Format } from './industries/concepts';
+import IndustryCarousel from './industries/Carousel';
 
 /**
  * Industries, as an exhibition of supplied hero mockups.
@@ -23,19 +22,12 @@ import { CONCEPTS, type Format } from './industries/concepts';
  * reach a visitor at that weight. It serves resized AVIF/WebP from a srcset,
  * keeps them sharp on retina, and lazy-loads them — all from the untouched
  * source files, which stay exactly as supplied.
+ *
+ * The exhibits moved into IndustryCarousel so phones can swipe them. The
+ * figures it renders are the same markup this file used to emit, so desktop
+ * reads them through the same grid rules and is unchanged; the carousel only
+ * exists below 768px.
  */
-
-/**
- * What the plate actually measures, so the browser picks the right source.
- * These track the grid: 6 columns for the opener, 4 for a wide card, 3 for a
- * small one. Wrong values here do not break the layout, they just make the
- * browser fetch a size it does not need.
- */
-const SIZES: Record<Format, string> = {
-  feature: '(min-width: 1100px) 566px, (min-width: 640px) 50vw, 92vw',
-  cardWide: '(min-width: 1100px) 371px, (min-width: 640px) 33vw, 92vw',
-  card: '(min-width: 1100px) 273px, (min-width: 640px) 25vw, 92vw',
-};
 
 export default function Industries() {
   return (
@@ -56,37 +48,7 @@ export default function Industries() {
 
         <div className="ind-rail" aria-hidden="true" />
 
-        <div className="ind-spread">
-          {CONCEPTS.map((c, n) => (
-            <figure
-              className="exh reveal"
-              key={c.key}
-              data-ind={c.key}
-              data-format={c.format}
-              style={{ ['--i' as string]: n }}
-            >
-              <div className="exh-stage">
-                <div className="exh-plate">
-                  <Image
-                    className="exh-photo"
-                    src={c.photo}
-                    alt={c.alt}
-                    fill
-                    sizes={SIZES[c.format]}
-                    quality={82}
-                  />
-                </div>
-              </div>
-
-              <figcaption className="exh-caption">
-                <span className="exh-index">{String(n + 1).padStart(2, '0')}</span>
-                <span className="exh-kicker">Concept — {c.industry}</span>
-                <h3>{c.benefit}</h3>
-                <p className="exh-story">{c.story}</p>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
+        <IndustryCarousel />
 
         <aside className="ind-cta reveal">
           <div>
