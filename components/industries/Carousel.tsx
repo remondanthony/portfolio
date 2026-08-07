@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { CONCEPTS, type Format } from './concepts';
 
@@ -17,7 +17,7 @@ import { CONCEPTS, type Format } from './concepts';
  * momentum, respects the platform's own feel, and costs nothing. No carousel
  * library, no new dependency, and nothing to keep in sync with a scroll
  * position. JavaScript only does the two things CSS cannot: read which card is
- * showing, and scroll to one when a chip or arrow is pressed.
+ * showing, and scroll to one when an arrow or a preview is pressed.
  *
  * All of that is skipped entirely above 768px. The listener is never attached,
  * so on desktop this behaves exactly like the server-rendered list it replaces.
@@ -29,33 +29,8 @@ const SIZES: Record<Format, string> = {
   card: '(min-width: 1100px) 273px, (min-width: 768px) 25vw, 88vw',
 };
 
-/** Short labels for the chip row — the full industry names do not fit. */
-const CHIP: Record<string, string> = {
-  fitness: 'Fitness',
-  healthcare: 'Healthcare',
-  restaurant: 'Restaurant',
-  boutique: 'Boutique',
-  beauty: 'Beauty',
-  realestate: 'Real Estate',
-  education: 'Education',
-  law: 'Law',
-};
-
-/** One line icon per trade, drawn to the same stroke grammar as the rest of the site. */
-const ICON: Record<string, ReactNode> = {
-  fitness: <><path d="M6.5 6.5v11M3.5 9v6M17.5 6.5v11M20.5 9v6M6.5 12h11" /></>,
-  healthcare: <path d="M12 20s-7-4.4-7-9.2A4 4 0 0 1 12 8a4 4 0 0 1 7 2.8C19 15.6 12 20 12 20Z" />,
-  restaurant: <><path d="M7 3v18M4.5 3v4.5a2.5 2.5 0 0 0 5 0V3" /><path d="M17.5 3c-1.4 1.6-2 3.2-2 5s.7 2.8 2 2.8V21" /></>,
-  boutique: <><path d="M5.5 8h13l-1 12h-11l-1-12Z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" /></>,
-  beauty: <path d="M12 3l1.9 5.3L19 10l-5.1 1.7L12 17l-1.9-5.3L5 10l5.1-1.7L12 3Z" />,
-  realestate: <><path d="M4 11.2 12 5l8 6.2" /><path d="M6.2 10v10h11.6V10" /></>,
-  education: <><path d="M12 5 2.8 9.3 12 13.6l9.2-4.3L12 5Z" /><path d="M6.6 11.3V16c0 1.4 2.4 2.5 5.4 2.5s5.4-1.1 5.4-2.5v-4.7" /></>,
-  law: <><path d="M12 4v16M7 20h10M4 8h16" /><path d="M4 8 1.9 13h4.2L4 8Z" /><path d="M20 8l-2.1 5h4.2L20 8Z" /></>,
-};
-
 export default function IndustryCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
-  const chipsRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const [isCarousel, setIsCarousel] = useState(false);
 
@@ -127,16 +102,6 @@ export default function IndustryCarousel() {
     },
     [step, isCarousel],
   );
-
-  /* Keep the active chip in view without dragging the page around it. */
-  useEffect(() => {
-    if (!isCarousel) return;
-    const row = chipsRef.current;
-    const chip = row?.children[active] as HTMLElement | undefined;
-    if (!row || !chip) return;
-    const left = chip.offsetLeft - (row.clientWidth - chip.offsetWidth) / 2;
-    row.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
-  }, [active, isCarousel]);
 
   return (
     <>
@@ -234,23 +199,6 @@ export default function IndustryCarousel() {
         {/* Desktop only, and decorative: it labels the three previews below,
             which already carry their own names. */}
         <span className="ind-next-label" aria-hidden="true">Up Next</span>
-      </div>
-
-      <div className="ind-chips" ref={chipsRef}>
-        {CONCEPTS.map((c, n) => (
-          <button
-            key={c.key}
-            type="button"
-            className={n === active ? 'is-on' : undefined}
-            aria-current={n === active ? 'true' : undefined}
-            onClick={() => goTo(n)}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              {ICON[c.key]}
-            </svg>
-            <span>{CHIP[c.key] ?? c.industry}</span>
-          </button>
-        ))}
       </div>
     </>
   );
