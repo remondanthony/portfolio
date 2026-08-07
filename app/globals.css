@@ -100,11 +100,13 @@
   .btn-ghost:hover { border-color: var(--ink); }
 
   /* ============ NAV ============ */
-  header.nav { position: sticky; top: 0; z-index: 100; background: transparent; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-bottom: 1px solid transparent; transition: transform .45s cubic-bezier(.4,0,.2,1), background .3s, backdrop-filter .3s, border-color .3s; }
+  header.nav { position: sticky; top: 0; z-index: 100; background: transparent; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-bottom: 1px solid transparent; transition: transform .32s cubic-bezier(.4,0,.2,1), background .3s, backdrop-filter .3s, border-color .3s; }
   header.nav.scrolled { background: color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter: blur(14px); border-bottom-color: var(--hair); }
-  /* .hide is retired: the navigation stays visible at all times. The rule
-     is kept as a no-op so any stale class cannot move the bar. */
-  header.nav.hide { transform: none; }
+  /* Out of the way on the way down, back on the way up — but only past the
+     hero, which SiteEffects gates. Translating the whole bar rather than
+     animating its height keeps it on the compositor, and -101% carries the
+     bottom hairline off with it so no seam is left behind. */
+  header.nav.nav-hidden { transform: translateY(-101%); }
   @media (prefers-reduced-motion: reduce) { header.nav { transition: background .3s, border-color .3s; } }
   /* Colour only — the .scrolled behaviour, its threshold and every listener are
      untouched. This block used to render the bar white-on-transparent because
@@ -364,7 +366,26 @@
      The swipe is CSS. scroll-snap gives native momentum and the platform's own
      feel for free, which no scroll-driven JavaScript matches, and it keeps
      working if the bundle never loads. */
+
+  /* The overlay's positioning context, and nothing else. `display: contents`
+     leaves no box at all, so above 768px the track and its controls are the
+     direct children they always were and desktop's box tree is untouched. */
+  .ind-deck { display: contents; }
+
   @media (max-width: 767px) {
+    .ind-deck {
+      display: block;
+      position: relative;
+      /* Tighter than the section gutter: the artwork is the container now, so
+         it runs nearly the full screen and only holds back enough for its
+         corners to read. */
+      --gut: 12px;
+      /* The plate is a fixed 3:2, so the artwork's height is derivable. That
+         is what lets the arrows centre on the image rather than on the whole
+         card, and the dots sit inside its bottom edge, with no measurement. */
+      --img-h: calc((100vw - var(--gut) * 2) * 2 / 3);
+    }
+
     .ind-spread {
       display: flex;
       grid-template-columns: none;
@@ -377,8 +398,8 @@
       /* Full-bleed, so a card can reach both edges while its content stays on
          the section's own measure. */
       margin-inline: calc(var(--pad) * -1);
-      padding-inline: var(--pad);
-      scroll-padding-inline: var(--pad);
+      padding-inline: var(--gut);
+      scroll-padding-inline: var(--gut);
     }
     .ind-spread::-webkit-scrollbar { display: none; }
 
@@ -387,10 +408,9 @@
       scroll-snap-align: center;
       scroll-snap-stop: always;
       margin-top: 0;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.09);
-      border-radius: 26px;
-      padding: 18px 18px 22px;
+      /* No card chrome: the artwork is the container. A panel drawn around a
+         mockup that already has its own frame reads as two frames, and it
+         costs the image the width that makes it the thing you look at. */
     }
     /* Artwork first, then the caption — the mockup is the reason to stop
        swiping, and it is the order desktop reads in too.
@@ -399,45 +419,79 @@
        this rule could set, so a flex-only swap would apply to seven cards and
        skip the opener. Normal block flow is the one thing all eight agree on. */
     .exh-stage { margin-top: 0; }
-    .exh-caption { margin-top: 14px; }
-    .exh-plate { border-radius: 16px; }
+    /* The artwork is wider than the section's measure, so the caption is
+       pushed back onto it — the label still lines up with the heading above
+       and the CTA below, which is what stops the wider image reading as a
+       mistake. */
+    .exh-caption { margin-top: 12px; padding-inline: calc(var(--pad) - var(--gut)); }
+    .exh-plate { border-radius: 14px; }
     .exh-story { min-height: 0; }
 
-    /* ---- arrows and dots ---- */
+    /* ---- arrows and dots, both riding on the artwork ----
+       One absolutely positioned layer the exact height of the plate. The
+       arrows then centre on 50% of it and the dots sit on its bottom edge,
+       with no magic numbers and nothing to keep in sync if the gutter moves.
+       It ignores pointer events so a thumb still swipes the image through it;
+       only the buttons themselves take input. */
     .ind-ctrl {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 20px;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--img-h);
+      pointer-events: none;
+      z-index: 3;
     }
     .ind-arrow {
-      width: 42px; height: 42px; flex: none;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: auto;
+      width: 48px; height: 48px; flex: none;
       display: grid; place-items: center;
       border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.22);
+      /* Sitting over photography rather than the page, so it needs its own
+         ground to stay legible whatever is behind it. */
+      background: rgba(18,14,12,.42);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
       color: #fff;
       cursor: pointer;
       transition: opacity .2s ease, border-color .2s ease;
     }
-    .ind-arrow svg { width: 18px; height: 18px; }
-    .ind-arrow:disabled { opacity: .3; cursor: default; }
+    .ind-ctrl .ind-arrow:first-child { left: -2px; }
+    .ind-ctrl .ind-arrow:last-child { right: -2px; }
+    .ind-arrow svg { width: 20px; height: 20px; }
+    .ind-arrow:disabled { opacity: 0; pointer-events: none; cursor: default; }
     .ind-arrow:not(:disabled):active { border-color: var(--accent-orange); }
 
-    .ind-dots { display: flex; align-items: center; gap: 8px; }
+    .ind-dots {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: auto;
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 10px;
+      border-radius: 20px;
+      background: rgba(18,14,12,.42);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
     .ind-dots button {
-      width: 7px; height: 7px; padding: 0; border: 0; border-radius: 50%;
-      background: rgba(255,255,255,.26); cursor: pointer;
+      width: 6px; height: 6px; padding: 0; border: 0; border-radius: 50%;
+      background: rgba(255,255,255,.45); cursor: pointer;
       transition: background .25s ease, width .25s ease;
     }
-    .ind-dots button.is-on { width: 22px; border-radius: 20px; background: var(--accent-orange); }
+    .ind-dots button.is-on { width: 20px; border-radius: 20px; background: var(--accent-orange); }
 
-    /* ---- industry chips ---- */
+    /* ---- industry picker, as icon cards ---- */
     .ind-chips {
       display: flex;
-      gap: 8px;
-      margin-top: 20px;
+      gap: 10px;
+      margin-top: 18px;
       overflow-x: auto;
       scrollbar-width: none;
       margin-inline: calc(var(--pad) * -1);
@@ -446,31 +500,321 @@
     .ind-chips::-webkit-scrollbar { display: none; }
     .ind-chips button {
       flex: none;
+      width: 96px;
+      height: 96px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
       font-family: var(--font);
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 500;
       letter-spacing: -.01em;
-      color: rgba(255,255,255,.7);
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 30px;
-      padding: 9px 16px;
+      text-align: center;
+      color: #14110f;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.14);
+      border-radius: 22px;
+      /* Narrow side padding, because the label is the constraint here: at 15px
+         "Healthcare" and "Real Estate" are within a few pixels of the card's
+         inner width, and they are set nowrap. The vertical padding is what
+         holds the icon off the edges. */
+      padding: 10px 4px;
       cursor: pointer;
       white-space: nowrap;
-      transition: color .2s ease, border-color .2s ease, background .2s ease;
+      transition: color .2s ease, border-color .2s ease;
     }
+    /* Centred as a stacked pair, which puts the icon's own centre above the
+       card's — no offset needed, and the gap keeps it clear of the label. */
+    .ind-chips button svg { width: 21px; height: 21px; flex: none; }
     .ind-chips button.is-on {
       color: var(--accent-orange);
       border-color: var(--accent-orange);
-      background: rgba(255,91,30,.1);
     }
 
-    .ind-cta { margin-top: 34px; }
+    .ind-cta { margin-top: 26px; }
+
+    /* Desktop's furniture. The caption already carries the number and the
+       category on a phone, so these would be a second copy of both. */
+    .ind-nav-index, .ind-nav-cat, .ind-next-label { display: none; }
   }
 
-  /* The carousel's furniture does not exist anywhere else. */
+  /* Tablet keeps the eight-up grid, so none of the carousel's furniture
+     applies there. Desktop takes the control row back below. */
   @media (min-width: 768px) {
     .ind-ctrl, .ind-chips { display: none; }
+    .ind-next-label { display: none; }
+  }
+
+  /* ---- desktop: one concept at full size, then what follows it -------------
+     Eight plates at once is a catalogue. The section's job is to make a single
+     concept land and then imply there are more, so above 1024px the same eight
+     figures stay in the DOM and only four are drawn: the active one as a
+     two-column feature, the three after it as previews. Which four is decided
+     entirely by `data-slot` — each figure's distance from the active index —
+     so the whole rearrangement is one attribute changing, with no second
+     layout to keep in step and no concept rendered twice.
+
+     `.ind-spread` becomes `display: contents` so the figures and the control
+     row share one grid. That is what puts the number, the category and its
+     arrows in the feature's own right-hand column beside the headline, using
+     the one set of arrow buttons the phone already uses rather than a copy. */
+  @media (min-width: 1024px) {
+    .ind-deck {
+      display: grid;
+      /* Fourteen, because two ratios have to land on the same track list: the
+         feature's 9:5 split, and the previews' 3:2:2. Seven could only do the
+         second, which is what kept the artwork a column narrower than it
+         should be. */
+      grid-template-columns: repeat(14, 1fr);
+      /* Floor raised to 28px so the preview gutter sits in the 28–32px band at
+         every desktop width, not only above ~1270px where 2.2vw got there on
+         its own. Shared with the feature's image-to-column gap, which moves a
+         few pixels at narrow desktop as a result. */
+      column-gap: clamp(28px, 2.2vw, 32px);
+      /* The two feature rows split the artwork's height evenly, which is what
+         actually centres the column beside it: the nav sits on the bottom of
+         the first, the caption on the top of the second, so the pair meets on
+         the image's midline instead of wherever the content happened to end. */
+      grid-template-rows: 1fr 1fr auto auto;
+      row-gap: 0;
+      margin-top: clamp(26px, 3vw, 44px);
+      align-items: start;
+    }
+    .ind-spread { display: contents; }
+
+    /* ---- the feature ---- */
+    .exh[data-slot="0"] { display: contents; }
+    .exh[data-slot="0"] .exh-stage {
+      grid-column: 1 / 9;
+      grid-row: 1 / 3;
+      max-width: none;
+      /* So the artwork yields when the column beside it claims its floor
+         below. Without it the plate's own intrinsic width wins and the text
+         column is squeezed instead. */
+      min-width: 0;
+    }
+    /* The artwork is its own frame — a second one drawn around it reads as
+       two. Radius and the existing shadow stay; the hairline goes. */
+    .exh[data-slot="0"] .exh-plate { border-radius: 12px; border-color: transparent; }
+    .exh[data-slot="0"] .exh-caption {
+      grid-column: 9 / 15;
+      grid-row: 2;
+      align-self: start;
+      margin-top: 0;
+      padding-top: 18px;
+      /* A floor, not a width. `1fr` tracks resolve to whatever is left, which
+         is how the headline ended up setting in a column too narrow to read;
+         a min-width raises the track group's minimum so the text claims its
+         measure first and the artwork gives up the difference. Capped against
+         the viewport because a hard 520px at 1024 would leave the image a
+         thumbnail — there is not enough room for both, and the picture is
+         still the point of the section. */
+      min-width: min(520px, 44vw);
+    }
+    /* Both are in the control row above, next to the arrows. */
+    .exh[data-slot="0"] .exh-index,
+    .exh[data-slot="0"] .exh-kicker { display: none; }
+    /* The column is narrower than it was, so the headline gains its weight
+       from tighter leading and from the category receding — not from a size
+       jump, which in this measure would simply cost it another line. */
+    .exh[data-slot="0"] .exh-caption h3 {
+      font-size: clamp(26px, 2.9vw, 42px);
+      line-height: 1.03;
+      letter-spacing: -.03em;
+      margin-top: 0;
+      /* Evens the lines out rather than filling each one to the edge, which
+         is what stops a long benefit ending on a single orphaned word. */
+      text-wrap: balance;
+    }
+    .exh[data-slot="0"] .exh-story {
+      font-size: 14.5px;
+      line-height: 1.55;
+      margin-top: 16px;
+      /* 32ch was a third of the column and forced four or five lines out of a
+         sentence that sets in two. */
+      max-width: 46ch;
+    }
+
+    /* ---- number, category, arrows: one row, ending where the headline starts ---- */
+    .ind-ctrl {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      grid-column: 9 / 15;
+      grid-row: 1;
+      align-self: end;
+      position: static;
+      height: auto;
+      pointer-events: auto;
+    }
+    .ind-dots { display: none; }
+    .ind-nav-index {
+      display: block;
+      flex: 0 0 100%;
+      margin-bottom: 4px;
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .2em;
+      color: rgba(255,255,255,.34);
+    }
+    .ind-nav-cat {
+      display: block;
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--tint, var(--accent-orange));
+      /* The row wraps by design — that is what puts the number on its own
+         line — so the category has to be told not to join in. */
+      white-space: nowrap;
+    }
+    /* Bare marks on the line rather than buttons on it: at this size a ring
+       around each one competes with the category it is meant to serve. The
+       hit area stays a full 26px square, it just is not drawn. */
+    .ind-arrow {
+      position: static;
+      transform: none;
+      width: 26px;
+      height: 26px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      color: rgba(255,255,255,.42);
+      transition: color .2s ease, opacity .2s ease;
+    }
+    .ind-arrow svg { width: 15px; height: 15px; }
+    .ind-arrow:disabled { opacity: .18; }
+    .ind-arrow:not(:disabled):hover { color: #fff; }
+
+    /* ---- up next ---- */
+    .ind-next-label {
+      display: block;
+      grid-column: 1 / -1;
+      grid-row: 3;
+      margin-top: clamp(28px, 3vw, 46px);
+      padding-top: 15px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: rgba(255,255,255,.38);
+    }
+    .exh:is([data-slot="1"], [data-slot="2"], [data-slot="3"]) {
+      grid-row: 4;
+      margin-top: clamp(20px, 2vw, 30px);
+      cursor: pointer;
+      /* Fitness still carries the old opener's `display: grid` and its twelve
+         columns from the 1100px block. As a preview that made the figure an
+         inner grid and auto-placed its stage and caption into one column each
+         — a twelfth of the card apiece, which is the sliver of image and the
+         three-line kicker. The other seven have no such rule, so only this
+         one card broke. Stacked like every other preview. */
+      display: block;
+      grid-template-columns: none;
+    }
+    /* 3 : 2 : 2 of fourteen — the first preview reads as the one you are about
+       to get without competing with the feature above it. */
+    .exh[data-slot="1"] { grid-column: 1 / 7; }
+    .exh[data-slot="2"] { grid-column: 7 / 11; }
+    .exh[data-slot="3"] { grid-column: 11 / 15; }
+    /* A preview is a picture, a trade and a promise. The number belongs to the
+       feature and the story is what you get by promoting it. */
+    .exh:is([data-slot="1"], [data-slot="2"], [data-slot="3"]) .exh-index,
+    .exh:is([data-slot="1"], [data-slot="2"], [data-slot="3"]) .exh-story { display: none; }
+    .exh:is([data-slot="1"], [data-slot="2"], [data-slot="3"]) .exh-kicker {
+      display: block;
+      margin-left: 0;
+    }
+    .exh:is([data-slot="1"], [data-slot="2"], [data-slot="3"]) .exh-caption {
+      grid-column: auto;
+      grid-row: auto;
+      align-self: auto;
+      margin-top: 15px;
+    }
+    .exh:is([data-slot="1"], [data-slot="2"], [data-slot="3"]) .exh-caption h3 {
+      font-size: clamp(15px, 1.25vw, 18px);
+      margin-top: 8px;
+      /* Two lines, always: a headline that wraps to one leaves its card short
+         and the row stops reading as a row. The reservation is what keeps the
+         three aligned whatever the copy happens to be. */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: calc(1.14em * 2);
+    }
+
+    /* One height for all three plates, set rather than derived. Deriving it
+       from a shared aspect-ratio looks right and is not: a card spanning six
+       tracks also spans five gutters, a four-track card only three, so the
+       widths are not in the clean 3:2 ratio the tracks suggest and the plates
+       land a few pixels apart. A height every card is given directly cannot
+       drift. The artwork still fills it — `cover` was already there — so the
+       wider first card shows a wider slice of the same picture. */
+    .exh:is([data-slot="1"], [data-slot="2"], [data-slot="3"]) .exh-plate {
+      aspect-ratio: auto;
+      height: clamp(170px, 17vw, 240px);
+      /* Matching the feature: radius kept, hairline dropped, so the row and
+         the artwork above it are framed the same way. */
+      border-radius: 12px;
+      border-color: transparent;
+    }
+    .exh:is([data-slot="1"], [data-slot="2"], [data-slot="3"]) .exh-stage {
+      grid-column: auto;
+      grid-row: auto;
+      max-width: none;
+    }
+
+    /* The other four stay in the DOM and out of the layout. */
+    .exh:is([data-slot="4"], [data-slot="5"], [data-slot="6"], [data-slot="7"]) { display: none; }
+
+    /* A panel rather than a ruled-off footnote. Same content, same button —
+       it just stops reading as the end of the grid and starts reading as the
+       thing after it. */
+    .ind-cta {
+      margin-top: clamp(40px, 4.2vw, 66px);
+      padding: clamp(28px, 3vw, 44px) clamp(30px, 3.2vw, 50px);
+      border-top: 0;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 28px;
+      background: rgba(255,255,255,.035);
+      box-shadow: 0 44px 90px -56px rgba(0,0,0,.95);
+    }
+
+    /* The swap, reusing what is already here: changing `data-slot` makes these
+       newly match, and a newly matched rule carrying an `animation` runs it.
+       No library, no state, nothing to clean up.
+
+       It also settles a bug it did not set out to. The four undrawn figures
+       are `display: none`, so the scroll observer never sees them and never
+       marks them `in` — promoted into view, a card would sit at the reveal's
+       opacity 0 and simply never appear. An animation outranks a normal
+       declaration, so holding both properties here overrides `.reveal` for
+       exactly the figures being drawn, and leaves the class alone everywhere
+       else. `both` keeps the end state after it finishes. */
+    @keyframes indFade {
+      from { opacity: 0; transform: none; }
+      to   { opacity: 1; transform: none; }
+    }
+    .exh[data-slot="0"] .exh-stage,
+    .exh[data-slot="0"] .exh-caption,
+    .exh:is([data-slot="1"], [data-slot="2"], [data-slot="3"]) {
+      animation: indFade .38s ease both;
+    }
+  }
+
+  @media (min-width: 1024px) and (prefers-reduced-motion: reduce) {
+    .exh[data-slot="0"] .exh-stage,
+    .exh[data-slot="0"] .exh-caption,
+    .exh:is([data-slot="1"], [data-slot="2"], [data-slot="3"]) {
+      animation: indFade .01s linear both;
+    }
   }
 
 
@@ -639,7 +983,11 @@
 
   /* ============ FOOTER ============ */
   footer { border-top: 1px solid var(--hair); padding-block: 60px 36px; }
-  .foot-grid { display: grid; grid-template-columns: 1.7fr 1fr 1fr 1fr; gap: 40px; }
+  /* Three tracks since the Services column went: the brand keeps the wider
+     measure its paragraph needs, and Explore and Connect divide the rest, so
+     the row still reaches the right edge instead of leaving a fourth track
+     standing empty. */
+  .foot-grid { display: grid; grid-template-columns: 1.7fr 1fr 1fr; gap: 40px; }
   .foot-brand p { color: var(--ink-2); font-size: 14.5px; margin-top: 16px; max-width: 34ch; }
   .foot-col h4 { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 18px; font-weight: 600; }
   .foot-col a { display: block; color: var(--ink-2); font-size: 14.5px; padding: 6px 0; transition: color .15s; }
