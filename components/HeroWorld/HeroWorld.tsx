@@ -7,20 +7,23 @@ import SceneWorkspace from './scenes/SceneWorkspace';
 import SceneGuides from './scenes/SceneGuides';
 import SceneDepth from './scenes/SceneDepth';
 import SceneSite from './scenes/SceneSite';
-import SceneBuild from './scenes/SceneBuild';
 import SceneLive from './scenes/SceneLive';
 import { useHeroTimeline } from './hooks/useHeroTimeline';
 import { usePointerParallax } from './hooks/usePointerParallax';
-import { CAPTIONS } from './animations/tokens';
 import { getFeaturedProject } from './utils/projects';
 
 /**
  * "The Website Is Born" — the hero backdrop.
  *
- * A MacBook sits on the desk from the first frame. As the visitor scrolls,
- * a website is assembled inside it component by component: blank canvas,
- * navigation, hero, typography, buttons, cards, polish, deployment, and
- * finally the real project loading in a browser.
+ * A MacBook sits on the desk from the first frame, a finished website already
+ * on its display. As the visitor scrolls, that design is rebuilt inside it
+ * component by component: navigation, hero, typography, buttons, cards,
+ * polish, and finally the real project loading in a browser.
+ *
+ * Everything happens ON the display. The development beat that used to float
+ * component tags, a file tree and deploy output in the room around the
+ * laptop is gone, along with the story captions above it — nothing is drawn
+ * outside the screen any more.
  *
  * Deliberate constraints:
  *   • Backdrop only. Renders at z-index 0 beneath the approved hero content
@@ -126,21 +129,9 @@ export default function HeroWorld({ projectIndex = 0 }: Props) {
               />
               </div>
             </div>
-
-            {/* Scene 4 happens in the room, not on the artboard. */}
-            <SceneBuild />
           </div>
         </div>
       </div>
-
-      <div className={styles.captionWrap}>
-        {CAPTIONS.map((c) => (
-          <span key={c.at} className={styles.caption} data-hw="caption">
-            {c.text}
-          </span>
-        ))}
-      </div>
-
     </div>
   );
 }

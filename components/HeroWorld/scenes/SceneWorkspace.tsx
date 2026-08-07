@@ -1,85 +1,68 @@
 import styles from '../HeroWorld.module.css';
 
 /**
- * THE IDLE SCREEN — a design workspace, waiting.
+ * THE IDLE SCREEN — the finished website, already on the display.
  *
  * This is what the visitor meets before they scroll a single pixel, so it has
- * one job: communicate craftsmanship and imply that something is about to
- * happen. Not a blank page, not a busy one.
+ * one job: show that the studio ships polished work. It used to be a design
+ * tool sitting on an empty artboard, which asked the visitor to imagine the
+ * result instead of showing it — the rulers, the grid and the blank sheet are
+ * all gone, and the page they were framing now fills the display.
  *
- * Everything here is chrome, never content. No logos, no buttons, no fake
- * copy — the only words on screen are the three the workspace itself would
- * show. The artboard stays genuinely empty because the emptiness is the
- * invitation.
+ * Every position here mirrors SceneSite's own percentages. That is the whole
+ * trick of the opening: the film's first act flies the same components into
+ * the same coordinates, so when this dissolves the build lands exactly where
+ * this stood and the handover reads as the design being taken apart rather
+ * than as a cut to a different page.
  *
- * The whole thing lives under one `data-hw="workspace"` node so the timeline
- * can dissolve it with a single tween as the build begins.
+ * It is drawn, not photographed — live markup, no screenshot.
+ *
+ * The whole thing stays under one `data-hw="workspace"` node so the timeline
+ * can dissolve it with the single tween it always used. Nothing inside
+ * carries a `data-hw` hook, so the timeline neither selects nor animates any
+ * of it.
  */
 
-/** Ruler ticks. Every fifth is a major mark — the rhythm reads as measured. */
-const TICKS = Array.from({ length: 41 }, (_, i) => i);
+const CARDS = ['Plan', 'Shape', 'Finish'] as const;
 
 export default function SceneWorkspace() {
   return (
     <div className={styles.workspace} data-hw="workspace">
-      {/* ---- application header ---- */}
-      <header className={styles.wsBar}>
-        <span className={styles.wsBarLeft}>
-          <span className={styles.wsMuted}>Project</span>
-          <span className={styles.wsDivider} />
-          <span className={styles.wsName}>Untitled-01</span>
-        </span>
-        <span className={styles.wsMuted}>Auto Saved</span>
-      </header>
+      <div className={styles.wsPage}>
+        {/* ---- navigation ---- */}
+        <span className={styles.wsPageBar} />
+        <span className={styles.wsPageBrand} />
+        <span className={styles.wsPageNav} style={{ left: '24%' }} />
+        <span className={styles.wsPageNav} style={{ left: '33%' }} />
+        <span className={styles.wsPageNav} style={{ left: '42%' }} />
+        <span className={styles.wsPageNavCta} />
 
-      {/* ---- rulers ---- */}
-      <div className={styles.wsRulerTop}>
-        {TICKS.map((i) => (
-          <i key={`t${i}`} className={i % 5 === 0 ? styles.wsTickMajor : styles.wsTick} />
-        ))}
-      </div>
-      <div className={styles.wsRulerLeft}>
-        {TICKS.slice(0, 26).map((i) => (
-          <i key={`l${i}`} className={i % 5 === 0 ? styles.wsTickMajorV : styles.wsTickV} />
-        ))}
-      </div>
-      <span className={styles.wsRulerCorner} />
+        {/* ---- hero ---- */}
+        <span className={`${styles.wsPageH1} ${styles.wsPageH1a}`}>Everything</span>
+        <span className={`${styles.wsPageH1} ${styles.wsPageH1b}`}>in order.</span>
+        <span className={styles.wsPageSub}>Clear plans, careful work, on time.</span>
 
-      {/* ---- canvas ---- */}
-      <div className={styles.wsCanvas}>
-        <div className={styles.wsGrid} />
+        <span className={styles.wsPageBtn}>Start a project</span>
+        <span className={styles.wsPageGhost}>See our work</span>
 
-        {/* the artboard: a fresh blank page */}
-        <div className={styles.wsArtboard}>
-          <span className={styles.wsSafeArea} />
+        <span className={styles.wsPageMedia} />
 
-          {/* corner handles */}
-          <i className={`${styles.wsHandle} ${styles.wsHandleTL}`} />
-          <i className={`${styles.wsHandle} ${styles.wsHandleTR}`} />
-          <i className={`${styles.wsHandle} ${styles.wsHandleBL}`} />
-          <i className={`${styles.wsHandle} ${styles.wsHandleBR}`} />
-
-          {/* faint measurement lines at the safe-area edges */}
-          <span className={`${styles.wsMeasure} ${styles.wsMeasureL}`} />
-          <span className={`${styles.wsMeasure} ${styles.wsMeasureR}`} />
-
-          {/* crosshairs where the guides cross the safe area */}
-          <i className={`${styles.wsCross} ${styles.wsCrossTL}`} />
-          <i className={`${styles.wsCross} ${styles.wsCrossTR}`} />
-          <i className={`${styles.wsCross} ${styles.wsCrossBL}`} />
-          <i className={`${styles.wsCross} ${styles.wsCrossBR}`} />
-
-          {/* the caret. CSS-driven, not timeline-driven: it must breathe while
-              the page is at rest, which a scrubbed timeline cannot do. */}
-          <span className={styles.wsCaret} />
+        {/* ---- cards ---- */}
+        <div className={styles.wsPageCards}>
+          {CARDS.map((label, i) => (
+            <span
+              className={styles.wsPageCard}
+              key={label}
+              style={{ left: `${i * 34.75}%` }}
+            >
+              <i className={styles.wsPageCardIcon} />
+              <em className={styles.wsPageCardLabel}>{label}</em>
+            </span>
+          ))}
         </div>
-
-        {/* centre alignment guides, drawn over the page */}
-        <span className={`${styles.wsAlign} ${styles.wsAlignV}`} />
-        <span className={`${styles.wsAlign} ${styles.wsAlignH}`} />
       </div>
 
-      {/* ---- ambience, above the canvas but below nothing else ---- */}
+      {/* ---- ambience, above the page ---- */}
       <span className={styles.wsGrain} />
       <span className={styles.wsHighlight} />
       <span className={styles.wsVignette} />
