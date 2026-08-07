@@ -34,12 +34,39 @@ export default function SiteEffects() {
     };
     measure();
 
+    /**
+     * Past the hero, the bar gets out of the way: it slides up on a downward
+     * scroll and comes back on an upward one.
+     *
+     * Gated on the same `solidAt` the solid treatment uses, which is why it
+     * cannot hide during the build. While the hero is pinned, scrollY climbs
+     * for over two extra screens without the page appearing to move at all —
+     * a bar that vanished there would read as a glitch rather than as a
+     * response to anything the visitor did.
+     */
+    let lastY = window.scrollY;
+    // Enough travel to be a decision rather than a trackpad tremor, and it
+    // applies both ways — so a hidden bar does not flicker back on the
+    // rubber-band at the end of a fling.
+    const INTENT = 10;
+
     const onScroll = () => {
       const y = window.scrollY;
       nav.classList.toggle('scrolled', y > solidAt);
       // Also gated on the hero: the pinned build inflates scrollY far past
       // any fixed threshold while the visitor is still in the first screen.
       totop.classList.toggle('show', y > solidAt + 200);
+
+      const dy = y - lastY;
+      if (Math.abs(dy) < INTENT) return;
+      lastY = y;
+
+      // Never over the hero, and never while the mobile menu is hanging off
+      // the bar — taking the bar away would leave the panel floating.
+      nav.classList.toggle(
+        'nav-hidden',
+        dy > 0 && y > solidAt && !menu.classList.contains('open')
+      );
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', measure, { passive: true });

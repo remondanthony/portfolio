@@ -10,8 +10,8 @@ export default function Contact() {
           <div className="contact-grid">
             <div className="contact-info reveal">
               <div className="row"><div className="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-10 5L2 7" /></svg></div><div><div className="lbl">Email</div><div className="val">admin@vioniche.com</div></div></div>
-              <div className="row"><div className="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg></div><div><div className="lbl">Studio</div><div className="val">Berlin · Working worldwide</div></div></div>
-              <div className="row"><div className="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg></div><div><div className="lbl">Hours</div><div className="val">Mon–Fri · 9:00–18:00 CET</div></div></div>
+              <div className="row"><div className="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg></div><div><div className="lbl">Studio</div><div className="val">Based in India · Working Worldwide</div></div></div>
+              <div className="row"><div className="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg></div><div><div className="lbl">Hours</div><div className="val">Mon–Sat · 08:00–22:00 IST</div></div></div>
             </div>
             <form id="contactForm" className="reveal" noValidate>
               <div className="row2">
