@@ -21,7 +21,7 @@ import './globals.css';
  * nothing to back one with yet.
  */
 export const metadata: Metadata = {
-  metadataBase: new URL('https://vioniche.com'),
+  metadataBase: new URL('https://www.vioniche.com'),
   alternates: {
     canonical: '/',
   },

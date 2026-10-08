@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * Served at https://vioniche.com/sitemap.xml.
+ * Served at https://www.vioniche.com/sitemap.xml.
  *
  * The site is one page. Work, Services, Process, About and Contact are
  * sections of it reached by #hash, and a hash is not a separate URL to a
@@ -12,12 +12,12 @@ import type { MetadataRoute } from 'next';
  * every deploy tells Google the page changed when it didn't, and Google learns
  * to ignore it. Bump it when the page's content actually changes.
  */
-const SITE_URL = 'https://vioniche.com';
+const SITE_URL = 'https://www.vioniche.com';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: SITE_URL,
+      url: `${SITE_URL}/`,
       lastModified: new Date('2026-08-07'),
       changeFrequency: 'monthly',
       priority: 1,

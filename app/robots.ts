@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * Served at https://vioniche.com/robots.txt.
+ * Served at https://www.vioniche.com/robots.txt.
  *
  * Everything is crawlable except /api/, which only holds the contact form
  * endpoint. CSS, JS, fonts and images are deliberately left open — Google
@@ -14,6 +14,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/api/',
     },
-    sitemap: 'https://vioniche.com/sitemap.xml',
+    sitemap: 'https://www.vioniche.com/sitemap.xml',
   };
 }
