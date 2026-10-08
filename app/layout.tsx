@@ -1,10 +1,33 @@
 import type { Metadata } from 'next';
 import './globals.css';
 
+/**
+ * Written for search intent, not for the brand voice.
+ *
+ * The title is 58 characters because Google truncates a result title at
+ * roughly 60 — anything past that is cut with an ellipsis, so a keyword
+ * sitting at position 70 is a keyword nobody reads. It front-loads the terms
+ * someone actually types ("web design studio", "small businesses", "India")
+ * and keeps the brand first only because a studio's name has to survive
+ * direct navigation too.
+ *
+ * The description is 144 characters, inside the ~155 Google renders. It is
+ * not a ranking factor, it is the click: it names the service, the two
+ * qualities a small business asks about first, and where the studio is.
+ *
+ * Every claim in it is one the page already makes and can stand behind —
+ * mobile-first and built-to-rank are the hero's own words. There is no
+ * client count, no years-in-business and no results figure, because there is
+ * nothing to back one with yet.
+ */
 export const metadata: Metadata = {
-  title: 'VIONICHE — Web & Product Studio',
+  metadataBase: new URL('https://vioniche.com'),
+  alternates: {
+    canonical: '/',
+  },
+  title: 'VIONICHE — Web Design Studio for Small Businesses in India',
   description:
-    'A senior web & product studio designing and building high-end websites. Berlin, working worldwide.',
+    'Custom website design and development for small businesses. Fast, mobile-first sites built to rank on Google. Based in India, working worldwide.',
 };
 
 /**
