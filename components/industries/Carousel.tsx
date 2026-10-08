@@ -219,7 +219,7 @@ function IndustryLabel({ concept }: { concept: Concept }) {
     <a
       href={concept.href}
       target="_blank"
-      rel="noreferrer noopener"
+      rel="noopener noreferrer"
       aria-label={`${concept.industry}: view the live website project (opens in a new tab)`}
       onClick={(e) => e.stopPropagation()}
     >

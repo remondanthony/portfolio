@@ -54,6 +54,7 @@ export const CONCEPTS: Concept[] = [
     photo: '/concepts/fitness.png',
     alt: 'A gym website design headed “Train Stronger”, shown on a screen in a dark weights room.',
     format: 'feature',
+    href: 'https://tavolo-omega.vercel.app',
   },
   {
     key: 'healthcare',
