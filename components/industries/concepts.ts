@@ -41,6 +41,8 @@ export type Concept = {
    */
   alt: string;
   format: Format;
+  /** A live build of this concept, if one exists. Links the industry label. */
+  href?: string;
 };
 
 export const CONCEPTS: Concept[] = [
@@ -72,6 +74,7 @@ export const CONCEPTS: Concept[] = [
     photo: '/concepts/resturant.png',
     alt: 'A restaurant website design headed “Dining Reimagined”, shown on a screen on a candlelit table.',
     format: 'card',
+    href: 'https://resturant-omega-coral.vercel.app',
   },
   {
     key: 'boutique',

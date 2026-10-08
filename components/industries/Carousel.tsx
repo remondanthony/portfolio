@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { CONCEPTS, type Format } from './concepts';
+import { CONCEPTS, type Concept, type Format } from './concepts';
 
 /**
  * The concepts, as a grid on desktop and a swipeable carousel on phones.
@@ -139,7 +139,7 @@ export default function IndustryCarousel() {
 
               <figcaption className="exh-caption">
                 <span className="exh-index">{String(n + 1).padStart(2, '0')}</span>
-                <span className="exh-kicker">Concept — {c.industry}</span>
+                <span className="exh-kicker">Concept — <IndustryLabel concept={c} /></span>
                 <h3>{c.benefit}</h3>
                 <p className="exh-story">{c.story}</p>
               </figcaption>
@@ -169,7 +169,7 @@ export default function IndustryCarousel() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
           </button>
 
-          <span className="ind-nav-cat">{CONCEPTS[active].industry}</span>
+          <span className="ind-nav-cat"><IndustryLabel concept={CONCEPTS[active]} /></span>
 
           <div className="ind-dots" role="tablist" aria-label="Concepts">
             {CONCEPTS.map((c, n) => (
@@ -201,5 +201,29 @@ export default function IndustryCarousel() {
         <span className="ind-next-label" aria-hidden="true">Up Next</span>
       </div>
     </>
+  );
+}
+
+/**
+ * The industry name, linked to the live build when there is one.
+ *
+ * The anchor carries no class: the global `a` rule inherits colour and drops
+ * the underline, so it looks exactly like the label it sits in. Same new-tab
+ * behaviour as the Born21 links in Work. The click is kept from reaching the
+ * figure, which on desktop would otherwise also promote the card behind the
+ * tab that just opened.
+ */
+function IndustryLabel({ concept }: { concept: Concept }) {
+  if (!concept.href) return <>{concept.industry}</>;
+  return (
+    <a
+      href={concept.href}
+      target="_blank"
+      rel="noreferrer noopener"
+      aria-label={`${concept.industry}: view the live website project (opens in a new tab)`}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {concept.industry}
+    </a>
   );
 }
