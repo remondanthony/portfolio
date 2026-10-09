@@ -20,14 +20,15 @@ import { commitChanges, gh, githubConfig, type Change } from './github';
 
 export type StoredArticle = { slug: string; source: string; version: string };
 export type CommitResult = { sha?: string; url?: string };
+export type StoredImage = { path: string; size: number };
 
 export interface Store {
   kind: 'github' | 'local';
   describe: string;
   list(): Promise<StoredArticle[]>;
   get(slug: string): Promise<StoredArticle | null>;
-  /** Repository paths of CMS-managed images: public/blog/<slug>/<name>.(jpg|png|webp) only. */
-  listImages(): Promise<string[]>;
+  /** CMS-managed images only — public/blog/<slug>/<name>.(jpg|png|webp) — with their size in bytes. */
+  listImages(): Promise<StoredImage[]>;
   commit(changes: Change[], message: string): Promise<CommitResult>;
 }
 
@@ -82,8 +83,11 @@ function githubStore(): Store | null {
     async listImages() {
       // One request for the whole tree, filtered to the CMS image pattern —
       // nothing else in the repository is ever listed.
-      const tree = await gh<{ tree: { path: string; type: string }[] }>(c, `/git/trees/${ref}?recursive=1`);
-      return tree.tree.filter((e) => e.type === 'blob' && IMAGE_PATH.test(e.path)).map((e) => e.path).sort();
+      const tree = await gh<{ tree: { path: string; type: string; size?: number }[] }>(c, `/git/trees/${ref}?recursive=1`);
+      return tree.tree
+        .filter((e) => e.type === 'blob' && IMAGE_PATH.test(e.path))
+        .map((e) => ({ path: e.path, size: e.size ?? 0 }))
+        .sort((a, b) => a.path.localeCompare(b.path));
     },
     commit: (changes, message) => commitChanges(c, changes.map((ch) => ({ ...ch, path: allowedPath(ch.path) })), message),
   };
@@ -119,20 +123,25 @@ function localStore(): Store {
     async listImages() {
       const base = path.join(/*turbopackIgnore: true*/ root, 'public', 'blog');
       const dirs = await fs.readdir(base, { withFileTypes: true }).catch(() => []);
-      const out: string[] = [];
+      const out: StoredImage[] = [];
       for (const d of dirs) {
         if (!d.isDirectory()) continue;
         for (const f of await fs.readdir(path.join(base, d.name)).catch(() => [] as string[])) {
           const p = `public/blog/${d.name}/${f}`;
-          if (IMAGE_PATH.test(p)) out.push(p);
+          if (IMAGE_PATH.test(p)) out.push({ path: p, size: (await fs.stat(path.join(base, d.name, f))).size });
         }
       }
-      return out.sort();
+      return out.sort((a, b) => a.path.localeCompare(b.path));
     },
     async commit(changes) {
       for (const ch of changes) {
         const file = abs(ch.path);
-        if ('remove' in ch) await fs.rm(file, { force: true });
+        if ('remove' in ch) {
+          await fs.rm(file, { force: true });
+          // An image folder left empty goes too, as it would in Git. rmdir only
+          // removes an empty directory, and this one came from a validated path.
+          if (IMAGE_PATH.test(ch.path)) await fs.rmdir(path.dirname(file)).catch(() => {});
+        }
         else {
           await fs.mkdir(path.dirname(file), { recursive: true });
           await fs.writeFile(file, ch.content);

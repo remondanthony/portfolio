@@ -1,9 +1,12 @@
 import type { Entry } from '@/lib/cms/catalog';
 import { formatDate } from '@/lib/blog/format';
+import Lifecycle from './Lifecycle';
 
 /** One article as the list shows it — never its body or source. */
 export type Row = {
   slug: string;
+  /** The stored file's version, so a lifecycle action can tell if it changed since the list loaded. */
+  version: string;
   title: string;
   category: string;
   status: 'published' | 'draft' | 'invalid';
@@ -15,6 +18,7 @@ export type Row = {
 export const toRows = (entries: Entry[]): Row[] =>
   entries.map((e) => ({
     slug: e.slug,
+    version: e.version,
     title: e.meta.title || 'Untitled',
     category: e.meta.category ?? '—',
     status: e.error ? 'invalid' : e.meta.draft ? 'draft' : 'published',
@@ -66,6 +70,9 @@ export default function ArticleTable({ rows, empty }: { rows: Row[]; empty?: Rea
               <a href={`/admin/blog/${r.slug}/preview`}>Preview</a>
               {/* Opens a new, unsaved draft based on this article; the article itself is not changed. */}
               {!r.error && <a href={`/admin/blog/new?from=${r.slug}`}>Duplicate</a>}
+              {r.status !== 'invalid' && (
+                <Lifecycle slug={r.slug} version={r.version} status={r.status} title={r.title} place="row" />
+              )}
             </td>
           </tr>
         ))}

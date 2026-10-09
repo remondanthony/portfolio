@@ -10,6 +10,7 @@ import type { Check, EditorData, Intent, SaveResult } from '@/lib/cms/types';
 import { readiness } from '@/lib/cms/readiness';
 import { suggestLinks, type CatalogItem } from '@/lib/cms/suggestions';
 import { useMDXComponents } from '@/mdx-components';
+import Lifecycle from './Lifecycle';
 
 /**
  * The article editor.
@@ -248,6 +249,19 @@ export default function Editor({ initial, others, storeKind, copyOf }: {
           {!isNew && (
             // Duplicates the saved version as a new, unsaved draft; this article is untouched.
             <a className="ad-btn" href={`/admin/blog/new?from=${d.originalSlug}`}>Duplicate</a>
+          )}
+          {!isNew && d.originalSlug && d.baseVersion && (
+            <Lifecycle
+              slug={d.originalSlug}
+              version={d.baseVersion}
+              status={d.wasPublished ? 'published' : 'draft'}
+              title={d.title || d.originalSlug}
+              place="editor"
+              unsaved={dirty}
+              // Now a draft: the same text, a new stored version.
+              onUnpublished={(version) => setD((p) => ({ ...p, baseVersion: version, wasPublished: false }))}
+              onLeave={() => setDirty(false)}
+            />
           )}
           <button type="button" className="ad-btn" onClick={runCheck} disabled={busy !== null}>{busy === 'check' ? 'Checking…' : 'Check'}</button>
           {!d.wasPublished && (

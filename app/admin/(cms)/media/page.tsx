@@ -1,20 +1,25 @@
 import MediaLibrary from '@/components/admin/MediaLibrary';
 import { requireSession } from '@/lib/admin/session';
 import { catalog } from '@/lib/cms/catalog';
+import { imageUsage } from '@/lib/cms/media';
 import { getStore } from '@/lib/cms/store';
 
 /**
  * Images the CMS manages: public/blog/<article>/<image>, and nothing else.
- * Listing and uploading only — no deletion, because the CMS cannot be sure
- * an image is unused by every published article.
+ * Listing, uploading and showing where each image is used — no deletion.
+ * "Unused" means no article mentions the image; it does not mean nothing
+ * else links to it, so removing one stays a deliberate repository change.
  */
 export default async function Media() {
   await requireSession();
   const store = getStore();
-  const [paths, entries] = store ? await Promise.all([store.listImages(), catalog(store)]) : [[], []];
-  const images = paths.map((p) => {
-    const [, , folder, file] = p.split('/');
-    return { src: `/${p.slice('public/'.length)}`, folder, file };
+  const [stored, entries] = store ? await Promise.all([store.listImages(), catalog(store)]) : [[], []];
+  const srcs = stored.map((i) => `/${i.path.slice('public/'.length)}`);
+  const usage = imageUsage(srcs, entries);
+  const titles = Object.fromEntries(entries.map((e) => [e.slug, e.meta.title ?? e.slug]));
+  const images = stored.map((i, n) => {
+    const [, , folder, file] = i.path.split('/');
+    return { src: srcs[n], folder, file, bytes: i.size, ...usage[srcs[n]] };
   });
 
   return (
@@ -30,6 +35,7 @@ export default async function Media() {
       <MediaLibrary
         images={images}
         folders={entries.filter((e) => !e.error).map((e) => ({ slug: e.slug, title: e.meta.title ?? e.slug }))}
+        titles={titles}
         storeKind={store?.kind ?? null}
       />
     </>

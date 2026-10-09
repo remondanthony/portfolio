@@ -5,11 +5,12 @@ import { redirect } from 'next/navigation';
 import { assertSession, adminConfigured, endSession, startSession } from '@/lib/admin/session';
 import { verifyPassword } from '@/lib/admin/password';
 import { clearFailures, isLimited, recordFailure } from '@/lib/admin/rate-limit';
-import type { Post } from '@/lib/blog/model';
-import { blocking, runChecks, toMeta } from './article';
-import { asPost, catalog, relatedFor } from './catalog';
+import { SLUG, problems, type Post } from '@/lib/blog/model';
+import { blocking, fromSource, runChecks, toMeta } from './article';
+import { asPost, catalog, relatedFor, type Entry } from './catalog';
 import { GitHubError, deploymentState, githubConfig, type Change } from './github';
 import { MAX_IMAGE_BYTES, imageName, inspectImage } from './images';
+import { imageUsage } from './media';
 import { parseArticle, serializeArticle } from './mdx-file';
 import { bodyProblems, compileForPreview } from './safety';
 import { articlePath, getStore, isImagePath, versionOf } from './store';
@@ -210,6 +211,190 @@ export async function saveArticle(form: FormData): Promise<SaveResult> {
   }
 }
 
+/* ---------- article lifecycle ---------- */
+
+export type LifecycleResult =
+  | { ok: true; message: string; version?: string; commit?: { sha?: string; url?: string }; store: 'github' | 'local' }
+  | { ok: false; message: string; conflict?: boolean };
+
+export type Impact = {
+  status: 'draft' | 'published';
+  /** Images in public/blog/<slug>/ that a delete would remove. */
+  images: number;
+  /** Other articles using an image from that folder — a delete is refused while there are any. */
+  sharedWith: string[];
+  /** Other articles whose text links to /blog/<slug>; those links would stop working. */
+  linkedFrom: string[];
+};
+
+const VERSION = /^[0-9a-f]{40}$/;
+const conflict = (): LifecycleResult => ({
+  ok: false,
+  conflict: true,
+  message: 'This article was changed elsewhere since this page loaded. Reload to see the latest version, then try again.',
+});
+
+/**
+ * The checks every lifecycle action starts with. The slug and version come
+ * from the browser, so both are shape-checked before anything is looked up,
+ * and the article is found by exact match in the store's own listing — a
+ * slug never becomes a path unless it names an article that exists.
+ */
+type Located =
+  | { error: LifecycleResult }
+  | { store: NonNullable<ReturnType<typeof getStore>>; entries: Entry[]; entry: Entry; slug: string };
+
+async function locate(slug: unknown, baseVersion: unknown): Promise<Located> {
+  await assertSession();
+  const store = getStore();
+  if (!store) return { error: { ok: false, message: noStore } };
+  if (typeof slug !== 'string' || !SLUG.test(slug) || typeof baseVersion !== 'string' || !VERSION.test(baseVersion)) {
+    return { error: { ok: false, message: 'That request is not valid.' } };
+  }
+  const entries = await catalog(store);
+  const entry = entries.find((e) => e.slug === slug);
+  if (!entry) return { error: { ok: false, message: `"${slug}" no longer exists in ${store.describe}. Reload the list.` } };
+  if (entry.version !== baseVersion) return { error: conflict() };
+  if (entry.error) return { error: { ok: false, message: `content/blog/${slug}.mdx could not be read (${entry.error}). Fix it in the repository first.` } };
+  return { store, entries, entry, slug };
+}
+
+const failed = (e: unknown, what: string): LifecycleResult => ({
+  ok: false,
+  message: e instanceof GitHubError
+    ? `GitHub rejected the ${what}: ${e.message}. Nothing was changed.`
+    : `Could not complete the ${what}: ${(e as Error).message}. Nothing was changed.`,
+});
+
+/** Everything else that refers to this article or its images. */
+function impactOf(entry: Entry, entries: Entry[], images: string[]): Impact {
+  const others = entries.filter((e) => e.slug !== entry.slug);
+  const usage = imageUsage(images.map((p) => `/${p.slice('public/'.length)}`), others);
+  const shared = new Set(Object.values(usage).flatMap((u) => [...u.featured, ...u.used]));
+  const link = new RegExp(`/blog/${entry.slug}(?![a-z0-9-])(?!/)`);
+  const title = (s: string) => others.find((e) => e.slug === s)?.meta.title ?? s;
+  return {
+    status: entry.meta.draft ? 'draft' : 'published',
+    images: images.length,
+    sharedWith: [...shared].map(title),
+    linkedFrom: others.filter((e) => link.test(e.body)).map((e) => e.meta.title ?? e.slug),
+  };
+}
+
+const folderImages = async (store: NonNullable<ReturnType<typeof getStore>>, slug: string) =>
+  (await store.listImages()).map((i) => i.path).filter((p) => p.startsWith(`public/blog/${slug}/`) && isImagePath(p));
+
+/** What deleting or unpublishing would affect, for the confirmation dialog. Read-only. */
+export async function articleImpact(slug: string, baseVersion: string): Promise<{ ok: true; impact: Impact } | LifecycleResult> {
+  const at = await locate(slug, baseVersion);
+  if ('error' in at) return at.error;
+  try {
+    return { ok: true, impact: impactOf(at.entry, at.entries, await folderImages(at.store, at.slug)) };
+  } catch (e) {
+    return failed(e, 'check');
+  }
+}
+
+/**
+ * Publishes a draft from the article list. It goes through saveArticle with
+ * the file's own contents, so it gets exactly the editor's publish checks.
+ */
+export async function publishArticle(slug: string, baseVersion: string): Promise<LifecycleResult> {
+  const at = await locate(slug, baseVersion);
+  if ('error' in at) return at.error;
+  if (!at.entry.meta.draft) return { ok: false, message: 'This article is already published.' };
+
+  const form = new FormData();
+  form.set('intent', 'publish');
+  form.set('data', JSON.stringify(fromSource(at.slug, at.entry.source, at.entry.version)));
+  const r = await saveArticle(form);
+  if (!r.ok) {
+    const errors = r.checks.filter((c) => c.level === 'error').map((c) => c.label);
+    return { ok: false, message: errors.length ? `${r.message} ${errors.join(' ')} Open the editor to fix them.` : r.message };
+  }
+  return { ok: true, message: r.message, version: r.version, commit: r.commit, store: at.store.kind };
+}
+
+/**
+ * Published → draft, in one commit that changes only the draft flag. The
+ * text, metadata and images stay; the article leaves /blog, the sitemap and
+ * its URL on the next deployment, and can be edited and published again.
+ */
+export async function unpublishArticle(slug: string, baseVersion: string): Promise<LifecycleResult> {
+  const at = await locate(slug, baseVersion);
+  if ('error' in at) return at.error;
+  const { store, entry } = at;
+  if (entry.meta.draft) return { ok: false, message: 'This article is already a draft.' };
+
+  try {
+    const { meta, body, preamble } = parseArticle(entry.source);
+    const next = { ...meta, draft: true };
+    const bad = problems(at.slug, next);
+    if (bad.length) return { ok: false, message: `Not unpublished: ${bad.join('; ')}.` };
+    const content = serializeArticle(next as Parameters<typeof serializeArticle>[0], body, preamble);
+    const commit = await store.commit([{ path: articlePath(at.slug), content }], `Unpublish: ${meta.title}
+
+Via the Vioniche CMS.`);
+    return {
+      ok: true,
+      message: store.kind === 'github'
+        ? 'Unpublished. It is now a draft; it leaves the public site when the Vercel deployment finishes.'
+        : 'Unpublished locally. It is now a draft.',
+      version: versionOf(content),
+      commit,
+      store: store.kind,
+    };
+  } catch (e) {
+    return failed(e, 'unpublish');
+  }
+}
+
+/**
+ * Removes an article and its image folder in one commit: the MDX file and
+ * every image under public/blog/<slug>/, and nothing else — each path is
+ * built from the validated slug and checked again by the store. `expect`
+ * must match the stored status, so a draft-only delete can never remove an
+ * article that went live in the meantime. Refused while another article
+ * uses an image from the folder.
+ */
+export async function deleteArticle(slug: string, baseVersion: string, expect: 'draft' | 'published'): Promise<LifecycleResult> {
+  const at = await locate(slug, baseVersion);
+  if ('error' in at) return at.error;
+  const { store, entry, entries } = at;
+  const status = entry.meta.draft ? 'draft' : 'published';
+  if (expect !== 'draft' && expect !== 'published') return { ok: false, message: 'That request is not valid.' };
+  if (status !== expect) {
+    return { ok: false, conflict: true, message: `This article is now ${status === 'draft' ? 'a draft' : 'published'}. Reload and try again.` };
+  }
+
+  try {
+    const images = await folderImages(store, at.slug);
+    const impact = impactOf(entry, entries, images);
+    if (impact.sharedWith.length) {
+      return { ok: false, message: `Not deleted: ${impact.sharedWith.join(', ')} uses images from this article's folder. Change ${impact.sharedWith.length === 1 ? 'that article' : 'those articles'} first.` };
+    }
+    const changes: Change[] = [
+      { path: articlePath(at.slug), remove: true },
+      ...images.map((p) => ({ path: p, remove: true as const })),
+    ];
+    const title = entry.meta.title ?? at.slug;
+    const commit = await store.commit(changes, `${status === 'draft' ? 'Delete draft' : 'Delete article'}: ${title}
+
+Via the Vioniche CMS.`);
+    const what = `${status === 'draft' ? 'Draft' : 'Article'} and ${images.length} image${images.length === 1 ? '' : 's'} deleted`;
+    return {
+      ok: true,
+      message: store.kind === 'github'
+        ? `${what} in one commit.${status === 'published' ? ' The URL stops working when the Vercel deployment finishes.' : ''}`
+        : `${what} locally.`,
+      commit,
+      store: store.kind,
+    };
+  } catch (e) {
+    return failed(e, 'delete');
+  }
+}
+
 /* ---------- media library ---------- */
 
 export type UploadResult =
@@ -241,7 +426,7 @@ export async function uploadImage(form: FormData): Promise<UploadResult> {
     const info = inspectImage(bytes);
     if (!info) return { ok: false, message: 'The image must be a JPEG, PNG or WebP file.' };
 
-    const taken = new Set(await store.listImages());
+    const taken = new Set((await store.listImages()).map((i) => i.path));
     const base = imageName(file.name, 'image');
     let name = `${base}.${info.ext}`;
     for (let n = 2; taken.has(`public/blog/${slug}/${name}`); n++) name = `${base}-${n}.${info.ext}`;

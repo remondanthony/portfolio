@@ -39,7 +39,7 @@ Password resets happen on the server, not by email — deliberately, since there
 is one admin and nothing to send a reset link to:
 
 1. Run `node scripts/hash-password.mjs`. It asks for the new password twice
-   (at least 12 characters) and prints an `ADMIN_PASSWORD_HASH=scrypt:…` line.
+   (at least 9 characters) and prints an `ADMIN_PASSWORD_HASH=scrypt:…` line.
    It writes nothing to disk.
 2. Replace `ADMIN_PASSWORD_HASH` in `.env.local` and/or in Vercel's
    environment variables with the printed value.
@@ -93,8 +93,44 @@ publishes nothing — drafts are excluded — but it uses build minutes. To skip
 them, set Vercel → Settings → Git → **Ignored Build Step** to:
 
 ```
-git log -1 --pretty=%s | grep -q '^Save draft:' && exit 0 || exit 1
+git log -1 --pretty=%s | grep -qE '^(Save draft|Delete draft):' && exit 0 || exit 1
 ```
+
+(Deleting a draft changes nothing public either. `Unpublish:` and `Delete
+article:` commits do change the site, so they must build.)
+
+## Unpublishing and deleting
+
+Each is one commit, confirmed in a dialog first, available from the article
+list and from the editor:
+
+| Action | Commit | What changes |
+| --- | --- | --- |
+| Publish (list) | `Publish: <title>` | Same checks as the editor's Publish. |
+| Unpublish | `Unpublish: <title>` | Only `draft: true` is added. Text, metadata and images stay; the article leaves `/blog`, the sitemap and its URL (404) after the deploy, and can be published again. |
+| Delete draft | `Delete draft: <title>` | Removes `content/blog/<slug>.mdx` and every image in `public/blog/<slug>/`. |
+| Delete permanently | `Delete article: <title>` | The same, for a published article; its URL returns 404 after the deploy. |
+
+Deleting cannot be undone from the CMS (Git history still has the files).
+It is refused when:
+
+- the article changed since the page was loaded (reload and try again);
+- a draft-only delete finds the article is now published, or the reverse;
+- another article uses an image from this article's folder — a duplicated
+  article keeps pointing at the original's images until it gets its own.
+
+Other articles that link to a deleted or unpublished one are listed in the
+dialog; those links are not changed automatically.
+
+## Media usage
+
+The Media page marks each image **✓ Featured image**, **✓ Used in article**
+(both can apply) or **⚠ Unused**, and filters by usage. An image counts as
+used when its path, `/blog/<folder>/<file>`, appears anywhere in an article:
+the featured image, a `<Figure>`, a Markdown image or link, or the CTA
+override's image. "Unused" only means no article mentions it — the CMS never
+deletes images on its own, and has no image delete button. Remove one with an
+ordinary commit if it is really not needed.
 
 ## Local development
 
@@ -112,4 +148,7 @@ without credentials. This mode is disabled in production.
 - A published article keeps its slug. A draft can be renamed; the old file is
   removed in the same commit.
 - If a file changed on GitHub after it was opened in the editor, saving is
-  refused instead of overwriting the other change.
+  refused instead of overwriting the other change. Unpublish and delete check
+  the same way.
+- Deleting removes only the article's own file and image folder, found by the
+  article's validated slug.
