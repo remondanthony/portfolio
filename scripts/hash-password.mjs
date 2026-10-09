@@ -66,8 +66,8 @@ if (password !== confirm) {
   console.error('Passwords do not match.');
   process.exit(1);
 }
-if (password.length < 12) {
-  console.error('Use at least 12 characters.');
+if (password.length < 9) {
+  console.error('Use at least 9 characters.');
   process.exit(1);
 }
 
