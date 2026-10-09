@@ -1,78 +1,32 @@
 /**
  * What Vioniche does — the section the nav's "Services" link lands on.
  *
- * Four services as an editorial list rather than four identical cards: each
- * row is a number and a name on one side, what it is and what it covers on
- * the other, separated by the same hairlines the rest of the page uses.
+ * A short overview, not the services themselves: each service has its own
+ * page now, so each row is a number, a name, one line and a way through to
+ * that page. The whole row is the link — one tab stop per service, with the
+ * name as the bulk of its accessible text — and the four links are the
+ * homepage's main internal links into the service pages.
+ *
+ * The rows keep the editorial list's hairlines, numbers, orange rule and
+ * entrance (.wwd-list / .wwd-item, shared with the service pages); only the
+ * homepage's --links modifier lays a row out as one link with an arrow.
  *
  * It is followed directly by "Not add-ons. Just how we build." (Services.tsx,
  * #standards): this section is what Vioniche does, that one is the standard
  * every project gets. They are meant to read as one story, in that order.
  *
  * Everything is visible without hover or JavaScript. Hover and keyboard focus
- * only add emphasis; the entrance is CSS-only and skipped where unsupported or
- * when reduced motion is requested. No outcome is promised: these describe the
- * work, not rankings, traffic or AI placement nobody can guarantee.
+ * only add emphasis. No outcome is promised.
  */
 
-import { servicePage } from '@/lib/services';
+import { servicePage, type ServicePageKey } from '@/lib/services';
 
-const SERVICES = [
-  {
-    name: 'Website Development',
-    page: servicePage('web-development'),
-    more: 'Explore web development',
-    text: 'Websites that look sharp, load fast, and turn visitors into customers.',
-    points: [
-      'Business websites',
-      'Landing pages',
-      'Custom web experiences',
-      'CMS integrations',
-      'Responsive, performance-focused builds',
-    ],
-  },
-  {
-    name: 'SEO',
-    page: servicePage('seo'),
-    more: 'Explore SEO services',
-    text: 'Build search visibility that compounds over time.',
-    points: [
-      'Technical SEO',
-      'On-page SEO',
-      'Content strategy',
-      'Site architecture',
-      'Search Console and indexing',
-      'Ongoing SEO monitoring',
-    ],
-  },
-  {
-    name: 'Automation',
-    page: servicePage('automation'),
-    more: 'Explore business automation',
-    text: 'Replace repetitive work with systems that run themselves.',
-    points: [
-      'Business workflows',
-      'API integrations',
-      'Automated reporting',
-      'Content workflows',
-      'Lead automation',
-      'AI-assisted processes',
-    ],
-  },
-  {
-    name: 'AI Automation',
-    page: servicePage('ai-automation'),
-    more: 'Explore AI automation',
-    text: 'Put practical AI workflows to work across your business.',
-    points: [
-      'AI-assisted workflows',
-      'AI + automation',
-      'Document processing',
-      'Information extraction',
-      'AI-powered reporting',
-      'Human-in-the-loop systems',
-    ],
-  },
+/** Homepage wording; the destination comes from the shared service list. */
+const SERVICES: { key: ServicePageKey; name: string; text: string }[] = [
+  { key: 'web-development', name: 'Website Development', text: 'Websites that look sharp, load fast, and turn visitors into customers.' },
+  { key: 'seo', name: 'SEO', text: 'Technical SEO and content systems built for sustainable visibility.' },
+  { key: 'automation', name: 'Automation', text: 'Workflows and integrations that eliminate repetitive work.' },
+  { key: 'ai-automation', name: 'AI Automation', text: 'Practical AI workflows that help your business work faster and smarter.' },
 ];
 
 export default function WhatWeDo() {
@@ -93,21 +47,17 @@ export default function WhatWeDo() {
           </p>
         </div>
 
-        <ol className="wwd-list">
+        <ol className="wwd-list wwd-list--links">
           {SERVICES.map((s, i) => (
-            <li key={s.name} className="wwd-item">
-              <div className="wwd-name">
-                <span className="wwd-no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                <h3>{s.name}</h3>
-              </div>
-              <div className="wwd-detail">
+            <li key={s.key} className="wwd-item">
+              <a className="wwd-row" href={servicePage(s.key).href}>
+                <div className="wwd-name">
+                  <span className="wwd-no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <h3>{s.name}</h3>
+                </div>
                 <p className="wwd-text">{s.text}</p>
-                <ul className="wwd-points">
-                  {s.points.map((p) => <li key={p}>{p}</li>)}
-                </ul>
-                {/* Each service has its own page; the row is the summary. */}
-                <a className="proj-link wwd-more" href={s.page.href}>{s.more} <span className="dot" aria-hidden="true">→</span></a>
-              </div>
+                <span className="wwd-arrow" aria-hidden="true">→</span>
+              </a>
             </li>
           ))}
         </ol>

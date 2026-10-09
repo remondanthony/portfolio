@@ -961,9 +961,23 @@
   .wwd-cta { display: flex; align-items: baseline; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; margin-top: 28px; }
   .wwd-cta p { margin: 0; font-size: 16px; color: var(--ink-2); }
   .wwd-cta-link { margin: 0; padding: 0; }
-  .wwd-more { margin-top: 18px; padding-top: 0; }
   /* One story with the standards section that follows: less air between them. */
   .wwd + #standards { padding-top: clamp(24px, 3vw, 40px); }
+
+  /* Homepage overview: each row is one link to its service page. The li
+     keeps the hairline, hover wash, orange rule and entrance; the link takes
+     over its grid and padding so the whole row is the click and focus target. */
+  .wwd-list--links .wwd-item { display: block; padding: 0; }
+  .wwd-row {
+    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr) auto; align-items: center;
+    gap: 12px clamp(24px, 4vw, 64px); padding: clamp(24px, 2.6vw, 34px) clamp(0px, 1.4vw, 20px); color: var(--ink);
+  }
+  .wwd-row .wwd-name { align-items: center; }
+  .wwd-row .wwd-text { max-width: 46ch; color: var(--ink-2); }
+  .wwd-arrow { font-size: 22px; line-height: 1; color: var(--muted); transition: transform .3s cubic-bezier(.2, .7, .2, 1), color .3s ease; }
+  .wwd-row:hover .wwd-arrow, .wwd-row:focus-visible .wwd-arrow { color: var(--accent-orange); transform: translateX(6px); }
+  .wwd-row:hover .wwd-text, .wwd-row:focus-visible .wwd-text { color: var(--ink); }
+  .wwd-row:focus-visible { outline: 2px solid var(--accent-orange); outline-offset: -2px; border-radius: 4px; }
 
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
@@ -977,15 +991,23 @@
 
   @media (max-width: 1023px) {
     .wwd-item { grid-template-columns: 1fr; gap: 16px; }
+    /* Name over the line, the arrow alongside both. */
+    .wwd-row { grid-template-columns: minmax(0, 1fr) auto; }
+    .wwd-row .wwd-name { grid-column: 1; }
+    .wwd-row .wwd-text { grid-column: 1; }
+    .wwd-row .wwd-arrow { grid-column: 2; grid-row: 1 / span 2; }
   }
   @media (max-width: 620px) {
     .wwd-list { margin-top: 40px; }
     .wwd-item { padding: 26px 0; }
+    .wwd-list--links .wwd-item { padding: 0; }
+    .wwd-row { padding: 22px 0; gap: 10px 16px; }
     .wwd-points { grid-template-columns: 1fr; }
     .wwd-cta { flex-direction: column; align-items: flex-start; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .wwd-item, .wwd-item::before, .wwd-no { transition: none; }
+    .wwd-item, .wwd-item::before, .wwd-no, .wwd-arrow { transition: none; }
+    .wwd-row:hover .wwd-arrow, .wwd-row:focus-visible .wwd-arrow { transform: none; }
   }
 
   /* ============ MARQUEE ============ */
