@@ -10,6 +10,11 @@
  */
 
 export const SERVICES = {
+  whatWeDo: {
+    href: '/#services',
+    title: 'What we do',
+    text: 'Website development, SEO, automation, and AI & GEO, planned as one connected system.',
+  },
   services: {
     // The standards section. #services is now the "What we do" section above it.
     href: '/#standards',

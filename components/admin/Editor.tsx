@@ -7,6 +7,8 @@ import { AUTHORS, CATEGORIES, type Post } from '@/lib/blog/model';
 import { CASE_STUDIES, SERVICES } from '@/lib/blog/links';
 import { checkArticle, deploymentStatus, previewArticle, saveArticle } from '@/lib/cms/actions';
 import type { Check, EditorData, Intent, SaveResult } from '@/lib/cms/types';
+import { readiness } from '@/lib/cms/readiness';
+import { suggestLinks, type CatalogItem } from '@/lib/cms/suggestions';
 import { useMDXComponents } from '@/mdx-components';
 
 /**
@@ -21,7 +23,7 @@ import { useMDXComponents } from '@/mdx-components';
  * re-checks the session, validates, and commits on the server.
  */
 
-type Other = { slug: string; title: string; draft: boolean };
+type Other = CatalogItem;
 type MDXContent = ComponentType<{ components?: unknown }>;
 type Preview =
   | { state: 'closed' }
@@ -39,7 +41,13 @@ const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor as
   scope: unknown,
 ) => Promise<{ default: MDXContent }>;
 
-export default function Editor({ initial, others, storeKind }: { initial: EditorData; others: Other[]; storeKind: 'github' | 'local' | null }) {
+export default function Editor({ initial, others, storeKind, copyOf }: {
+  initial: EditorData;
+  others: Other[];
+  storeKind: 'github' | 'local' | null;
+  /** Set when this new article started as a duplicate of an existing one. */
+  copyOf?: { slug: string; title: string };
+}) {
   const [d, setD] = useState<EditorData>(initial);
   const [slugTouched, setSlugTouched] = useState(Boolean(initial.originalSlug));
   const [dirty, setDirty] = useState(false);
@@ -216,6 +224,13 @@ export default function Editor({ initial, others, storeKind }: { initial: Editor
   };
 
   const disabled = busy !== null || !storeKind;
+  const ready = readiness(d, Boolean(upload));
+  const attention = ready.filter((r) => !r.ok).length;
+  const suggestions = suggestLinks(d, others);
+  const insertLink = (title: string, href: string) => edit((sel) => {
+    const text = `[${sel || title}](${href})`;
+    return { text, select: [text.length, text.length] };
+  });
   const counts = checks && {
     error: checks.filter((c) => c.level === 'error').length,
     warn: checks.filter((c) => c.level === 'warn').length,
@@ -226,10 +241,14 @@ export default function Editor({ initial, others, storeKind }: { initial: Editor
       <div className="ad-bar">
         <div className="ad-bar-l">
           <a href="/admin/blog" className="ad-link">← Articles</a>
-          <span className={`ad-pill ad-pill--${d.wasPublished ? 'published' : 'draft'}`}>{d.wasPublished ? 'published' : isNew ? 'new' : 'draft'}</span>
+          <span className={`ad-pill ad-pill--${d.wasPublished ? 'published' : 'draft'}`}>{d.wasPublished ? 'published' : isNew ? (copyOf ? 'new draft' : 'new') : 'draft'}</span>
           {dirty && <span className="ad-unsaved">Unsaved changes</span>}
         </div>
         <div className="ad-bar-r">
+          {!isNew && (
+            // Duplicates the saved version as a new, unsaved draft; this article is untouched.
+            <a className="ad-btn" href={`/admin/blog/new?from=${d.originalSlug}`}>Duplicate</a>
+          )}
           <button type="button" className="ad-btn" onClick={runCheck} disabled={busy !== null}>{busy === 'check' ? 'Checking…' : 'Check'}</button>
           {!d.wasPublished && (
             <button type="button" className="ad-btn" onClick={() => save('draft')} disabled={disabled}>{busy === 'draft' ? 'Saving…' : 'Save draft'}</button>
@@ -243,6 +262,13 @@ export default function Editor({ initial, others, storeKind }: { initial: Editor
 
       {!storeKind && (
         <p className="ad-note ad-note--warn">Saving is unavailable: GitHub is not configured on this deployment. You can still write, check and preview.</p>
+      )}
+
+      {copyOf && isNew && (
+        <p className="ad-note">
+          Copy of <a href={`/admin/blog/${copyOf.slug}/edit`}>{copyOf.title}</a> — a new draft, not saved yet. Saving creates{' '}
+          <code>/blog/{d.slug || '…'}</code> as a draft; the original is not changed.
+        </p>
       )}
 
       {(busy === 'publish' || busy === 'draft' || result) && (
@@ -291,6 +317,18 @@ export default function Editor({ initial, others, storeKind }: { initial: Editor
             ) : (
               <p className="ad-hint">Run <b>Check</b> to see what publishing needs. Errors block publishing; warnings don&rsquo;t.</p>
             )}
+          </Panel>
+
+          <Panel title={`SEO readiness · ${attention ? `${attention} item${attention > 1 ? 's' : ''} need${attention > 1 ? '' : 's'} attention` : 'ready to publish'}`}>
+            <ul className="ad-checks">
+              {ready.map((r) => (
+                <li key={r.label} className={`ad-check ad-check--${r.ok ? 'pass' : 'warn'}`}>
+                  <span aria-hidden="true">{r.ok ? '✓' : '⚠'}</span>
+                  <span><span className="ad-sr">{r.ok ? 'Done: ' : 'Needs attention: '}</span>{r.label}{r.note && <span className="ad-check-note"> — {r.note}</span>}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="ad-hint">A checklist, not a ranking score. Nothing here blocks saving — <b>Check</b> decides what can be published.</p>
           </Panel>
 
           <Panel title="Publishing">
@@ -360,6 +398,24 @@ export default function Editor({ initial, others, storeKind }: { initial: Editor
               onChange={(v) => set('related', v)}
               empty="No other articles yet."
             />
+            <div className="ad-suggest">
+              <span className="ad-label">Suggested links</span>
+              {suggestions.length ? (
+                <ul>
+                  {suggestions.map((s) => (
+                    <li key={s.href}>
+                      <span className="ad-suggest-text"><b>{s.title}</b> <code>{s.href}</code><span className="ad-hint">{s.kind} · {s.reason}</span></span>
+                      <span className="ad-suggest-actions">
+                        <button type="button" className="ad-mini" onClick={() => insertLink(s.title, s.href)} title="Insert a Markdown link at the cursor">Insert</button>
+                        <button type="button" className="ad-mini" onClick={() => navigator.clipboard?.writeText(`[${s.title}](${s.href})`)} title="Copy the Markdown link">Copy</button>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="ad-hint">Every suggested page is already linked.</p>
+              )}
+            </div>
           </Panel>
 
           <Panel title="SEO brief">

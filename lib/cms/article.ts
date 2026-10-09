@@ -161,3 +161,39 @@ export async function runChecks(
 }
 
 export const blocking = (checks: Check[]) => checks.some((c) => c.level === 'error');
+
+/**
+ * A free slug for a copy: "slug-copy", then "slug-copy-2", … Never one that
+ * exists, never longer than a sensible URL, always a valid slug.
+ */
+export function uniqueCopySlug(slug: string, taken: string[]) {
+  const root = slug.replace(/-copy(?:-\d+)?$/, '').slice(0, 70).replace(/-+$/, '') || 'article';
+  for (let n = 1; ; n++) {
+    const candidate = n === 1 ? `${root}-copy` : `${root}-copy-${n}`;
+    if (!taken.includes(candidate)) return candidate;
+  }
+}
+
+/**
+ * The editor's starting point for duplicating an article: everything worth
+ * keeping (body, category, tags, image, links, SEO brief, CTA overrides) as a
+ * brand-new, unsaved draft under a free slug. Nothing is written until the
+ * admin saves it, and then through the normal save path — so the original
+ * cannot be touched. Dates restart, and the canonical is dropped: a copy must
+ * not claim to be the original's URL.
+ */
+export function duplicateArticle(slug: string, source: string, taken: string[]): EditorData {
+  const d = fromSource(slug, source, '');
+  return {
+    ...d,
+    originalSlug: null,
+    baseVersion: null,
+    wasPublished: false,
+    slug: uniqueCopySlug(slug, taken),
+    // A copy of a copy is still just '(copy)', never '(copy) (copy)'.
+    title: d.title ? `${d.title.replace(/(\s*\(copy\))+$/, '')} (copy)` : '',
+    published: today(),
+    updated: '',
+    canonical: '',
+  };
+}

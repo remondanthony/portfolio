@@ -24,6 +24,7 @@ export default async function CmsShell({ children }: { children: ReactNode }) {
               <a href="/admin/dashboard">Dashboard</a>
               <a href="/admin/blog">Articles</a>
               <a href="/admin/blog/new">New article</a>
+              <a href="/admin/media">Media</a>
             </nav>
             <div className="ad-top-right">
               <span className={`ad-store ad-store--${store?.kind ?? 'none'}`} title={store?.describe ?? 'Not connected'}>

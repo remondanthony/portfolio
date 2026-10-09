@@ -151,3 +151,35 @@
   .ad-actions a { margin: 0 14px 0 0; }
   .ad-preview-page .ad-preview-bar { top: 0; }
 }
+
+/* ---- Phase 1.5: list filters, readiness notes, link suggestions, media ---- */
+.ad-check-note { color: var(--muted); }
+.ad-mini { font: inherit; font-size: 12.5px; font-weight: 500; color: var(--ink); background: var(--panel); border: 1px solid var(--hair); border-radius: 20px; padding: 4px 10px; cursor: pointer; white-space: nowrap; }
+.ad-mini:hover { border-color: var(--ink); }
+
+.ad-filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 10px; }
+.ad-filters .field { min-width: 160px; }
+.ad-filters input, .ad-filters select { padding: 10px 12px; font-size: 14px; border-radius: 10px; }
+.ad-filter-q { flex: 1 1 260px; }
+.ad-count { margin: 0 0 12px; }
+
+.ad-suggest { border-top: 1px solid var(--hair); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.ad-suggest ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ad-suggest li { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.ad-suggest-text { display: flex; flex-direction: column; gap: 2px; font-size: 13.5px; min-width: 0; }
+.ad-suggest-text code { font-size: 11.5px; word-break: break-all; }
+.ad-suggest-actions { display: flex; gap: 6px; flex: none; }
+
+.ad-upload { margin-bottom: 22px; }
+.ad-upload-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+.ad-upload-row .field { flex: 1 1 220px; }
+.ad-upload-row .btn { padding: 8px 8px 8px 18px; font-size: 14px; }
+.ad-upload-row .btn .dot { width: 24px; height: 24px; }
+
+.ad-media { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.ad-media-card { background: var(--panel); border: 1px solid var(--hair); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+.ad-media-thumb { aspect-ratio: 16 / 10; background: var(--bg); display: grid; place-items: center; overflow: hidden; border-bottom: 1px solid var(--hair); }
+.ad-media-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.ad-media-meta { padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ad-media-meta b { font-size: 13.5px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ad-media-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }

@@ -1,4 +1,4 @@
-import ArticleTable from '@/components/admin/ArticleTable';
+import ArticleTable, { toRows } from '@/components/admin/ArticleTable';
 import { requireSession } from '@/lib/admin/session';
 import { catalog } from '@/lib/cms/catalog';
 import { getStore } from '@/lib/cms/store';
@@ -39,7 +39,7 @@ export default async function Dashboard() {
         <h2>Recent</h2>
         <a href="/admin/blog" className="ad-link">All articles →</a>
       </div>
-      <ArticleTable entries={entries.slice(0, 6)} />
+      <ArticleTable rows={toRows(entries.slice(0, 6))} />
     </>
   );
 }

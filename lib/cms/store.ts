@@ -26,6 +26,8 @@ export interface Store {
   describe: string;
   list(): Promise<StoredArticle[]>;
   get(slug: string): Promise<StoredArticle | null>;
+  /** Repository paths of CMS-managed images: public/blog/<slug>/<name>.(jpg|png|webp) only. */
+  listImages(): Promise<string[]>;
   commit(changes: Change[], message: string): Promise<CommitResult>;
 }
 
@@ -34,6 +36,7 @@ const ARTICLE_PATH = /^content\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*\.mdx$/;
 const IMAGE_PATH = /^public\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*\/[a-z0-9]+(?:-[a-z0-9]+)*\.(?:jpg|png|webp)$/;
 
 export const articlePath = (slug: string) => `${ARTICLE_DIR}/${slug}.mdx`;
+export const isImagePath = (p: string) => IMAGE_PATH.test(p);
 
 export function allowedPath(p: string) {
   if (!ARTICLE_PATH.test(p) && !IMAGE_PATH.test(p)) throw new Error(`Refusing to write outside content/blog and public/blog: ${p}`);
@@ -76,6 +79,12 @@ function githubStore(): Store | null {
       return (await Promise.all(slugs.map(read))).filter((a): a is StoredArticle => a !== null);
     },
     get: read,
+    async listImages() {
+      // One request for the whole tree, filtered to the CMS image pattern —
+      // nothing else in the repository is ever listed.
+      const tree = await gh<{ tree: { path: string; type: string }[] }>(c, `/git/trees/${ref}?recursive=1`);
+      return tree.tree.filter((e) => e.type === 'blob' && IMAGE_PATH.test(e.path)).map((e) => e.path).sort();
+    },
     commit: (changes, message) => commitChanges(c, changes.map((ch) => ({ ...ch, path: allowedPath(ch.path) })), message),
   };
 }
@@ -107,6 +116,19 @@ function localStore(): Store {
       return (await Promise.all(slugs.map(read))).filter((a): a is StoredArticle => a !== null);
     },
     get: read,
+    async listImages() {
+      const base = path.join(/*turbopackIgnore: true*/ root, 'public', 'blog');
+      const dirs = await fs.readdir(base, { withFileTypes: true }).catch(() => []);
+      const out: string[] = [];
+      for (const d of dirs) {
+        if (!d.isDirectory()) continue;
+        for (const f of await fs.readdir(path.join(base, d.name)).catch(() => [] as string[])) {
+          const p = `public/blog/${d.name}/${f}`;
+          if (IMAGE_PATH.test(p)) out.push(p);
+        }
+      }
+      return out.sort();
+    },
     async commit(changes) {
       for (const ch of changes) {
         const file = abs(ch.path);

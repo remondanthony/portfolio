@@ -42,3 +42,17 @@ export function relatedFor(post: Post, entries: Entry[], n = 3): Post[] {
   const chosen = (post.related ?? []).map((s) => all.find((p) => p.slug === s)).filter((p): p is Post => Boolean(p));
   return [...chosen, ...all.filter((p) => p.category === post.category && !chosen.includes(p))].slice(0, n);
 }
+
+/** What the editor needs to know about other articles — never their bodies or sources. */
+export const catalogItems = (entries: Entry[], except?: string) =>
+  entries
+    .filter((e) => !e.error && e.slug !== except)
+    .map((e) => ({
+      slug: e.slug,
+      title: e.meta.title ?? e.slug,
+      draft: Boolean(e.meta.draft),
+      category: e.meta.category,
+      tags: e.meta.tags ?? [],
+      primaryKeyword: e.meta.primaryKeyword,
+      description: e.meta.description,
+    }));

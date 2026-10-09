@@ -12,7 +12,7 @@ import { GitHubError, deploymentState, githubConfig, type Change } from './githu
 import { MAX_IMAGE_BYTES, imageName, inspectImage } from './images';
 import { parseArticle, serializeArticle } from './mdx-file';
 import { bodyProblems, compileForPreview } from './safety';
-import { articlePath, getStore, versionOf } from './store';
+import { articlePath, getStore, isImagePath, versionOf } from './store';
 import type { Check, EditorData, Intent, SaveResult, Step } from './types';
 
 /**
@@ -207,6 +207,52 @@ export async function saveArticle(form: FormData): Promise<SaveResult> {
   } catch (e) {
     const msg = e instanceof GitHubError ? `GitHub rejected the update: ${e.message}` : `Could not save: ${(e as Error).message}`;
     return fail(`${msg} Nothing was published.`);
+  }
+}
+
+/* ---------- media library ---------- */
+
+export type UploadResult =
+  | { ok: true; src: string; width: number; height: number; commit?: { sha?: string; url?: string }; store: 'github' | 'local' }
+  | { ok: false; message: string };
+
+/**
+ * Adds an image to an existing article's folder, public/blog/<slug>/, through
+ * the same checks as an article upload: the type is read from the bytes, the
+ * size is capped, the name is reduced to a safe slug, and the final path must
+ * match the CMS image pattern. A name already in that folder gets a numbered
+ * suffix, so an upload can never replace an image an article is using.
+ */
+export async function uploadImage(form: FormData): Promise<UploadResult> {
+  await assertSession();
+  const store = getStore();
+  if (!store) return { ok: false, message: noStore };
+
+  const slug = String(form.get('slug') ?? '');
+  const file = form.get('image');
+  if (!(file instanceof File) || file.size === 0) return { ok: false, message: 'Choose an image to upload.' };
+  if (file.size > MAX_IMAGE_BYTES) return { ok: false, message: `The image is ${(file.size / 1048576).toFixed(1)} MB; the limit is 3 MB.` };
+
+  try {
+    const entries = await catalog(store);
+    if (!entries.some((e) => e.slug === slug)) return { ok: false, message: 'Choose one of the existing articles as the image folder.' };
+
+    const bytes = Buffer.from(await file.arrayBuffer());
+    const info = inspectImage(bytes);
+    if (!info) return { ok: false, message: 'The image must be a JPEG, PNG or WebP file.' };
+
+    const taken = new Set(await store.listImages());
+    const base = imageName(file.name, 'image');
+    let name = `${base}.${info.ext}`;
+    for (let n = 2; taken.has(`public/blog/${slug}/${name}`); n++) name = `${base}-${n}.${info.ext}`;
+    const repoPath = `public/blog/${slug}/${name}`;
+    if (!isImagePath(repoPath)) return { ok: false, message: 'That file name cannot be used.' };
+
+    const commit = await store.commit([{ path: repoPath, content: bytes }], `Upload image: ${slug}/${name}\n\nVia the Vioniche CMS.`);
+    return { ok: true, src: `/blog/${slug}/${name}`, width: info.width, height: info.height, commit, store: store.kind };
+  } catch (e) {
+    const msg = e instanceof GitHubError ? `GitHub rejected the upload: ${e.message}` : `Could not upload: ${(e as Error).message}`;
+    return { ok: false, message: msg };
   }
 }
 
