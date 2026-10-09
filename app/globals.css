@@ -144,6 +144,39 @@
   .mobile-menu a { padding: 13px 6px; border-bottom: 1px solid var(--hair); color: var(--ink-2); }
   /* The menu's link colour must not override the button's own white text. */
   .mobile-menu a.cta { border: 0; margin-top: 10px; color: #fff; }
+  /* The service pages, indented under Services. The menu scrolls if a short
+     phone cannot fit it all. */
+  .mobile-menu { max-height: calc(100dvh - 74px); overflow-y: auto; overscroll-behavior: contain; }
+  .mobile-menu .mm-sub { display: flex; flex-direction: column; }
+  .mobile-menu .mm-sub a { padding: 10px 6px 10px 22px; font-size: 15px; color: var(--ink-2); }
+
+  /* ============ NAV: SERVICES PANEL ============
+     Shown on hover and on focus inside it, so a keyboard user tabbing onto
+     Services finds the four pages next. The ::before bridge keeps the hover
+     alive across the gap between the link and the panel. .dd-closed is set
+     by Escape (SiteEffects) and cleared when pointer or focus leave. */
+  .nav-dd { position: relative; }
+  nav.links .nav-dd-top { display: inline-flex; align-items: center; gap: 5px; }
+  .nav-dd-chev { width: 11px; height: 11px; transition: transform .2s; }
+  .nav-dd-panel {
+    position: absolute; top: calc(100% + 12px); left: 50%; z-index: 101; width: 340px; padding: 8px;
+    background: var(--panel); border: 1px solid var(--hair); border-radius: 18px; box-shadow: 0 30px 60px -30px rgba(30,34,40,.35);
+    opacity: 0; visibility: hidden; transform: translate(-50%, 6px);
+    transition: opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
+  }
+  .nav-dd-panel::before { content: ""; position: absolute; left: 0; right: 0; top: -14px; height: 14px; }
+  .nav-dd:hover .nav-dd-panel, .nav-dd:focus-within .nav-dd-panel {
+    opacity: 1; visibility: visible; transform: translate(-50%, 0); transition: opacity .18s ease, transform .18s ease, visibility 0s;
+  }
+  .nav-dd:hover .nav-dd-chev, .nav-dd:focus-within .nav-dd-chev { transform: rotate(180deg); }
+  .nav-dd.dd-closed .nav-dd-panel { opacity: 0; visibility: hidden; transform: translate(-50%, 6px); }
+  .nav-dd.dd-closed .nav-dd-chev { transform: none; }
+  header.nav nav.links .nav-dd-panel a { display: block; padding: 12px 14px; border-radius: 12px; color: var(--ink); background: transparent; }
+  header.nav nav.links .nav-dd-panel a:hover { background: var(--bg-soft); }
+  .nav-dd-panel b { display: block; font-size: 15px; font-weight: 500; letter-spacing: -.01em; }
+  .nav-dd-panel span { display: block; margin-top: 3px; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+  header.nav a:focus-visible { outline: 2px solid var(--accent-orange); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { .nav-dd-panel, .nav-dd-chev { transition: none; } }
 
   /* ============ MACBOOK (static { position: relative; z-index: 3; width: min(90vw, 1000px); perspective: 2600px; }
 
@@ -928,6 +961,7 @@
   .wwd-cta { display: flex; align-items: baseline; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; margin-top: 28px; }
   .wwd-cta p { margin: 0; font-size: 16px; color: var(--ink-2); }
   .wwd-cta-link { margin: 0; padding: 0; }
+  .wwd-more { margin-top: 18px; padding-top: 0; }
   /* One story with the standards section that follows: less air between them. */
   .wwd + #standards { padding-top: clamp(24px, 3vw, 40px); }
 
@@ -1016,7 +1050,7 @@
      measure its paragraph needs, and Explore and Connect divide the rest, so
      the row still reaches the right edge instead of leaving a fourth track
      standing empty. */
-  .foot-grid { display: grid; grid-template-columns: 1.7fr 1fr 1fr; gap: 40px; }
+  .foot-grid { display: grid; grid-template-columns: 1.7fr 1fr 1fr 1fr; gap: 40px; }
   .foot-brand p { color: var(--ink-2); font-size: 14.5px; margin-top: 16px; max-width: 34ch; }
   .foot-col h4 { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 18px; font-weight: 600; }
   .foot-col a { display: block; color: var(--ink-2); font-size: 14.5px; padding: 6px 0; transition: color .15s; }

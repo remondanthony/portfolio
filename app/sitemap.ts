@@ -1,12 +1,14 @@
 import type { MetadataRoute } from 'next';
 import { getPosts } from '@/lib/blog/posts';
 import { SITE_URL } from '@/lib/site';
+import { SERVICE_PAGES } from '@/lib/services';
 
 /**
  * Served at https://www.vioniche.com/sitemap.xml.
  *
  * The homepage is one page. Work, Services, Process, About and Contact are
- * sections of it reached by #hash, and a hash is not a separate URL to a
+ * sections of it reached by #hash (each service also has its own page, listed
+ * below), and a hash is not a separate URL to a
  * crawler, so none of them are listed. /api/contact is a form endpoint, not a
  * page. Add an entry here only when a real route is added under app/.
  *
@@ -36,6 +38,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.8,
     },
+    // The four service pages, from the same list the nav uses.
+    ...SERVICE_PAGES.map((s) => ({
+      url: `${SITE_URL}${s.href}`,
+      lastModified: new Date('2026-10-09'),
+      changeFrequency: 'monthly' as const,
+      priority: 0.9,
+    })),
     {
       url: `${SITE_URL}/blog`,
       // The index changes when an article is published or revised.

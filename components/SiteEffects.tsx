@@ -114,6 +114,28 @@ export default function SiteEffects() {
     document.addEventListener('keydown', onKey);
     cleanups.push(() => document.removeEventListener('keydown', onKey));
 
+    // ---- services panel: Escape dismisses it ----
+    // It opens on hover or focus in CSS. Escape hides it without moving the
+    // pointer or focus away; leaving it (pointer or focus) re-arms it.
+    const dd = nav.querySelector<HTMLElement>('.nav-dd');
+    if (dd) {
+      const onDdKey = (e: KeyboardEvent) => {
+        if (e.key === 'Escape' && (dd.matches(':hover') || dd.contains(document.activeElement))) {
+          dd.classList.add('dd-closed');
+        }
+      };
+      const rearm = () => dd.classList.remove('dd-closed');
+      const onFocusOut = (e: FocusEvent) => { if (!dd.contains(e.relatedTarget as Node | null)) rearm(); };
+      document.addEventListener('keydown', onDdKey);
+      dd.addEventListener('mouseleave', rearm);
+      dd.addEventListener('focusout', onFocusOut);
+      cleanups.push(() => {
+        document.removeEventListener('keydown', onDdKey);
+        dd.removeEventListener('mouseleave', rearm);
+        dd.removeEventListener('focusout', onFocusOut);
+      });
+    }
+
     // Widening past the breakpoint hides the menu in CSS; close it in state
     // too, so it is not found open on the way back down.
     const desktop = window.matchMedia('(min-width: 901px)');

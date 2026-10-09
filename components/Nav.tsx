@@ -1,7 +1,15 @@
+import { SERVICE_PAGES } from '@/lib/services';
+
 /**
  * `base` prefixes every in-page link. Empty on the homepage, so the anchors
  * are exactly what they were; "/" on any other route, so Work or Contact
  * lands on the homepage section instead of a hash on the current page.
+ */
+/*
+ * Services keeps its old behaviour — it is still a link to the What we do
+ * section — and gains a panel of the four service pages. The panel opens on
+ * hover and on keyboard focus (CSS only), and Escape closes it (SiteEffects).
+ * On a phone the pages sit indented under Services in the menu instead.
  */
 export default function Nav({ base = '' }: { base?: string }) {
   return (
@@ -14,7 +22,20 @@ export default function Nav({ base = '' }: { base?: string }) {
           </a>
           <nav className="links">
             <a href={`${base}#work`}>Work</a>
-            <a href={`${base}#services`}>Services</a>
+            <div className="nav-dd">
+              <a href={`${base}#services`} className="nav-dd-top">
+                Services
+                <svg className="nav-dd-chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              </a>
+              <div className="nav-dd-panel">
+                {SERVICE_PAGES.map((s) => (
+                  <a key={s.key} href={s.href}>
+                    <b>{s.name}</b>
+                    <span>{s.short}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
             <a href={`${base}#process`}>Process</a>
             <a href="/blog">Blog</a>
             <a href={`${base}#about`}>About</a>
@@ -29,6 +50,9 @@ export default function Nav({ base = '' }: { base?: string }) {
       <div className="mobile-menu" id="mobileMenu">
         <a href={`${base}#work`}>Work</a>
         <a href={`${base}#services`}>Services</a>
+        <div className="mm-sub">
+          {SERVICE_PAGES.map((s) => <a key={s.key} href={s.href}>{s.name}</a>)}
+        </div>
         <a href={`${base}#process`}>Process</a>
         <a href="/blog">Blog</a>
         <a href={`${base}#about`}>About</a>

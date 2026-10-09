@@ -1,11 +1,40 @@
-export default function Contact() {
+import type { ReactNode } from 'react';
+
+/**
+ * The contact form. The homepage uses it as it is; a service page passes its
+ * own heading and the project type to start on, so an enquiry from the SEO
+ * page arrives already marked as one. The form, its endpoint and its
+ * fallback are the same everywhere (SiteEffects wires #contactForm).
+ */
+const TYPES = [
+  'Website / Landing page',
+  'E-commerce store',
+  'Web app / SaaS',
+  'SEO',
+  'Business automation',
+  'AI automation',
+  'Branding & design',
+  'Not sure yet',
+];
+
+export default function Contact({
+  eyebrow = '07',
+  title = <>Let&rsquo;s build <b>your next website.</b></>,
+  type,
+}: {
+  /** The section number shown before "Contact". */
+  eyebrow?: string;
+  title?: ReactNode;
+  /** One of TYPES, preselected. */
+  type?: string;
+} = {}) {
   return (
     <>
       <section id="contact">
         <div className="wrap">
           <div className="reveal">
-            <span className="eyebrow"><span className="n">07</span> Contact</span>
-            <h2 className="title" style={{marginTop: '18px'}}>Let&rsquo;s build <b>your next website.</b></h2>
+            <span className="eyebrow"><span className="n">{eyebrow}</span> Contact</span>
+            <h2 className="title" style={{marginTop: '18px'}}>{title}</h2>
           </div>
           <div className="contact-grid">
             <div className="contact-info reveal">
@@ -19,12 +48,8 @@ export default function Contact() {
                 <div className="field"><label htmlFor="email">Email</label><input id="email" name="email" type="email" placeholder="you@company.com" required /></div>
               </div>
               <div className="field"><label htmlFor="type">Project type</label>
-                <select id="type" name="type">
-                  <option>Website / Landing page</option>
-                  <option>E-commerce store</option>
-                  <option>Web app / SaaS</option>
-                  <option>Branding &amp; design</option>
-                  <option>Not sure yet</option>
+                <select id="type" name="type" defaultValue={type && TYPES.includes(type) ? type : TYPES[0]}>
+                  {TYPES.map((t) => <option key={t}>{t}</option>)}
                 </select>
               </div>
               <div className="field"><label htmlFor="msg">Project details</label><textarea id="msg" name="msg" placeholder="Tell us what you're building…" required></textarea></div>

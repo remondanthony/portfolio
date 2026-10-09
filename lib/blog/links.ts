@@ -13,7 +13,7 @@ export const SERVICES = {
   whatWeDo: {
     href: '/#services',
     title: 'What we do',
-    text: 'Website development, SEO, automation, and AI & GEO, planned as one connected system.',
+    text: 'Website development, SEO, automation, and AI automation, planned as one connected system.',
   },
   services: {
     // The standards section. #services is now the "What we do" section above it.
@@ -30,6 +30,27 @@ export const SERVICES = {
     href: '/#work',
     title: 'Selected work',
     text: 'Websites designed, built and launched by Vioniche.',
+  },
+  // The service pages. Text matches each page's own summary.
+  webDevelopment: {
+    href: '/services/web-development',
+    title: 'Web development services',
+    text: 'Fast, maintainable websites built to be found and to convert.',
+  },
+  seo: {
+    href: '/services/seo',
+    title: 'SEO services',
+    text: 'Technical SEO, site structure and content that search engines can read.',
+  },
+  automation: {
+    href: '/services/automation',
+    title: 'Business automation',
+    text: 'Repetitive work turned into reliable, monitored workflows.',
+  },
+  aiAutomation: {
+    href: '/services/ai-automation',
+    title: 'AI Automation',
+    text: 'Practical AI workflows, automation and human-in-the-loop systems.',
   },
 } as const;
 export type ServiceKey = keyof typeof SERVICES;

@@ -15,9 +15,13 @@
  * work, not rankings, traffic or AI placement nobody can guarantee.
  */
 
+import { servicePage } from '@/lib/services';
+
 const SERVICES = [
   {
     name: 'Website Development',
+    page: servicePage('web-development'),
+    more: 'Explore web development',
     text: 'Websites that look sharp, load fast, and turn visitors into customers.',
     points: [
       'Business websites',
@@ -29,6 +33,8 @@ const SERVICES = [
   },
   {
     name: 'SEO',
+    page: servicePage('seo'),
+    more: 'Explore SEO services',
     text: 'Build search visibility that compounds over time.',
     points: [
       'Technical SEO',
@@ -41,6 +47,8 @@ const SERVICES = [
   },
   {
     name: 'Automation',
+    page: servicePage('automation'),
+    more: 'Explore business automation',
     text: 'Replace repetitive work with systems that run themselves.',
     points: [
       'Business workflows',
@@ -52,15 +60,17 @@ const SERVICES = [
     ],
   },
   {
-    name: 'AI & GEO',
-    text: 'Prepare your business for the next generation of search and automation.',
+    name: 'AI Automation',
+    page: servicePage('ai-automation'),
+    more: 'Explore AI automation',
+    text: 'Put practical AI workflows to work across your business.',
     points: [
-      'AI-ready content systems',
-      'Generative Engine Optimization (GEO)',
       'AI-assisted workflows',
-      'Intelligent content systems',
-      'AI automation',
-      'Visibility across emerging AI search experiences',
+      'AI + automation',
+      'Document processing',
+      'Information extraction',
+      'AI-powered reporting',
+      'Human-in-the-loop systems',
     ],
   },
 ];
@@ -95,6 +105,8 @@ export default function WhatWeDo() {
                 <ul className="wwd-points">
                   {s.points.map((p) => <li key={p}>{p}</li>)}
                 </ul>
+                {/* Each service has its own page; the row is the summary. */}
+                <a className="proj-link wwd-more" href={s.page.href}>{s.more} <span className="dot" aria-hidden="true">→</span></a>
               </div>
             </li>
           ))}

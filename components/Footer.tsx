@@ -1,3 +1,5 @@
+import { SERVICE_PAGES } from '@/lib/services';
+
 /** `base` works as in Nav: empty on the homepage, "/" everywhere else. */
 export default function Footer({ base = '' }: { base?: string }) {
   return (
@@ -9,6 +11,7 @@ export default function Footer({ base = '' }: { base?: string }) {
               <a href={`${base}#top`} className="logo"><img className="logo-img" src="/logo.png" alt="VIONICHE logo" /><span>VIONICHE<small>WEB STUDIO</small></span></a>
               <p>A senior web &amp; product studio designing and building high-end websites. India, working worldwide.</p>
             </div>
+            <div className="foot-col"><h4>Services</h4>{SERVICE_PAGES.map((s) => <a key={s.key} href={s.href}>{s.name}</a>)}</div>
             <div className="foot-col"><h4>Explore</h4><a href={`${base}#work`}>Work</a><a href={`${base}#process`}>Process</a><a href={`${base}#about`}>About</a><a href={`${base}#contact`}>Contact</a></div>
             {/* The supplied LinkedIn URL was /company/135774364/admin/dashboard/,
                 which is the private management view — visitors who are not

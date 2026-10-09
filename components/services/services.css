@@ -1,0 +1,101 @@
+/* ============ SERVICE PAGES ============
+   Built from parts that already exist: the tokens, .wrap, .eyebrow,
+   h2.title, .lead, .card / .svc-grid, .btn, .faq, .wwd-list and .reveal
+   from globals.css, and the flow, dark sections, areas, panels and framed
+   screenshots from case-study.css. What is here is only what a service page
+   needs that neither of those had — its hero, the chain that ties the four
+   services together, and cards that are links.
+
+   Everything is prefixed sv- so none of it can reach another page. */
+
+/* ---- hero ---- */
+.sv-hero { padding-block: clamp(40px, 6vw, 84px) clamp(48px, 6vw, 80px); }
+.sv-hero-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(260px, .7fr); gap: clamp(28px, 5vw, 72px); align-items: end; }
+/* One h1 holding the search phrase and the promise beneath it: both are
+   visible, both are the page's heading. */
+.sv-h1 { margin: 26px 0 0; font-weight: 400; letter-spacing: normal; line-height: normal; }
+.sv-h1-k { display: block; font-size: clamp(15px, 1.4vw, 18px); font-weight: 500; letter-spacing: -.005em; color: var(--accent-orange); }
+.sv-h1-v { display: block; margin-top: 14px; font-size: clamp(42px, 7vw, 96px); font-weight: 300; letter-spacing: -.05em; line-height: .98; max-width: 13ch; }
+.sv-h1-v b { font-weight: 500; }
+.sv-hero-side { padding-bottom: 8px; }
+.sv-hero-lead { font-size: clamp(17px, 1.6vw, 20px); line-height: 1.5; letter-spacing: -.01em; color: var(--ink-2); margin: 0; max-width: 40ch; }
+.sv-hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+
+/* ---- the chain: website → SEO → automation → AI ---- */
+.sv-chain { margin-top: clamp(48px, 6vw, 84px); padding-top: 22px; border-top: 1px solid var(--hair); display: grid; grid-template-columns: auto 1fr; gap: 14px 32px; align-items: center; }
+.sv-chain-k { font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.sv-chain ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.sv-chain li { position: relative; min-width: 0; }
+/* The arrow sits in the gap between two stops. */
+.sv-chain li + li::before { content: "→"; position: absolute; left: -10px; top: 50%; width: 10px; text-align: center; transform: translateY(-50%); font-size: 12px; color: var(--accent-orange); }
+.sv-chain a { display: flex; align-items: baseline; gap: 10px; height: 100%; padding: 13px 16px; border: 1px solid var(--hair); border-radius: 14px; background: var(--panel); font-size: 15px; font-weight: 500; letter-spacing: -.01em; color: var(--ink); transition: border-color .2s, transform .2s; }
+.sv-chain a:hover { border-color: var(--ink); transform: translateY(-2px); }
+.sv-chain a[aria-current="page"] { background: var(--pill); border-color: var(--pill); color: #fff; }
+.sv-chain a[aria-current="page"]:hover { transform: none; }
+.sv-chain-n { flex: none; font-size: 11px; font-weight: 500; letter-spacing: .14em; font-variant-numeric: tabular-nums; color: var(--muted); }
+.sv-chain a[aria-current="page"] .sv-chain-n { color: var(--accent-orange); }
+
+/* ---- section heads, shared by every section ---- */
+.sv-head { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px, 5vw, 72px); align-items: end; }
+.sv-head .lead { margin: 0; }
+.sv-body { margin-top: clamp(40px, 5vw, 56px); }
+.sv-copy p { font-size: 16.5px; line-height: 1.7; color: var(--ink-2); margin: 0; max-width: 64ch; }
+.sv-copy p + p { margin-top: 16px; }
+.sv-copy strong { font-weight: 500; color: var(--ink); }
+
+/* Three columns of the case study's numbered objectives, for comparisons. */
+.cs-objectives.sv-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.cs-objectives .sv-tag { display: inline-block; margin-top: 14px; font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+
+/* ---- workflows drawn on a dark section, one after another ---- */
+.cs-dark .sv-body + .sv-body { margin-top: clamp(56px, 7vw, 88px); }
+.sv-flow-title { margin-bottom: 30px; font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.72); }
+.sv-flow-note { margin: 30px 0 0; max-width: 70ch; font-size: 15px; line-height: 1.6; color: rgba(255,255,255,.6); }
+.sv-flow-note a { color: #fff; border-bottom: 1px solid rgba(255,255,255,.5); }
+.sv-flow-note a:hover { border-color: #fff; }
+.cs-dark a:focus-visible { outline: 2px solid var(--accent-orange); outline-offset: 4px; }
+
+/* ---- link cards: the other services, the case study ---- */
+.sv-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: clamp(40px, 5vw, 56px); }
+.sv-links--2 { grid-template-columns: repeat(2, 1fr); }
+a.sv-link { display: flex; flex-direction: column; color: var(--ink); }
+.sv-link-k { font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+a.sv-link h3 { margin-top: 16px; font-size: 21px; font-weight: 500; letter-spacing: -.02em; }
+a.sv-link p { flex: 1; }
+.sv-link-go { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; font-size: 14.5px; font-weight: 500; }
+.sv-link-go span { color: var(--accent-orange); transition: transform .25s; }
+a.sv-link:hover .sv-link-go span { transform: translateX(4px); }
+
+/* ---- proof: a real project beside what it shows ---- */
+.sv-proof { display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(28px, 4.5vw, 64px); align-items: center; }
+.sv-proof .cs-facts { margin-top: 26px; }
+.sv-proof-link { margin-top: 26px; }
+
+/* Inline links in running copy stay readable as links. */
+.sv-copy a, .sv-inline a, .cs-panel p a, .faq p a { color: var(--ink); border-bottom: 1px solid currentColor; transition: color .15s; }
+.sv-copy a:hover, .sv-inline a:hover, .cs-panel p a:hover, .faq p a:hover { color: var(--accent-orange); }
+
+/* Keyboard focus on everything a service page adds. */
+.sv-chain a:focus-visible, a.sv-link:focus-visible, .sv-hero a:focus-visible, main .faq summary:focus-visible {
+  outline: 2px solid var(--accent-orange); outline-offset: 4px;
+}
+
+/* ---- responsive ---- */
+@media (max-width: 1023px) {
+  .sv-chain { grid-template-columns: 1fr; }
+  .sv-links { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 900px) {
+  .sv-hero-grid, .sv-head, .sv-proof { grid-template-columns: 1fr; }
+  .cs-objectives.sv-cols-3 { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) {
+  .sv-chain ol { grid-template-columns: 1fr 1fr; }
+  .sv-chain li:nth-child(3)::before { display: none; }
+  .sv-links, .sv-links--2 { grid-template-columns: 1fr; }
+  .sv-hero-actions .btn { justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sv-chain a, .sv-link-go span { transition: none; }
+  .sv-chain a:hover { transform: none; }
+}
