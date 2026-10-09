@@ -1,14 +1,15 @@
-export default function Footer() {
+/** `base` works as in Nav: empty on the homepage, "/" everywhere else. */
+export default function Footer({ base = '' }: { base?: string }) {
   return (
     <>
       <footer>
         <div className="wrap">
           <div className="foot-grid">
             <div className="foot-brand">
-              <a href="#top" className="logo"><img className="logo-img" src="/logo.png" alt="VIONICHE logo" /><span>VIONICHE<small>WEB STUDIO</small></span></a>
+              <a href={`${base}#top`} className="logo"><img className="logo-img" src="/logo.png" alt="VIONICHE logo" /><span>VIONICHE<small>WEB STUDIO</small></span></a>
               <p>A senior web &amp; product studio designing and building high-end websites. India, working worldwide.</p>
             </div>
-            <div className="foot-col"><h4>Explore</h4><a href="#work">Work</a><a href="#process">Process</a><a href="#about">About</a><a href="#contact">Contact</a></div>
+            <div className="foot-col"><h4>Explore</h4><a href={`${base}#work`}>Work</a><a href={`${base}#process`}>Process</a><a href={`${base}#about`}>About</a><a href={`${base}#contact`}>Contact</a></div>
             {/* The supplied LinkedIn URL was /company/135774364/admin/dashboard/,
                 which is the private management view — visitors who are not
                 admins of the page get bounced. Trimmed to the public company

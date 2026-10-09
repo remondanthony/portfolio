@@ -90,21 +90,36 @@ export default function SiteEffects() {
     cleanups.push(() => totop.removeEventListener('click', toTop));
 
     // ---- mobile menu ----
-    const onHam = () => {
-      const open = menu.classList.toggle('open');
+    const setOpen = (open: boolean) => {
+      menu.classList.toggle('open', open);
       ham.setAttribute('aria-expanded', String(open));
+      ham.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     };
+    const onHam = () => setOpen(!menu.classList.contains('open'));
     ham.addEventListener('click', onHam);
     cleanups.push(() => ham.removeEventListener('click', onHam));
 
-    const closeMenu = () => {
-      menu.classList.remove('open');
-      ham.setAttribute('aria-expanded', 'false');
-    };
+    const closeMenu = () => setOpen(false);
     menu.querySelectorAll('a').forEach((a) => {
       a.addEventListener('click', closeMenu);
       cleanups.push(() => a.removeEventListener('click', closeMenu));
     });
+
+    // Escape closes it and hands focus back to the button that opened it.
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || !menu.classList.contains('open')) return;
+      setOpen(false);
+      ham.focus();
+    };
+    document.addEventListener('keydown', onKey);
+    cleanups.push(() => document.removeEventListener('keydown', onKey));
+
+    // Widening past the breakpoint hides the menu in CSS; close it in state
+    // too, so it is not found open on the way back down.
+    const desktop = window.matchMedia('(min-width: 901px)');
+    const onBreakpoint = () => { if (desktop.matches) setOpen(false); };
+    desktop.addEventListener('change', onBreakpoint);
+    cleanups.push(() => desktop.removeEventListener('change', onBreakpoint));
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

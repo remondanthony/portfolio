@@ -1,0 +1,62 @@
+{/*
+  TEMPLATE — not an article. Files starting with "_" are never published.
+
+  To start an article:
+    1. Copy this file to content/blog/<slug>.mdx. The file name is the URL:
+       content/blog/what-a-sitemap-does.mdx → /blog/what-a-sitemap-does
+    2. Fill in `post` below. Keep `draft: true` until it has been reviewed.
+    3. Put the featured image in public/blog/<slug>/ (1600×900 works well).
+    4. Run `npm run dev` and open /blog/<slug> — drafts show there with a
+       Draft label, and nowhere in a production build.
+    5. Remove `draft: true` to publish. It then appears on /blog, gets its
+       own page, and is added to the sitemap.
+
+  See content/blog/README.md for the full workflow and the review checklist.
+*/}
+
+export const post = {
+  title: 'Article title, as it should appear in search results',
+  description: 'One or two sentences, 140–160 characters, that say what the reader will learn. This is the meta description and the standfirst.',
+  excerpt: 'Shorter text for the card on /blog.',
+  published: '2026-01-01',
+  // updated: '2026-02-01',
+  author: 'vioniche',
+  category: 'Technical SEO', // Website Development · Technical SEO · Automation · AI & AI Agents · Web Technology
+  tags: ['Sitemaps', 'Indexing'],
+  // image: { src: '/blog/<slug>/cover.jpg', alt: 'What the image shows', width: 1600, height: 900 },
+  draft: true,
+
+  // Internal links shown after the article. Keys are defined in lib/blog/links.ts.
+  // related: ['another-article-slug'],
+  // caseStudies: ['born21'],
+  // services: ['services', 'process'],
+
+  // The popup CTA shown halfway through. Leave out for the default Vioniche CTA;
+  // override any of: template, title, description, buttonText, buttonHref, image, imageAlt.
+  // cta: { title: 'Want more people to find your business?', buttonHref: '/#contact' },
+
+  // The brief. Not rendered; kept with the article for SEO review.
+  primaryKeyword: '',
+  secondaryKeywords: [],
+  searchIntent: 'informational',
+};
+
+Open with the answer or the problem — the first paragraph is what search
+engines and readers both judge the article by.
+
+## Sections start at two hashes
+
+The title above is the page's only H1, so the body begins at `##`. Use `###`
+for sub-sections.
+
+Link to other Vioniche pages with ordinary Markdown links, for example the
+[Born21 case study](/case-studies/born21) or [how a project runs](/#process).
+Links to other sites open in a new tab automatically.
+
+<Figure
+  src="/case-studies/born21/insights.jpg"
+  alt="Describe what the image shows, not the keyword it should rank for"
+  width={2000}
+  height={1250}
+  caption="Optional caption."
+/>

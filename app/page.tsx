@@ -5,6 +5,7 @@ import Industries from '@/components/Industries';
 import Work from '@/components/Work';
 import Marquee from '@/components/Marquee';
 import Process from '@/components/Process';
+import WhatWeDo from '@/components/WhatWeDo';
 import Services from '@/components/Services';
 import Faq from '@/components/Faq';
 import Contact from '@/components/Contact';
@@ -22,6 +23,7 @@ import SiteEffects from '@/components/SiteEffects';
  *   Industries .... is this for me          (02 Industries)
  *   Work .......... has it worked           (03 Work)
  *   Process ....... what happens if I say yes   (04, dark section, no eyebrow)
+ *   WhatWeDo ...... what do you actually do     (#services, the nav's Services link)
  *   Services ...... what do I actually get  (05 Why Vioniche)
  *   Faq ........... what am I still unsure about  (06 Common questions)
  *   Contact ....... here is how             (07 Contact)
@@ -51,6 +53,8 @@ export default function Home() {
       <Marquee />
       <Process />
       <hr className="divider" />
+      {/* What we do, then how we build: one story, so no divider between them. */}
+      <WhatWeDo />
       <Services />
       <hr className="divider" />
       <Faq />

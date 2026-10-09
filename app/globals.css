@@ -133,8 +133,17 @@
   .hamburger svg { width: 18px; height: 18px; }
   .mobile-menu { position: fixed; inset: 74px 0 auto 0; z-index: 99; background: var(--panel); border-bottom: 1px solid var(--hair); padding: 16px var(--pad) 26px; transform: translateY(-120%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; flex-direction: column; gap: 2px; }
   .mobile-menu.open { transform: translateY(0); }
+  /* Closed means gone, not just off-screen: visibility takes the links out of
+     the tab order and the accessibility tree. It switches after the slide-up
+     finishes, and at once when opening, so the motion is unchanged. */
+  .mobile-menu { visibility: hidden; transition: transform .35s cubic-bezier(.4,0,.2,1), visibility 0s linear .35s; }
+  .mobile-menu.open { visibility: visible; transition: transform .35s cubic-bezier(.4,0,.2,1), visibility 0s; }
+  /* Desktop never shows it, even if it was left open while resizing. */
+  @media (min-width: 901px) { .mobile-menu { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .mobile-menu, .mobile-menu.open { transition: none; } }
   .mobile-menu a { padding: 13px 6px; border-bottom: 1px solid var(--hair); color: var(--ink-2); }
-  .mobile-menu a.cta { border: 0; margin-top: 10px; }
+  /* The menu's link colour must not override the button's own white text. */
+  .mobile-menu a.cta { border: 0; margin-top: 10px; color: #fff; }
 
   /* ============ MACBOOK (static { position: relative; z-index: 3; width: min(90vw, 1000px); perspective: 2600px; }
 
@@ -886,13 +895,79 @@
   }
 
 
+  /* ============ WHAT WE DO (#services) ============
+     The four services, as an editorial list: hairline-separated rows, the
+     number and name on the left, what it is and what it covers on the right.
+     Followed directly by the standards section (.svc-grid), so the space
+     between them is trimmed to read as one story.
+
+     All content is visible without hover or JavaScript. Hover and keyboard
+     focus add a 2px orange rule and darken the number — nothing is revealed
+     that wasn't already there. The entrance is CSS-only (scroll-driven where
+     supported, otherwise none), never the .reveal class, so no script is
+     needed for the words to appear. */
+  .wwd-list { list-style: none; margin: 56px 0 0; padding: 0; border-bottom: 1px solid var(--hair); }
+  .wwd-item {
+    position: relative; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px clamp(24px, 4vw, 64px);
+    padding: clamp(28px, 3.4vw, 44px) clamp(0px, 1.4vw, 20px); border-top: 1px solid var(--hair); transition: background .3s ease;
+  }
+  .wwd-item::before {
+    content: ""; position: absolute; left: 0; top: -1px; height: 2px; width: 100%; background: var(--accent-orange);
+    transform: scaleX(0); transform-origin: left; transition: transform .45s cubic-bezier(.2, .7, .2, 1);
+  }
+  .wwd-item:hover, .wwd-item:focus-within { background: color-mix(in srgb, var(--panel) 70%, transparent); }
+  .wwd-item:hover::before, .wwd-item:focus-within::before { transform: scaleX(1); }
+  .wwd-name { display: flex; align-items: baseline; gap: clamp(16px, 2vw, 28px); }
+  .wwd-no { flex: none; width: 2.4ch; font-size: clamp(30px, 3.2vw, 44px); font-weight: 300; letter-spacing: -.04em; line-height: 1; color: var(--muted); font-variant-numeric: tabular-nums; transition: color .3s ease; }
+  .wwd-item:hover .wwd-no, .wwd-item:focus-within .wwd-no { color: var(--ink); }
+  .wwd-name h3 { font-size: clamp(26px, 3vw, 40px); font-weight: 400; letter-spacing: -.035em; line-height: 1.05; }
+  .wwd-text { margin: 0; font-size: clamp(17px, 1.6vw, 20px); line-height: 1.45; letter-spacing: -.01em; color: var(--ink); max-width: 40ch; }
+  .wwd-points { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; }
+  .wwd-points li { display: flex; gap: 10px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--hair); font-size: 14.5px; line-height: 1.45; color: var(--ink-2); }
+  .wwd-points li::before { content: ""; flex: none; width: 5px; height: 5px; border-radius: 50%; background: var(--muted); transform: translateY(-2px); }
+  .wwd-cta { display: flex; align-items: baseline; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; margin-top: 28px; }
+  .wwd-cta p { margin: 0; font-size: 16px; color: var(--ink-2); }
+  .wwd-cta-link { margin: 0; padding: 0; }
+  /* One story with the standards section that follows: less air between them. */
+  .wwd + #standards { padding-top: clamp(24px, 3vw, 40px); }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .wwd-item { animation: wwd-in linear both; animation-timeline: view(); animation-range: entry 0% entry 60%; }
+    }
+  }
+  /* Position only, never opacity: a row that has not scrolled into view yet is
+     still fully visible to anything reading the page — print, screenshots,
+     crawlers, or a browser without the animation. */
+  @keyframes wwd-in { from { translate: 0 22px; } to { translate: 0 0; } }
+
+  @media (max-width: 1023px) {
+    .wwd-item { grid-template-columns: 1fr; gap: 16px; }
+  }
+  @media (max-width: 620px) {
+    .wwd-list { margin-top: 40px; }
+    .wwd-item { padding: 26px 0; }
+    .wwd-points { grid-template-columns: 1fr; }
+    .wwd-cta { flex-direction: column; align-items: flex-start; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wwd-item, .wwd-item::before, .wwd-no { transition: none; }
+  }
+
   /* ============ MARQUEE ============ */
   .marquee { border-block: 1px solid var(--hair); overflow: hidden; padding-block: 22px; background: var(--bg-soft); }
-  .mq-track { display: flex; gap: 44px; width: max-content; animation: scroll 30s linear infinite; align-items: center; }
+  /* Spacing lives on each item (padding), not as a flex gap, so half the track
+     is exactly one repeat and the loop has no seam. The half is three copies of
+     the list, so the duration is three times the old 30s: same speed. */
+  .mq-track { display: flex; width: max-content; animation: scroll 90s linear infinite; align-items: center; }
   .marquee:hover .mq-track { animation-play-state: paused; }
   @keyframes scroll { to { transform: translateX(-50%); } }
-  @media (prefers-reduced-motion: reduce) { .mq-track { animation: none; flex-wrap: wrap; width: auto; justify-content: center; } }
-  .mq-track span { font-size: 20px; font-weight: 500; letter-spacing: -.01em; color: var(--ink-2); display: inline-flex; align-items: center; gap: 18px; }
+  @media (prefers-reduced-motion: reduce) {
+    .mq-track { animation: none; flex-wrap: wrap; width: auto; justify-content: center; gap: 12px 44px; padding-inline: var(--pad); }
+    .marquee .mq-track span { padding-right: 0; }
+    .marquee .mq-track .mq-dup { display: none; }
+  }
+  .mq-track span { font-size: 20px; font-weight: 500; letter-spacing: -.01em; color: var(--ink-2); display: inline-flex; align-items: center; gap: 18px; padding-right: 44px; }
   .mq-track span::after { content: "✦"; color: var(--muted); font-size: 12px; }
 
 
@@ -958,7 +1033,7 @@
 
   @media (max-width: 900px) {
     nav.links { display: none; }
-    .hamburger { display: none; }
+    .hamburger { display: grid; }
     .intro-grid, .contact-grid { grid-template-columns: 1fr; }
     .svc-grid { grid-template-columns: 1fr 1fr; }
     .foot-grid { grid-template-columns: 1fr 1fr; }
@@ -1210,6 +1285,7 @@
      description, 32 to the buttons, 40 to the device, 32 to the strip. */
   @media (max-width: 767px) {
     .nav-inner { height: 72px; }
+    .mobile-menu { inset: 72px 0 auto 0; }
     .logo { font-size: 16.5px; }
     .logo-img { width: 26px; height: 26px; }
 

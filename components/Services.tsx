@@ -8,6 +8,9 @@
  *
  * The icons, the grid, the card count and the numbering are deliberately
  * untouched.
+ *
+ * Anchored at #standards. #services belongs to WhatWeDo, directly above:
+ * that section is what Vioniche does, this one is how every project is built.
  */
 
 const ICON = {
@@ -21,7 +24,7 @@ const ICON = {
 export default function Services() {
   return (
     <>
-      <section id="services">
+      <section id="standards">
         <div className="wrap">
           <div className="svc-head reveal">
             <div>

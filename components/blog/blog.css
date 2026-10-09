@@ -1,0 +1,185 @@
+/* ============ BLOG ============
+   The homepage's parts, again: tokens, .wrap, .eyebrow, h2.title, .lead,
+   .btn, .cta and .reveal come from globals.css. The card is the homepage
+   project card (panel, hairline, 20px radius, the same lift); the article
+   header borrows the case study's editorial scale.
+
+   Prefixed bl- so nothing here reaches another page. */
+
+.bl-crumb a { color: var(--muted); transition: color .15s; }
+.bl-crumb a:hover { color: var(--ink); }
+.bl-crumb [aria-hidden] { color: var(--muted); }
+main a:focus-visible { outline: 2px solid var(--accent-orange); outline-offset: 4px; border-radius: 6px; }
+
+.bl-cat { display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--accent-orange); }
+.bl-draft { font-size: 10px; letter-spacing: .14em; color: var(--ink); background: #ffe3d6; border-radius: 20px; padding: 3px 9px; }
+
+/* ---- index header ---- */
+.bl-head { padding-block: clamp(48px, 7vw, 96px) clamp(36px, 5vw, 56px); }
+.bl-title { font-size: clamp(40px, 7vw, 92px); font-weight: 300; letter-spacing: -.045em; line-height: .98; margin-top: 22px; max-width: 14ch; }
+.bl-title b { font-weight: 500; }
+.bl-intro { max-width: 58ch; }
+.bl-topics { list-style: none; margin: 34px 0 0; padding: 22px 0 0; border-top: 1px solid var(--hair); display: flex; flex-wrap: wrap; gap: 8px 0; }
+.bl-topics li { font-size: 14px; font-weight: 500; color: var(--ink-2); }
+.bl-topics li:not(:last-child)::after { content: "·"; color: var(--accent-orange); margin: 0 14px; }
+
+/* ---- cards ---- */
+.bl-list { padding-top: 0; }
+.bl-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+.bl-card { min-width: 0; }
+.bl-card-link { display: flex; flex-direction: column; height: 100%; background: var(--panel); border: 1px solid var(--hair); border-radius: 20px; overflow: hidden; transition: transform .25s, box-shadow .25s; }
+.bl-card-link:hover { transform: translateY(-5px); box-shadow: 0 30px 60px -34px rgba(60,66,74,.4); }
+.bl-card-media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--bg); }
+.bl-card-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+.bl-card-link:hover .bl-card-media img { transform: scale(1.03); }
+/* Drafts may not have an image yet; a quiet plate rather than a broken box. */
+.bl-card-noimg { position: absolute; inset: 0; display: grid; place-items: center; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+  background: radial-gradient(120% 120% at 85% 90%, #ffe7dc 0%, var(--bg) 55%); }
+.bl-card-body { display: flex; flex-direction: column; flex: 1; padding: 24px 26px 26px; }
+.bl-card-title { font-size: clamp(19px, 1.6vw, 22px); font-weight: 500; letter-spacing: -.02em; line-height: 1.18; margin-top: 12px; }
+.bl-card-excerpt { color: var(--ink-2); font-size: 15px; line-height: 1.6; margin: 10px 0 0; }
+.bl-card-meta { margin: auto 0 0; padding-top: 18px; font-size: 13px; color: var(--muted); }
+
+.bl-card--featured .bl-card-link { display: grid; grid-template-columns: 1.15fr .85fr; }
+.bl-card--featured .bl-card-media { aspect-ratio: auto; min-height: 340px; }
+.bl-card--featured .bl-card-body { padding: clamp(28px, 3.5vw, 48px); justify-content: center; }
+.bl-card--featured .bl-card-title { font-size: clamp(26px, 2.8vw, 38px); letter-spacing: -.03em; line-height: 1.08; }
+.bl-card--featured .bl-card-excerpt { font-size: 16px; }
+.bl-card--featured .bl-card-meta { margin-top: 0; }
+
+.bl-empty { border: 1px dashed var(--hair); border-radius: 20px; background: var(--bg-soft); padding: clamp(32px, 5vw, 64px); }
+.bl-empty h2 { font-size: clamp(24px, 2.6vw, 32px); font-weight: 400; letter-spacing: -.025em; }
+.bl-empty p { color: var(--ink-2); margin: 12px 0 0; }
+.bl-empty a { color: var(--ink); border-bottom: 1px solid var(--ink); }
+
+/* ---- article ---- */
+.bl-art-head { padding-block: clamp(40px, 6vw, 80px) 0; }
+.bl-art-title { font-size: clamp(36px, 5.6vw, 72px); font-weight: 400; letter-spacing: -.045em; line-height: 1.02; margin-top: 22px; max-width: 18ch; }
+.bl-art-dek { font-size: clamp(18px, 1.8vw, 22px); line-height: 1.45; letter-spacing: -.01em; color: var(--ink-2); max-width: 46ch; margin: 22px 0 0; }
+.bl-art-meta { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 24px 0 0; font-size: 14px; color: var(--muted); }
+.bl-art-image { margin: clamp(36px, 5vw, 64px) 0 0; border-radius: 20px; overflow: hidden; border: 1px solid var(--hair); background: var(--panel); }
+.bl-art-image img { width: 100%; height: auto; display: block; }
+
+/* The reading column: about 70 characters at the body size. Set in pixels,
+   not ch, so the link cards and tags below — in smaller type — share exactly
+   the same edges as the text. */
+.bl-prose, .bl-next, .bl-tags { max-width: 740px; margin-inline: auto; }
+.bl-prose { padding-block: clamp(40px, 6vw, 72px) 0; font-size: 18px; line-height: 1.75; color: var(--ink); }
+.bl-prose > * + * { margin-top: 1.1em; }
+.bl-prose p, .bl-prose ul, .bl-prose ol, .bl-prose blockquote, .bl-prose pre { margin-bottom: 0; }
+.bl-prose h2 { font-size: clamp(26px, 2.6vw, 34px); font-weight: 500; letter-spacing: -.03em; line-height: 1.15; margin-top: 2.1em; scroll-margin-top: 96px; }
+.bl-prose h3 { font-size: clamp(20px, 1.9vw, 24px); font-weight: 500; letter-spacing: -.02em; line-height: 1.25; margin-top: 1.8em; scroll-margin-top: 96px; }
+.bl-prose h4 { font-size: 18px; font-weight: 500; letter-spacing: -.01em; margin-top: 1.6em; }
+.bl-prose a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent-orange); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+.bl-prose a:hover { text-decoration-color: var(--ink); }
+.bl-prose ul, .bl-prose ol { padding-left: 1.3em; }
+.bl-prose li + li { margin-top: .45em; }
+.bl-prose li::marker { color: var(--accent-orange); }
+.bl-prose strong { font-weight: 500; }
+.bl-prose blockquote { margin-inline: 0; padding-left: 22px; border-left: 2px solid var(--accent-orange); color: var(--ink-2); font-size: 1.08em; }
+.bl-prose hr { border: 0; height: 1px; background: var(--hair); margin-block: 2.4em; }
+.bl-prose code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86em; background: var(--panel); border: 1px solid var(--hair); border-radius: 6px; padding: 1px 6px; }
+.bl-prose pre { background: var(--pill); color: #e9ecef; border-radius: 14px; padding: 20px 22px; overflow-x: auto; font-size: 14.5px; line-height: 1.6; }
+.bl-prose pre code { background: none; border: 0; padding: 0; color: inherit; font-size: inherit; }
+.bl-prose table { width: 100%; border-collapse: collapse; font-size: 15.5px; display: block; overflow-x: auto; }
+.bl-prose th, .bl-prose td { text-align: left; padding: 10px 14px 10px 0; border-bottom: 1px solid var(--hair); }
+.bl-figure { margin: 2em 0 0; }
+.bl-figure img { width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--hair); }
+.bl-figure figcaption { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--ink-2); }
+
+/* ---- what to do next: case studies and service links ---- */
+.bl-next { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: clamp(48px, 6vw, 72px); }
+.bl-next-card { display: flex; flex-direction: column; gap: 8px; padding: 22px 24px; background: var(--panel); border: 1px solid var(--hair); border-radius: 18px; transition: border-color .2s, transform .25s; }
+.bl-next-card:hover { border-color: var(--ink); transform: translateY(-3px); }
+.bl-next-card--case { background: var(--pill); border-color: var(--pill); color: #fff; }
+.bl-next-card--case:hover { border-color: var(--accent-orange); }
+.bl-next-title { font-size: 20px; font-weight: 500; letter-spacing: -.02em; line-height: 1.2; }
+.bl-next-text { font-size: 14.5px; line-height: 1.55; color: var(--ink-2); }
+.bl-next-card--case .bl-next-text { color: rgba(255,255,255,.66); }
+.bl-next-go { margin-top: auto; padding-top: 8px; font-size: 14px; font-weight: 500; }
+.bl-tags { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--hair); font-size: 14px; color: var(--ink-2); }
+.bl-tags span { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-right: 8px; }
+
+.bl-related .bl-grid { margin-top: 36px; }
+
+@media (max-width: 900px) {
+  .bl-grid { grid-template-columns: 1fr 1fr; }
+  .bl-card--featured .bl-card-link { grid-template-columns: 1fr; }
+  .bl-card--featured .bl-card-media { aspect-ratio: 16 / 10; min-height: 0; }
+}
+@media (max-width: 620px) {
+  .bl-grid { grid-template-columns: 1fr; }
+  .bl-prose { font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bl-card-link, .bl-card-media img, .bl-next-card { transition: none; }
+  .bl-card-link:hover, .bl-next-card:hover { transform: none; }
+  .bl-card-link:hover .bl-card-media img { transform: none; }
+}
+
+/* ---- article CTA (BlogCtaPopup) ----
+   A small card floating in the bottom-right corner — not a modal. No
+   backdrop, no dimming, no scroll lock: the article stays readable and usable
+   around it. The site's own parts, made compact: panel, hairline, rounded
+   corners, .btn-dark with the orange dot. */
+.bl-pop {
+  position: fixed; right: 24px; bottom: 24px; z-index: 120; width: 360px; overflow: hidden;
+  background: var(--panel); border: 1px solid var(--hair); border-radius: 20px;
+  box-shadow: 0 24px 60px -24px rgba(12, 14, 17, .38), 0 2px 8px rgba(12, 14, 17, .06);
+  opacity: 0; transform: translateY(12px);
+  transition: opacity .26s ease, transform .26s cubic-bezier(.2, .7, .2, 1);
+}
+.bl-pop[hidden] { display: none; }
+.bl-pop[data-state="open"] { opacity: 1; transform: none; }
+
+.bl-pop-visual { position: relative; height: 112px; background: #8d8f93; }
+.bl-pop-visual img { object-fit: cover; object-position: 50% 40%; }
+
+.bl-pop-close {
+  position: absolute; top: 10px; right: 10px; z-index: 1; width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer; color: var(--ink);
+  background: #fff; border: 1px solid rgba(12, 14, 17, .08);
+  box-shadow: 0 4px 12px -4px rgba(12, 14, 17, .35); transition: transform .2s ease;
+}
+.bl-pop-close:hover { transform: scale(1.06); }
+/* A larger touch target than the 30px it draws. */
+.bl-pop-close::after { content: ""; position: absolute; inset: -7px; }
+.bl-pop-close svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; fill: none; }
+
+.bl-pop-body { padding: 18px 20px 16px; }
+.bl-pop-eyebrow { display: block; font-size: 10.5px; font-weight: 600; letter-spacing: .22em; color: var(--accent-orange); }
+.bl-pop-title { font-size: 23px; font-weight: 400; letter-spacing: -.03em; line-height: 1.12; margin-top: 8px; }
+.bl-pop-desc { font-size: 14.5px; line-height: 1.5; color: var(--ink-2); margin: 8px 0 0; }
+.bl-pop-cta {
+  display: flex; justify-content: space-between; width: 100%; min-height: 46px; margin-top: 14px;
+  padding: 8px 8px 8px 18px; font-size: 13px; letter-spacing: .12em; text-transform: uppercase;
+}
+.bl-pop-cta .dot { width: 30px; height: 30px; background: var(--accent-orange); color: #fff; }
+.bl-pop-note { margin: 9px 0 0; font-size: 12px; color: var(--muted); text-align: center; }
+.bl-pop a:focus-visible, .bl-pop button:focus-visible { outline: 2px solid var(--accent-orange); outline-offset: 2px; }
+
+/* While the card is showing, the back-to-top button moves up above it
+   instead of hiding underneath. */
+html[data-bl-cta] .totop.show { transform: translateY(calc(-1 * var(--bl-cta-h, 0px) - 12px)); }
+
+@media (max-width: 560px) {
+  .bl-pop { left: 16px; right: 16px; bottom: 16px; width: auto; border-radius: 18px; }
+  .bl-pop-visual { height: 90px; }
+  .bl-pop-body { padding: 14px 16px 12px; }
+  .bl-pop-title { font-size: 20.5px; margin-top: 6px; }
+  .bl-pop-desc { font-size: 14px; margin-top: 6px; }
+  .bl-pop-cta { min-height: 46px; margin-top: 12px; }
+  .bl-pop-note { margin-top: 7px; }
+}
+/* Short phones: a slimmer picture, and the headline and button carry it alone,
+   so the card never takes more than about a third of the screen. */
+@media (max-width: 560px) and (max-height: 720px) {
+  .bl-pop-visual { height: 64px; }
+  .bl-pop-desc { display: none; }
+  .bl-pop-cta { margin-top: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bl-pop, .bl-pop-close { transition: none; }
+  .bl-pop { transform: none; }
+  .bl-pop-close:hover { transform: none; }
+}

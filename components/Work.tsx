@@ -33,14 +33,16 @@ export default function Work() {
 
           <div className="proj-grid">
             <article className="proj reveal">
-              <a className="proj-shot" href="https://born21.com" target="_blank" rel="noreferrer noopener">
+              {/* Both links stay on Vioniche now: the card opens the case
+                  study, and the case study is where born21.com is linked. */}
+              <a className="proj-shot" href="/case-studies/born21">
                 <img src="/projects/born21.jpg" alt="Born21 — YouTube growth agency website built by VIONICHE" width={1280} height={800} loading="lazy" decoding="async" />
               </a>
               <div className="proj-meta">
                 <span className="proj-industry">YouTube Growth · Agency Site</span>
                 <h3>Born21</h3>
                 <p>Born21 is a YouTube growth agency in New York. We designed and built their site end to end — messaging, motion, case study pages and the front-end underneath.</p>
-                <a className="proj-link" href="https://born21.com" target="_blank" rel="noreferrer noopener">Visit born21.com <span className="dot">→</span></a>
+                <a className="proj-link" href="/case-studies/born21">View Case Study <span className="dot">→</span></a>
               </div>
             </article>
 

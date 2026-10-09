@@ -123,8 +123,49 @@ export function useHeroTimeline(scopeRef: React.RefObject<HTMLElement | null>) {
 
   // A late webfont or image changes layout, which moves every pin boundary.
   useEffect(() => {
+    /* Arriving with a #section — a link from another page, or a reload.
+
+       The browser makes its jump at load, and makes it smoothly because the
+       site sets scroll-behavior: smooth. The refresh below then scrolls to
+       measure the pin, and any programmatic scroll cancels a smooth one, so
+       the jump dies on its first frame and the page stays at the top. The
+       pin's spacer also pushes every later section down by the pin distance,
+       so even a finished jump would end in the wrong place.
+
+       So the landing happens here instead: after each measurement, once the
+       pin is in place, the section is put at the top of the screen — at once,
+       not animated, so the hero's scrubbed build is not played on the way
+       past. It stops after the page has loaded, or the moment the visitor
+       scrolls, taps or presses a key, so it never fights them. */
+    let landing = Boolean(window.location.hash);
+    const land = () => {
+      if (!landing) return;
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      const target = id ? document.getElementById(id) : null;
+      if (target) {
+        // Layout position, not the painted box: a section mid-way through its
+        // .reveal entrance is drawn 22px low, and scrollIntoView would aim for
+        // that. offsetTop ignores transforms; scroll-margin keeps the sticky
+        // nav clear, exactly as a normal anchor jump would.
+        let top = 0;
+        for (let el: HTMLElement | null = target; el; el = el.offsetParent as HTMLElement | null) top += el.offsetTop;
+        top -= parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+        window.scrollTo({ top, behavior: 'instant' as ScrollBehavior });
+      }
+      if (document.readyState === 'complete') landing = false;
+    };
+    const handOver = () => { landing = false; };
+    const intents = ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const;
+    if (landing) {
+      ScrollTrigger.addEventListener('refresh', land);
+      intents.forEach((t) => window.addEventListener(t, handOver, { passive: true, once: true }));
+    }
+
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener('load', refresh);
+    // If the page finished loading before this ran, the listener above will
+    // never fire; measure now instead.
+    const raf = document.readyState === 'complete' ? requestAnimationFrame(refresh) : 0;
 
     // Back/forward can hand the page back from the bfcache fully rendered and
     // already scrolled, skipping mount entirely — so neither the head script
@@ -137,8 +178,11 @@ export function useHeroTimeline(scopeRef: React.RefObject<HTMLElement | null>) {
     window.addEventListener('pageshow', onShow);
 
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener('load', refresh);
       window.removeEventListener('pageshow', onShow);
+      ScrollTrigger.removeEventListener('refresh', land);
+      intents.forEach((t) => window.removeEventListener(t, handOver));
     };
   }, []);
 

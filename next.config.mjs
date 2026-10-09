@@ -1,6 +1,13 @@
+import createMDX from '@next/mdx';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: { useTypeScriptCli: true },
+  experimental: {
+    useTypeScriptCli: true,
+    // Admin CMS: a 3 MB featured image plus its article in one Server Action
+    // request. Kept under Vercel's 4.5 MB request limit.
+    serverActions: { bodySizeLimit: '4mb' },
+  },
 
   /**
    * Dev-only. Next blocks /_next/* dev resources (HMR socket, dev assets) from
@@ -38,4 +45,12 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+/**
+ * MDX for the blog. Articles live in content/blog/ and are imported by the
+ * blog routes, so no page extension changes: .mdx files are never routes of
+ * their own. No remark/rehype plugins — options must stay serialisable for
+ * Turbopack, and plain Markdown plus components covers what the blog needs.
+ */
+const withMDX = createMDX({});
+
+export default withMDX(nextConfig);
