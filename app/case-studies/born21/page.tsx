@@ -16,6 +16,7 @@ import Born21Established from '@/components/case-studies/born21/Born21Establishe
 import Born21Role from '@/components/case-studies/born21/Born21Role';
 import CaseCta from '@/components/case-studies/CaseCta';
 import JsonLd from '@/components/JsonLd';
+import { withPageSeo } from '@/lib/seo/page-metadata';
 import { ORGANIZATION } from '@/lib/site';
 import '@/components/case-studies/case-study.css';
 
@@ -40,7 +41,7 @@ const OG_IMAGE = {
   alt: 'The Born21 homepage, headed “We build brands that outlast algorithms.”',
 };
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withPageSeo('born21', {
   title: TITLE,
   description: DESCRIPTION,
   alternates: {
@@ -61,7 +62,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     images: [OG_IMAGE],
   },
-};
+});
 
 /**
  * Structured data, limited to what the page itself states: what it is, who

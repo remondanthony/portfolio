@@ -4,13 +4,18 @@ import { requireSession } from '@/lib/admin/session';
 import { SLUG } from '@/lib/blog/model';
 import { fromSource } from '@/lib/cms/article';
 import { catalog, catalogItems } from '@/lib/cms/catalog';
-import { getStore } from '@/lib/cms/store';
+import { editorSeo } from '@/lib/cms/seo-data';
+import ProjectNotice from '@/components/admin/ProjectNotice';
+import { getCurrentProject } from '@/lib/cms/projects';
+import { siteStore } from '@/lib/cms/store';
 
 export default async function EditArticle({ params }: { params: Promise<{ slug: string }> }) {
   await requireSession();
   const { slug } = await params;
   if (!SLUG.test(slug)) notFound();
-  const store = getStore();
+  const project = await getCurrentProject();
+  if (!project.features.articles) return <ProjectNotice project={project} what="Articles" />;
+  const store = siteStore();
   if (!store) notFound();
 
   const entries = await catalog(store);
@@ -29,6 +34,7 @@ export default async function EditArticle({ params }: { params: Promise<{ slug: 
       initial={fromSource(slug, entry.source, entry.version)}
       others={catalogItems(entries, slug)}
       storeKind={store.kind}
+      seo={await editorSeo(store, entries)}
     />
   );
 }

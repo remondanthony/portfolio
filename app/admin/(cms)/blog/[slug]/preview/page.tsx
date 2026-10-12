@@ -6,7 +6,9 @@ import { requireSession } from '@/lib/admin/session';
 import { SLUG, problems, type PostMeta } from '@/lib/blog/model';
 import { asPost, catalog, relatedFor } from '@/lib/cms/catalog';
 import { bodyProblems } from '@/lib/cms/safety';
-import { getStore } from '@/lib/cms/store';
+import ProjectNotice from '@/components/admin/ProjectNotice';
+import { getCurrentProject } from '@/lib/cms/projects';
+import { siteStore } from '@/lib/cms/store';
 import { useMDXComponents } from '@/mdx-components';
 
 /**
@@ -18,7 +20,9 @@ export default async function PreviewArticle({ params }: { params: Promise<{ slu
   await requireSession();
   const { slug } = await params;
   if (!SLUG.test(slug)) notFound();
-  const store = getStore();
+  const project = await getCurrentProject();
+  if (!project.features.articles) return <ProjectNotice project={project} what="Articles" />;
+  const store = siteStore();
   if (!store) notFound();
 
   const entries = await catalog(store);

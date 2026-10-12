@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { getPosts } from '@/lib/blog/posts';
 import { SITE_URL } from '@/lib/site';
 import { SERVICE_PAGES } from '@/lib/services';
+import { excludedFromSitemap } from '@/lib/seo/page-metadata';
 
 /**
  * Served at https://www.vioniche.com/sitemap.xml.
@@ -24,8 +25,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getPosts();
   const newest = posts[0];
 
-  return [
+  // A page set to noindex in the CMS, or canonicalised elsewhere, is left out.
+  const entries: (MetadataRoute.Sitemap[number] & { page?: Parameters<typeof excludedFromSitemap>[0] })[] = [
     {
+      page: 'home',
       url: `${SITE_URL}/`,
       lastModified: new Date('2026-08-07'),
       changeFrequency: 'monthly',
@@ -33,6 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       // No trailing slash: matches the page's canonical exactly.
+      page: 'born21',
       url: `${SITE_URL}/case-studies/born21`,
       lastModified: new Date('2026-10-09'),
       changeFrequency: 'monthly',
@@ -40,12 +44,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     // The four service pages, from the same list the nav uses.
     ...SERVICE_PAGES.map((s) => ({
+      page: s.key,
       url: `${SITE_URL}${s.href}`,
       lastModified: new Date('2026-10-09'),
       changeFrequency: 'monthly' as const,
       priority: 0.9,
     })),
     {
+      page: 'blog' as const,
       url: `${SITE_URL}/blog`,
       // The index changes when an article is published or revised.
       lastModified: new Date(newest ? (newest.updated ?? newest.published) : '2026-10-09'),
@@ -53,7 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     ...posts
-      .filter((p) => !p.canonical || p.canonical === `${SITE_URL}${p.url}`)
+      .filter((p) => !p.noindex && (!p.canonical || p.canonical === `${SITE_URL}${p.url}`))
       .map((p) => ({
         url: `${SITE_URL}${p.url}`,
         lastModified: new Date(p.updated ?? p.published),
@@ -61,4 +67,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.6,
       })),
   ];
+  return entries.filter((e) => !e.page || !excludedFromSitemap(e.page)).map(({ page: _page, ...e }) => e);
 }

@@ -9,6 +9,8 @@ import { checkArticle, deploymentStatus, previewArticle, saveArticle } from '@/l
 import type { Check, EditorData, Intent, SaveResult } from '@/lib/cms/types';
 import { readiness } from '@/lib/cms/readiness';
 import { suggestLinks, type CatalogItem } from '@/lib/cms/suggestions';
+import { editHref, primaryConflicts, readMarkdown, relatedByKeywords, seoChecklist, type EditorSeo } from '@/lib/seo/content';
+import SeoChecklistView from './seo/SeoChecklistView';
 import { useMDXComponents } from '@/mdx-components';
 import Lifecycle from './Lifecycle';
 
@@ -42,12 +44,14 @@ const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor as
   scope: unknown,
 ) => Promise<{ default: MDXContent }>;
 
-export default function Editor({ initial, others, storeKind, copyOf }: {
+export default function Editor({ initial, others, storeKind, copyOf, seo = { keywords: [], clusters: [], items: [] } }: {
   initial: EditorData;
   others: Other[];
   storeKind: 'github' | 'local' | null;
   /** Set when this new article started as a duplicate of an existing one. */
   copyOf?: { slug: string; title: string };
+  /** The keyword library and every other page and article, for the SEO panels. */
+  seo?: EditorSeo;
 }) {
   const [d, setD] = useState<EditorData>(initial);
   const [slugTouched, setSlugTouched] = useState(Boolean(initial.originalSlug));
@@ -228,6 +232,28 @@ export default function Editor({ initial, others, storeKind, copyOf }: {
   const ready = readiness(d, Boolean(upload));
   const attention = ready.filter((r) => !r.ok).length;
   const suggestions = suggestLinks(d, others);
+
+  // SEO: the eight-item checklist, cannibalisation and keyword-based related content.
+  const md = readMarkdown(d.body);
+  const hasFeatured = Boolean(upload || d.image.src.trim());
+  const seoChecks = seoChecklist({
+    primaryKeyword: d.primaryKeyword,
+    title: d.seoTitle.trim() || `${d.title.trim()} | Vioniche`,
+    h1: d.title,
+    text: md.text,
+    metaDescription: d.description,
+    path: `/blog/${d.slug}`,
+    // Related articles, case studies and services render as links on the page too.
+    internalLinks: md.internalLinks + d.related.length + d.caseStudies.length + d.services.length,
+    images: md.images + (hasFeatured ? 1 : 0),
+    imagesMissingAlt: md.imagesMissingAlt + (hasFeatured && !d.image.alt.trim() ? 1 : 0),
+  });
+  const self = { kind: 'article' as const, id: d.originalSlug ?? '' };
+  const cannibal = d.primaryKeyword.trim() ? primaryConflicts(d.primaryKeyword, seo.items, self) : [];
+  const keywordRelated = relatedByKeywords(
+    { ...self, seo: { primaryKeyword: d.primaryKeyword, secondaryKeywords: d.secondaryKeywords, relatedKeywords: d.relatedKeywords, cluster: d.cluster || undefined } },
+    seo.items,
+  );
   const insertLink = (title: string, href: string) => edit((sel) => {
     const text = `[${sel || title}](${href})`;
     return { text, select: [text.length, text.length] };
@@ -345,6 +371,10 @@ export default function Editor({ initial, others, storeKind, copyOf }: {
             <p className="ad-hint">A checklist, not a ranking score. Nothing here blocks saving — <b>Check</b> decides what can be published.</p>
           </Panel>
 
+          <Panel title={`SEO checklist · ${seoChecks.filter((c) => !c.ok).length ? `${seoChecks.filter((c) => !c.ok).length} to review` : 'all done'}`}>
+            <SeoChecklistView items={seoChecks} />
+          </Panel>
+
           <Panel title="Publishing">
             <Field label="Slug" hint={slugLocked ? 'Locked: this article is live, and changing its slug would break its URL.' : `/blog/${d.slug || '…'}`}>
               <input value={d.slug} disabled={slugLocked} onChange={(e) => { setSlugTouched(true); set('slug', slugify(e.target.value)); }} />
@@ -430,11 +460,38 @@ export default function Editor({ initial, others, storeKind, copyOf }: {
                 <p className="ad-hint">Every suggested page is already linked.</p>
               )}
             </div>
+            <div className="ad-suggest">
+              <span className="ad-label">Related by keywords and cluster</span>
+              {keywordRelated.length ? (
+                <ul>
+                  {keywordRelated.map((r) => (
+                    <li key={`${r.item.kind}:${r.item.id}`}>
+                      <span className="ad-suggest-text"><b>{r.item.name}</b> <code>{r.item.path}</code><span className="ad-hint">{r.reasons.join(' · ')}</span></span>
+                      <span className="ad-suggest-actions">
+                        <button type="button" className="ad-mini" onClick={() => insertLink(r.item.name, r.item.path)} title="Insert a Markdown link at the cursor">Insert</button>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="ad-hint">Add secondary or related keywords, or a cluster, to see pages on the same topic.</p>
+              )}
+            </div>
           </Panel>
 
-          <Panel title="SEO brief">
-            <Field label="Primary keyword"><input value={d.primaryKeyword} onChange={(e) => set('primaryKeyword', e.target.value)} /></Field>
+          <Panel title="SEO">
+            <datalist id="library-keywords">{seo.keywords.map((k) => <option key={`${k.keyword}|${k.location ?? ''}`} value={k.keyword}>{k.location}</option>)}</datalist>
+            <Field label="Primary keyword" hint={seo.keywords.length ? 'Pick from the keyword library or type one' : undefined}>
+              <input list="library-keywords" value={d.primaryKeyword} onChange={(e) => set('primaryKeyword', e.target.value)} />
+            </Field>
+            {cannibal.length > 0 && (
+              <p className="ad-note ad-note--warn" role="alert">
+                Potential duplicate or cannibalizing content — this keyword is already being targeted by another page:{' '}
+                {cannibal.map((c, i) => <span key={`${c.kind}:${c.id}`}>{i > 0 && ', '}<a href={editHref(c)}>{c.name}</a> ({c.status})</span>)}.
+              </p>
+            )}
             <Field label="Secondary keywords" hint="Comma-separated"><input value={d.secondaryKeywords.join(', ')} onChange={(e) => set('secondaryKeywords', splitList(e.target.value))} /></Field>
+            <Field label="Related keywords" hint="Comma-separated"><input value={d.relatedKeywords.join(', ')} onChange={(e) => set('relatedKeywords', splitList(e.target.value))} /></Field>
             <Field label="Search intent">
               <select value={d.searchIntent} onChange={(e) => set('searchIntent', e.target.value)}>
                 <option value="">—</option>
@@ -444,10 +501,36 @@ export default function Editor({ initial, others, storeKind, copyOf }: {
                 <option value="navigational">Navigational</option>
               </select>
             </Field>
+            <Field label="Target audience"><input value={d.targetAudience} onChange={(e) => set('targetAudience', e.target.value)} placeholder="Who this is for" /></Field>
+            <Field label="Target location"><input value={d.targetLocation} onChange={(e) => set('targetLocation', e.target.value)} placeholder="e.g. New York, USA" /></Field>
+            <Field label="Topic cluster">
+              <select value={seo.clusters.some((c) => c.id === d.cluster) ? d.cluster : ''} onChange={(e) => set('cluster', e.target.value)}>
+                <option value="">None</option>
+                {seo.clusters.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </Field>
+            <Field label="Keyword notes"><textarea rows={2} value={d.keywordNotes} onChange={(e) => set('keywordNotes', e.target.value)} /></Field>
+            <p className="ad-hint">The keyword brief is saved with the article but never shown on the site.</p>
+          </Panel>
+
+          <Panel title="Search appearance">
+            <Field label={`SEO title · ${(d.seoTitle.trim() || `${d.title.trim()} | Vioniche`).length} characters`} hint="Leave empty to use the title followed by “| Vioniche”">
+              <input value={d.seoTitle} placeholder={`${d.title || 'Title'} | Vioniche`} onChange={(e) => set('seoTitle', e.target.value)} />
+            </Field>
+            <p className="ad-hint">The meta description is the article&rsquo;s Description field.</p>
+            <Field label="Open Graph title"><input value={d.ogTitle} placeholder="Defaults to the SEO title" onChange={(e) => set('ogTitle', e.target.value)} /></Field>
+            <Field label="Open Graph description"><input value={d.ogDescription} placeholder="Defaults to the description" onChange={(e) => set('ogDescription', e.target.value)} /></Field>
+            <Field label="Social image" hint="A site image path; defaults to the featured image">
+              <input value={d.ogImage} placeholder="/blog/slug/cover.jpg" onChange={(e) => set('ogImage', e.target.value)} />
+            </Field>
             <Field label="Canonical URL" hint="Leave empty — only for articles first published elsewhere">
               <input value={d.canonical} placeholder="https://…" onChange={(e) => set('canonical', e.target.value)} />
             </Field>
-            <p className="ad-hint">The brief is saved with the article but never shown on the site.</p>
+            <fieldset className="ad-checklist">
+              <legend>Indexing</legend>
+              <label><input type="checkbox" checked={d.noindex} onChange={(e) => set('noindex', e.target.checked)} /> noindex — keep out of search results and the sitemap</label>
+              <label><input type="checkbox" checked={d.nofollow} onChange={(e) => set('nofollow', e.target.checked)} /> nofollow</label>
+            </fieldset>
           </Panel>
         </aside>
       </div>

@@ -2,7 +2,9 @@ import MediaLibrary from '@/components/admin/MediaLibrary';
 import { requireSession } from '@/lib/admin/session';
 import { catalog } from '@/lib/cms/catalog';
 import { imageUsage } from '@/lib/cms/media';
-import { getStore } from '@/lib/cms/store';
+import ProjectNotice from '@/components/admin/ProjectNotice';
+import { getCurrentProject } from '@/lib/cms/projects';
+import { siteStore } from '@/lib/cms/store';
 
 /**
  * Images the CMS manages: public/blog/<article>/<image>, and nothing else.
@@ -12,7 +14,9 @@ import { getStore } from '@/lib/cms/store';
  */
 export default async function Media() {
   await requireSession();
-  const store = getStore();
+  const project = await getCurrentProject();
+  if (!project.features.media) return <ProjectNotice project={project} what="Media" />;
+  const store = siteStore();
   const [stored, entries] = store ? await Promise.all([store.listImages(), catalog(store)]) : [[], []];
   const srcs = stored.map((i) => `/${i.path.slice('public/'.length)}`);
   const usage = imageUsage(srcs, entries);

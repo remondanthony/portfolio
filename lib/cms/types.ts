@@ -28,6 +28,18 @@ export type EditorData = {
   primaryKeyword: string;
   secondaryKeywords: string[];
   searchIntent: string;
+  relatedKeywords: string[];
+  targetAudience: string;
+  targetLocation: string;
+  /** A keyword-library cluster id, or ''. */
+  cluster: string;
+  keywordNotes: string;
+  seoTitle: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
+  noindex: boolean;
+  nofollow: boolean;
   /** The article's popup CTA overrides, carried through unchanged (not edited here yet). */
   cta: Record<string, string> | null;
   body: string;

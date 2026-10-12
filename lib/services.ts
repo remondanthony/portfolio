@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { withPageSeo } from './seo/page-metadata';
 import { ORGANIZATION, SITE_URL } from './site';
 
 /**
@@ -54,13 +55,14 @@ export const servicePage = (key: ServicePageKey) => SERVICE_PAGES.find((s) => s.
  */
 export function serviceMetadata(key: ServicePageKey, title: string, description: string): Metadata {
   const { href } = servicePage(key);
-  return {
+  // The CMS's optional overrides (content/seo/pages.json) are merged in at build time.
+  return withPageSeo(key, {
     title,
     description,
     alternates: { canonical: href },
     openGraph: { type: 'website', url: href, siteName: 'Vioniche', title, description },
     twitter: { card: 'summary', site: '@vionicheweb', title, description },
-  };
+  });
 }
 
 /**

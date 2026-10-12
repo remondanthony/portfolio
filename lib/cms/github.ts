@@ -1,18 +1,24 @@
 import { createSign } from 'node:crypto';
+import type { Project, ProjectId } from './projects';
 
 /**
  * The CMS's only route to GitHub: a GitHub App, authenticated on the server.
  *
  * The app signs a short-lived JWT with its private key and exchanges it for
- * an installation token limited to this one repository. Tokens live in
- * server memory for their lifetime (about an hour) and are never sent to the
- * browser, logged, or written anywhere.
+ * an installation token limited to one project's repository. Tokens live in
+ * server memory for their lifetime (about an hour), one per repository, and
+ * are never sent to the browser, logged, or written anywhere.
+ *
+ * Which repository is decided by lib/cms/projects.ts alone: a config is
+ * built from a Project, so a request can only ever reach a repository on
+ * that server-side list.
  *
  * Required app permissions: Contents — read and write. Optional: Deployments
  * — read, so the editor can report Vercel's progress instead of guessing.
  */
 
 export type GitHubConfig = {
+  project: ProjectId;
   appId: string;
   privateKey: string;
   installationId: string;
@@ -22,19 +28,23 @@ export type GitHubConfig = {
   api: string;
 };
 
-export function githubConfig(): GitHubConfig | null {
-  const { GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY, GITHUB_APP_INSTALLATION_ID, GITHUB_REPOSITORY } = process.env;
-  if (!GITHUB_APP_ID || !GITHUB_APP_PRIVATE_KEY || !GITHUB_APP_INSTALLATION_ID || !GITHUB_REPOSITORY) return null;
-  const [owner, repo] = GITHUB_REPOSITORY.split('/');
-  if (!owner || !repo) return null;
+/** Whether the GitHub App itself is configured on this deployment (for any project). */
+export const githubAppConfigured = () =>
+  Boolean(process.env.GITHUB_APP_ID && process.env.GITHUB_APP_PRIVATE_KEY && process.env.GITHUB_APP_INSTALLATION_ID);
+
+/** The project's repository, reached through the GitHub App — or null if either is not configured. */
+export function githubConfig(project: Project): GitHubConfig | null {
+  const { GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY, GITHUB_APP_INSTALLATION_ID } = process.env;
+  if (!GITHUB_APP_ID || !GITHUB_APP_PRIVATE_KEY || !GITHUB_APP_INSTALLATION_ID || !project.github) return null;
   return {
+    project: project.id,
     appId: GITHUB_APP_ID,
     // Environment variables often carry the PEM with literal "\n".
     privateKey: GITHUB_APP_PRIVATE_KEY.replace(/\\n/g, '\n'),
-    installationId: GITHUB_APP_INSTALLATION_ID,
-    owner,
-    repo,
-    branch: process.env.GITHUB_BRANCH || 'main',
+    installationId: project.github.installationId ?? GITHUB_APP_INSTALLATION_ID,
+    owner: project.github.owner,
+    repo: project.github.repo,
+    branch: project.github.branch,
     api: (process.env.GITHUB_API_URL || 'https://api.github.com').replace(/\/$/, ''),
   };
 }
@@ -56,11 +66,24 @@ function appJwt(c: GitHubConfig) {
   return `${head}.${body}.${b64url(sig)}`;
 }
 
-let cached: { token: string; expires: number; key: string } | null = null;
+/** One token per app, installation and repository: a token for one project's repository is never used for another's. */
+const tokens = new Map<string, { token: string; expires: number }>();
+/** Requests in flight, so parallel reads on one page share a single token request. */
+const pending = new Map<string, Promise<string>>();
 
-async function installationToken(c: GitHubConfig) {
-  const key = `${c.appId}:${c.installationId}:${c.owner}/${c.repo}`;
-  if (cached && cached.key === key && cached.expires - Date.now() > 5 * 60_000) return cached.token;
+function installationToken(c: GitHubConfig): Promise<string> {
+  const key = `${c.appId}:${c.installationId}:${c.owner}/${c.repo}`.toLowerCase();
+  const cached = tokens.get(key);
+  if (cached && cached.expires - Date.now() > 5 * 60_000) return Promise.resolve(cached.token);
+  let p = pending.get(key);
+  if (!p) {
+    p = requestToken(c, key).finally(() => pending.delete(key));
+    pending.set(key, p);
+  }
+  return p;
+}
+
+async function requestToken(c: GitHubConfig, key: string) {
   const res = await fetch(`${c.api}/app/installations/${c.installationId}/access_tokens`, {
     method: 'POST',
     headers: headers(appJwt(c)),
@@ -68,9 +91,14 @@ async function installationToken(c: GitHubConfig) {
     body: JSON.stringify({ repositories: [c.repo] }),
     cache: 'no-store',
   });
-  if (!res.ok) throw new GitHubError(`GitHub App authentication failed (${res.status}). Check the app ID, private key and installation ID.`, res.status);
+  if (!res.ok) {
+    // 422 / 404: the installation exists but cannot reach this repository.
+    throw new GitHubError(res.status === 422 || res.status === 404
+      ? `The GitHub App cannot access ${c.owner}/${c.repo} (${res.status}). Add the repository to the app's installation.`
+      : `GitHub App authentication failed (${res.status}). Check the app ID, private key and installation ID.`, res.status);
+  }
   const data = (await res.json()) as { token: string; expires_at: string };
-  cached = { token: data.token, expires: Date.parse(data.expires_at), key };
+  tokens.set(key, { token: data.token, expires: Date.parse(data.expires_at) });
   return data.token;
 }
 
@@ -96,6 +124,31 @@ export async function gh<T>(c: GitHubConfig, path: string, init: { method?: stri
     throw new GitHubError(`GitHub ${init.method ?? 'GET'} ${path.split('?')[0]} failed (${res.status})${detail ? `: ${detail}` : ''}`, res.status);
   }
   return (res.status === 204 ? undefined : await res.json()) as T;
+}
+
+export type RepoStatus =
+  | { state: 'connected'; repository: string; branch: string }
+  | { state: 'access-required' | 'not-configured' | 'error'; repository?: string; message: string };
+
+/**
+ * Whether the project's repository and branch can be reached with the app's
+ * credentials. Reads only; never changes any permission.
+ */
+export async function repoStatus(project: Project): Promise<RepoStatus> {
+  if (!project.github) return { state: 'not-configured', message: project.githubProblem ?? 'No repository configured.' };
+  const repository = `${project.github.owner}/${project.github.repo}`;
+  const c = githubConfig(project);
+  if (!c) return { state: 'not-configured', repository, message: 'The GitHub App is not configured on this deployment.' };
+  try {
+    await gh(c, `/git/ref/heads/${encodeURIComponent(c.branch)}`);
+    return { state: 'connected', repository, branch: c.branch };
+  } catch (e) {
+    const status = e instanceof GitHubError ? e.status : 0;
+    if (status === 401 || status === 403 || status === 404 || status === 422) {
+      return { state: 'access-required', repository, message: `The GitHub App cannot read ${repository} on ${c.branch}. Grant the app access to this repository.` };
+    }
+    return { state: 'error', repository, message: `GitHub could not be reached (${status || 'network error'}).` };
+  }
 }
 
 export type Change = { path: string; content: string | Buffer } | { path: string; remove: true };

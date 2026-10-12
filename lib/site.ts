@@ -7,6 +7,11 @@
  */
 export const SITE_URL = 'https://www.vioniche.com';
 
+/** The homepage's title and description — also every route's fallback (app/layout.tsx). */
+export const HOME_TITLE = 'VIONICHE — Web Design Studio for Small Businesses in India';
+export const HOME_DESCRIPTION =
+  'Custom website design and development for small businesses. Fast, mobile-first sites built to rank on Google. Based in India, working worldwide.';
+
 export const ORGANIZATION = {
   '@type': 'Organization',
   '@id': `${SITE_URL}/#organization`,

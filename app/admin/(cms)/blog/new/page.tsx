@@ -4,7 +4,10 @@ import { requireSession } from '@/lib/admin/session';
 import { SLUG } from '@/lib/blog/model';
 import { blankArticle, duplicateArticle } from '@/lib/cms/article';
 import { catalog, catalogItems } from '@/lib/cms/catalog';
-import { getStore } from '@/lib/cms/store';
+import { editorSeo } from '@/lib/cms/seo-data';
+import ProjectNotice from '@/components/admin/ProjectNotice';
+import { getCurrentProject } from '@/lib/cms/projects';
+import { siteStore } from '@/lib/cms/store';
 
 /**
  * A new article — blank, or, with ?from=<slug>, a copy of an existing one.
@@ -14,7 +17,9 @@ import { getStore } from '@/lib/cms/store';
 export default async function NewArticle({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
   await requireSession();
   const { from } = await searchParams;
-  const store = getStore();
+  const project = await getCurrentProject();
+  if (!project.features.articles) return <ProjectNotice project={project} what="Articles" />;
+  const store = siteStore();
   const entries = store ? await catalog(store) : [];
 
   let initial = blankArticle();
@@ -26,5 +31,5 @@ export default async function NewArticle({ searchParams }: { searchParams: Promi
     copyOf = { slug: source.slug, title: source.meta.title ?? source.slug };
   }
 
-  return <Editor initial={initial} others={catalogItems(entries)} storeKind={store?.kind ?? null} copyOf={copyOf} />;
+  return <Editor initial={initial} others={catalogItems(entries)} storeKind={store?.kind ?? null} copyOf={copyOf} seo={await editorSeo(store, entries)} />;
 }

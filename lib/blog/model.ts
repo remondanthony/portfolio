@@ -13,13 +13,20 @@
  *               rendered on the page and in metadata.
  *   Linking     related, caseStudies, services — the internal links an
  *               article carries. Real routes only; see links.ts.
- *   Planning    primaryKeyword, secondaryKeywords, searchIntent — the brief
- *               the article was written to. Never rendered, never emitted as
- *               meta keywords; kept with the article for SEO review.
+ *   Planning    primaryKeyword, secondaryKeywords, relatedKeywords,
+ *               searchIntent, targetAudience, targetLocation, cluster,
+ *               keywordNotes — the brief the article was written to. Never
+ *               rendered, never emitted as meta keywords; kept with the
+ *               article for SEO review (lib/seo/).
+ *   Search      seoTitle, ogTitle, ogDescription, ogImage, noindex,
+ *               nofollow — optional overrides for the article's metadata.
+ *               Without them the title, description and featured image are
+ *               used, as before.
  */
 
 import type { CaseStudyKey, ServiceKey } from './links';
 import { ctaProblems, type CtaOverride } from './cta';
+import { contentSeoProblems, type ContentSeo } from '../seo/content';
 
 export const CATEGORIES = [
   'Website Development',
@@ -71,7 +78,7 @@ export type PostMeta = {
   primaryKeyword?: string;
   secondaryKeywords?: string[];
   searchIntent?: SearchIntent;
-};
+} & Omit<ContentSeo, 'primaryKeyword' | 'secondaryKeywords' | 'searchIntent'>;
 
 export type Post = PostMeta & {
   slug: string;
@@ -111,6 +118,12 @@ export function problems(slug: string, meta: unknown): string[] {
   }
 
   problems.push(...ctaProblems(m.cta));
+
+  // The keyword brief and search overrides: optional, but well-formed if present.
+  const SEO_KEYS = ['primaryKeyword', 'secondaryKeywords', 'relatedKeywords', 'searchIntent', 'targetAudience', 'targetLocation',
+    'cluster', 'keywordNotes', 'seoTitle', 'ogTitle', 'ogDescription', 'ogImage', 'noindex', 'nofollow'] as const;
+  const seo = Object.fromEntries(SEO_KEYS.filter((k) => m[k] !== undefined).map((k) => [k, m[k]]));
+  problems.push(...contentSeoProblems(seo));
 
   return problems;
 }

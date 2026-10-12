@@ -21,21 +21,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const found = await getPost(slug);
   if (!found) return {};
   const { post } = found;
-  const title = `${post.title} | Vioniche`;
-  const image = post.image && { url: post.image.src, width: post.image.width, height: post.image.height, alt: post.image.alt };
+  // An SEO title, when the article has one, is used exactly as written.
+  const title = post.seoTitle?.trim() || `${post.title} | Vioniche`;
+  const ogTitle = post.ogTitle?.trim() || title;
+  const ogDescription = post.ogDescription?.trim() || post.description;
+  const image = post.ogImage
+    ? { url: post.ogImage, alt: post.image?.alt ?? post.title }
+    : post.image && { url: post.image.src, width: post.image.width, height: post.image.height, alt: post.image.alt };
 
   return {
     title,
     description: post.description,
     alternates: { canonical: post.canonical ?? post.url },
     // Drafts only render in development; this keeps a stray preview out of any index.
-    ...(post.draft && { robots: { index: false, follow: false } }),
+    ...(post.draft
+      ? { robots: { index: false, follow: false } }
+      : (post.noindex || post.nofollow) && { robots: { index: !post.noindex, follow: !post.nofollow } }),
     openGraph: {
       type: 'article',
       url: post.url,
       siteName: 'Vioniche',
-      title,
-      description: post.description,
+      title: ogTitle,
+      description: ogDescription,
       publishedTime: post.published,
       ...(post.updated && { modifiedTime: post.updated }),
       section: post.category,
@@ -45,8 +52,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     twitter: {
       card: image ? 'summary_large_image' : 'summary',
       site: '@vionicheweb',
-      title,
-      description: post.description,
+      title: ogTitle,
+      description: ogDescription,
       ...(image && { images: [image] }),
     },
   };

@@ -24,7 +24,9 @@ export const blankArticle = (): EditorData => ({
   author: Object.keys(AUTHORS)[0], category: CATEGORIES[0], tags: [],
   image: { src: '', alt: '', width: 0, height: 0 }, canonical: '',
   related: [], caseStudies: [], services: [],
-  primaryKeyword: '', secondaryKeywords: [], searchIntent: 'informational', cta: null,
+  primaryKeyword: '', secondaryKeywords: [], searchIntent: 'informational',
+  relatedKeywords: [], targetAudience: '', targetLocation: '', cluster: '', keywordNotes: '',
+  seoTitle: '', ogTitle: '', ogDescription: '', ogImage: '', noindex: false, nofollow: false, cta: null,
   body: '## First section\n\nStart writing here.\n',
 });
 
@@ -38,6 +40,10 @@ export function fromSource(slug: string, source: string, version: string): Edito
     image: { src: m.image?.src ?? '', alt: m.image?.alt ?? '', width: m.image?.width ?? 0, height: m.image?.height ?? 0 },
     canonical: m.canonical ?? '', related: list(m.related), caseStudies: list(m.caseStudies), services: list(m.services),
     primaryKeyword: m.primaryKeyword ?? '', secondaryKeywords: list(m.secondaryKeywords), searchIntent: m.searchIntent ?? '',
+    relatedKeywords: list(m.relatedKeywords), targetAudience: m.targetAudience ?? '', targetLocation: m.targetLocation ?? '',
+    cluster: m.cluster ?? '', keywordNotes: m.keywordNotes ?? '',
+    seoTitle: m.seoTitle ?? '', ogTitle: m.ogTitle ?? '', ogDescription: m.ogDescription ?? '', ogImage: m.ogImage ?? '',
+    noindex: m.noindex === true, nofollow: m.nofollow === true,
     cta: m.cta && typeof m.cta === 'object' ? (m.cta as Record<string, string>) : null,
     body,
   };
@@ -65,6 +71,17 @@ export function toMeta(d: EditorData, intent: Intent): PostMeta {
     secondaryKeywords: list(d.secondaryKeywords),
     searchIntent: (['informational', 'commercial', 'transactional', 'navigational'].includes(d.searchIntent)
       ? d.searchIntent : undefined) as PostMeta['searchIntent'],
+    relatedKeywords: list(d.relatedKeywords),
+    targetAudience: d.targetAudience.trim() || undefined,
+    targetLocation: d.targetLocation.trim() || undefined,
+    cluster: d.cluster.trim() || undefined,
+    keywordNotes: d.keywordNotes.trim() || undefined,
+    seoTitle: d.seoTitle.trim() || undefined,
+    ogTitle: d.ogTitle.trim() || undefined,
+    ogDescription: d.ogDescription.trim() || undefined,
+    ogImage: d.ogImage.trim() || undefined,
+    noindex: d.noindex || undefined,
+    nofollow: d.nofollow || undefined,
     cta: d.cta && Object.keys(d.cta).length ? (d.cta as PostMeta['cta']) : undefined,
   };
 }

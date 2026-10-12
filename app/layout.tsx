@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { HOME_DESCRIPTION, HOME_TITLE } from '@/lib/site';
 import './globals.css';
 
 /**
@@ -25,9 +26,8 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
-  title: 'VIONICHE — Web Design Studio for Small Businesses in India',
-  description:
-    'Custom website design and development for small businesses. Fast, mobile-first sites built to rank on Google. Based in India, working worldwide.',
+  title: HOME_TITLE,
+  description: HOME_DESCRIPTION,
 };
 
 /**

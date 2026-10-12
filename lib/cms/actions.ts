@@ -1,6 +1,6 @@
 'use server';
 
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { assertSession, adminConfigured, endSession, startSession } from '@/lib/admin/session';
 import { verifyPassword } from '@/lib/admin/password';
@@ -13,7 +13,8 @@ import { MAX_IMAGE_BYTES, imageName, inspectImage } from './images';
 import { imageUsage } from './media';
 import { parseArticle, serializeArticle } from './mdx-file';
 import { bodyProblems, compileForPreview } from './safety';
-import { articlePath, getStore, isImagePath, versionOf } from './store';
+import { PROJECT_COOKIE, getProject } from './projects';
+import { articlePath, isImagePath, siteStore, versionOf, type Store } from './store';
 import type { Check, EditorData, Intent, SaveResult, Step } from './types';
 
 /**
@@ -21,6 +22,10 @@ import type { Check, EditorData, Intent, SaveResult, Step } from './types';
  * Next.js rejects any whose Origin does not match the host, which covers
  * CSRF; each one also re-checks the session itself before doing anything.
  * Return values carry only what the editor shows — never tokens or config.
+ *
+ * Articles and images belong to the Vioniche website this app builds, so
+ * every action here reads and writes Vioniche's repository (siteStore) and
+ * no other project's, whichever project the switcher shows.
  */
 
 const MAX_BODY_CHARS = 200_000;
@@ -57,6 +62,7 @@ export async function login(_: { error?: string; userId?: string } | undefined, 
 
 export async function logout() {
   await endSession();
+  (await cookies()).delete({ name: PROJECT_COOKIE, path: '/admin' });
   redirect('/admin/login');
 }
 
@@ -85,6 +91,11 @@ function readData(raw: unknown): EditorData {
     related: arr(d?.related), caseStudies: arr(d?.caseStudies), services: arr(d?.services),
     primaryKeyword: str(d?.primaryKeyword, 200), secondaryKeywords: arr(d?.secondaryKeywords),
     searchIntent: str(d?.searchIntent, 20),
+    relatedKeywords: arr(d?.relatedKeywords),
+    targetAudience: str(d?.targetAudience, 200), targetLocation: str(d?.targetLocation, 120),
+    cluster: str(d?.cluster, 40), keywordNotes: str(d?.keywordNotes, 1000),
+    seoTitle: str(d?.seoTitle, 120), ogTitle: str(d?.ogTitle, 120), ogDescription: str(d?.ogDescription, 300), ogImage: str(d?.ogImage, 300),
+    noindex: d?.noindex === true, nofollow: d?.nofollow === true,
     // Text fields only; the blog model's ctaProblems() checks the rest.
     cta: d?.cta && typeof d.cta === 'object' && !Array.isArray(d.cta)
       ? Object.fromEntries(Object.entries(d.cta).slice(0, 10).map(([k, v]) => [str(k, 40), str(v, 500)]))
@@ -99,7 +110,7 @@ const noStore = 'Saving is not available: GitHub is not configured on this deplo
 
 export async function checkArticle(raw: EditorData, intent: Intent, hasUpload: boolean): Promise<Check[]> {
   await assertSession();
-  const store = getStore();
+  const store = siteStore();
   const existing = store ? (await catalog(store)).map((e) => e.slug) : [];
   return runChecks(readData(raw), intent, { existingSlugs: existing, hasUpload });
 }
@@ -115,7 +126,7 @@ export async function previewArticle(raw: EditorData): Promise<
     const code = await compileForPreview(d.body);
     const meta = toMeta(d, d.wasPublished ? 'publish' : 'draft');
     const post = asPost(d.slug || 'preview', { ...meta, title: meta.title || 'Untitled article' }, d.body);
-    const store = getStore();
+    const store = siteStore();
     const related = store ? relatedFor(post, await catalog(store)) : [];
     return { ok: true, code, post, related };
   } catch (e) {
@@ -131,7 +142,7 @@ export async function saveArticle(form: FormData): Promise<SaveResult> {
   const steps: Step[] = [];
   const fail = (message: string, checks: Check[] = []): SaveResult => ({ ok: false, message, checks, steps });
 
-  const store = getStore();
+  const store = siteStore();
   if (!store) return fail(noStore);
 
   let d: EditorData;
@@ -242,11 +253,11 @@ const conflict = (): LifecycleResult => ({
  */
 type Located =
   | { error: LifecycleResult }
-  | { store: NonNullable<ReturnType<typeof getStore>>; entries: Entry[]; entry: Entry; slug: string };
+  | { store: Store; entries: Entry[]; entry: Entry; slug: string };
 
 async function locate(slug: unknown, baseVersion: unknown): Promise<Located> {
   await assertSession();
-  const store = getStore();
+  const store = siteStore();
   if (!store) return { error: { ok: false, message: noStore } };
   if (typeof slug !== 'string' || !SLUG.test(slug) || typeof baseVersion !== 'string' || !VERSION.test(baseVersion)) {
     return { error: { ok: false, message: 'That request is not valid.' } };
@@ -281,7 +292,7 @@ function impactOf(entry: Entry, entries: Entry[], images: string[]): Impact {
   };
 }
 
-const folderImages = async (store: NonNullable<ReturnType<typeof getStore>>, slug: string) =>
+const folderImages = async (store: Store, slug: string) =>
   (await store.listImages()).map((i) => i.path).filter((p) => p.startsWith(`public/blog/${slug}/`) && isImagePath(p));
 
 /** What deleting or unpublishing would affect, for the confirmation dialog. Read-only. */
@@ -410,7 +421,7 @@ export type UploadResult =
  */
 export async function uploadImage(form: FormData): Promise<UploadResult> {
   await assertSession();
-  const store = getStore();
+  const store = siteStore();
   if (!store) return { ok: false, message: noStore };
 
   const slug = String(form.get('slug') ?? '');
@@ -443,7 +454,7 @@ export async function uploadImage(form: FormData): Promise<UploadResult> {
 
 export async function deploymentStatus(sha: string) {
   await assertSession();
-  const c = githubConfig();
+  const c = githubConfig(getProject('vioniche')!);
   if (!c || !/^[0-9a-f]{40}$/.test(sha)) return { state: 'unknown' as const };
   return deploymentState(c, sha);
 }

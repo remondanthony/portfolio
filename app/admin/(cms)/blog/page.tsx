@@ -3,11 +3,15 @@ import { toRows } from '@/components/admin/ArticleTable';
 import { CATEGORIES } from '@/lib/blog/model';
 import { requireSession } from '@/lib/admin/session';
 import { catalog } from '@/lib/cms/catalog';
-import { getStore } from '@/lib/cms/store';
+import ProjectNotice from '@/components/admin/ProjectNotice';
+import { getCurrentProject } from '@/lib/cms/projects';
+import { siteStore } from '@/lib/cms/store';
 
 export default async function Articles() {
   await requireSession();
-  const store = getStore();
+  const project = await getCurrentProject();
+  if (!project.features.articles) return <ProjectNotice project={project} what="Articles" />;
+  const store = siteStore();
   const entries = store ? await catalog(store) : [];
   return (
     <>

@@ -3,19 +3,20 @@ import JsonLd from '@/components/JsonLd';
 import PostCard from '@/components/blog/PostCard';
 import { CATEGORIES } from '@/lib/blog/model';
 import { getPosts } from '@/lib/blog/posts';
+import { withPageSeo } from '@/lib/seo/page-metadata';
 import { ORGANIZATION, SITE_URL, absolute } from '@/lib/site';
 
 const TITLE = 'Vioniche Blog — SEO, Web Development & Automation';
 const DESCRIPTION =
   'Practical writing from Vioniche on website development, technical SEO, automation and AI — how modern websites are built, found and kept running.';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withPageSeo('blog', {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: '/blog' },
   openGraph: { type: 'website', url: '/blog', siteName: 'Vioniche', title: TITLE, description: DESCRIPTION },
   twitter: { card: 'summary', site: '@vionicheweb', title: TITLE, description: DESCRIPTION },
-};
+});
 
 export default async function BlogIndex() {
   const posts = await getPosts();

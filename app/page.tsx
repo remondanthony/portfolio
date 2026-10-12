@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Nav from '@/components/Nav';
 import Hero from '@/components/Hero';
 import About from '@/components/About';
@@ -12,6 +13,15 @@ import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import BackToTop from '@/components/BackToTop';
 import SiteEffects from '@/components/SiteEffects';
+import { withPageSeo } from '@/lib/seo/page-metadata';
+import { HOME_DESCRIPTION, HOME_TITLE } from '@/lib/site';
+
+/**
+ * The homepage's own metadata lives in the root layout. This only adds the
+ * CMS's optional SEO overrides (content/seo/pages.json); with none saved it
+ * returns the layout's values unchanged.
+ */
+export const metadata: Metadata = withPageSeo('home', { title: HOME_TITLE, description: HOME_DESCRIPTION, alternates: { canonical: '/' } });
 
 /**
  * Homepage order.

@@ -56,6 +56,8 @@ export function parseArticle(source: string): ParsedFile {
 const ORDER: (keyof PostMeta)[] = [
   'title', 'description', 'excerpt', 'published', 'updated', 'author', 'category', 'tags', 'image',
   'canonical', 'draft', 'related', 'caseStudies', 'services', 'cta', 'primaryKeyword', 'secondaryKeywords', 'searchIntent',
+  'relatedKeywords', 'targetAudience', 'targetLocation', 'cluster', 'keywordNotes',
+  'seoTitle', 'ogTitle', 'ogDescription', 'ogImage', 'noindex', 'nofollow',
 ];
 
 export function serializeArticle(meta: PostMeta, body: string, preamble = ''): string {
