@@ -1,5 +1,116 @@
 {
   "version": 1,
-  "keywords": [],
+  "keywords": [
+    {
+      "keyword": "ai automation services",
+      "type": "secondary",
+      "volume": 500,
+      "competition": "low",
+      "source": "google-keyword-planner",
+      "status": "idea",
+      "id": "kw-06ab9a6896ee",
+      "createdAt": "2026-11-02T23:32:32.198Z",
+      "updatedAt": "2026-11-02T23:32:32.198Z"
+    },
+    {
+      "keyword": "custom software development",
+      "type": "secondary",
+      "volume": 5000,
+      "competition": "low",
+      "source": "google-keyword-planner",
+      "status": "idea",
+      "id": "kw-05d353325e43",
+      "createdAt": "2026-11-02T23:32:32.198Z",
+      "updatedAt": "2026-11-02T23:32:32.198Z"
+    },
+    {
+      "keyword": "custom website development",
+      "type": "secondary",
+      "volume": 500,
+      "competition": "low",
+      "source": "google-keyword-planner",
+      "status": "idea",
+      "id": "kw-e17388e43ba1",
+      "createdAt": "2026-11-02T23:32:32.198Z",
+      "updatedAt": "2026-11-02T23:32:32.198Z"
+    },
+    {
+      "keyword": "seo company",
+      "type": "secondary",
+      "volume": 5000,
+      "competition": "low",
+      "source": "google-keyword-planner",
+      "status": "idea",
+      "id": "kw-6af3fd0b0b35",
+      "createdAt": "2026-11-02T23:32:32.198Z",
+      "updatedAt": "2026-11-02T23:32:32.198Z"
+    },
+    {
+      "keyword": "seo services",
+      "type": "secondary",
+      "volume": 50000,
+      "competition": "low",
+      "source": "google-keyword-planner",
+      "status": "idea",
+      "id": "kw-70d696ba21ea",
+      "createdAt": "2026-11-02T23:32:32.198Z",
+      "updatedAt": "2026-11-02T23:32:32.198Z"
+    },
+    {
+      "keyword": "small business website design",
+      "type": "secondary",
+      "volume": 500,
+      "competition": "low",
+      "source": "google-keyword-planner",
+      "status": "idea",
+      "id": "kw-724391123583",
+      "createdAt": "2026-11-02T23:32:32.198Z",
+      "updatedAt": "2026-11-02T23:32:32.198Z"
+    },
+    {
+      "keyword": "software development company",
+      "type": "secondary",
+      "volume": 5000,
+      "competition": "low",
+      "source": "google-keyword-planner",
+      "status": "idea",
+      "id": "kw-befdfba69d03",
+      "createdAt": "2026-11-02T23:32:32.198Z",
+      "updatedAt": "2026-11-02T23:32:32.198Z"
+    },
+    {
+      "keyword": "web design company",
+      "type": "secondary",
+      "volume": 5000,
+      "competition": "low",
+      "source": "google-keyword-planner",
+      "status": "idea",
+      "id": "kw-2f1ee255bf2c",
+      "createdAt": "2026-11-02T23:32:32.198Z",
+      "updatedAt": "2026-11-02T23:32:32.198Z"
+    },
+    {
+      "keyword": "website design services",
+      "type": "secondary",
+      "volume": 5000,
+      "competition": "low",
+      "source": "google-keyword-planner",
+      "status": "idea",
+      "id": "kw-b59374db7294",
+      "createdAt": "2026-11-02T23:32:32.198Z",
+      "updatedAt": "2026-11-02T23:32:32.198Z"
+    },
+    {
+      "keyword": "website development company",
+      "type": "secondary",
+      "volume": 5000,
+      "competition": "low",
+      "source": "google-keyword-planner",
+      "status": "idea",
+      "id": "kw-b190e7546a40",
+      "createdAt": "2026-11-02T23:32:32.198Z",
+      "updatedAt": "2026-11-02T23:32:32.198Z"
+    }
+  ],
   "clusters": []
 }
