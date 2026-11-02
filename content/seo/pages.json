@@ -1,4 +1,31 @@
 {
   "version": 1,
-  "pages": {}
+  "pages": {
+    "home": {
+      "primaryKeyword": "web design studio for small businesses",
+      "secondaryKeywords": [
+        "website design for small businesses",
+        "website development services",
+        "custom website design",
+        "business website design",
+        "responsive web design",
+        "web design studio India"
+      ],
+      "relatedKeywords": [
+        "small business website development",
+        "professional website design",
+        "mobile-friendly website design",
+        "custom website development",
+        "web design company India"
+      ],
+      "searchIntent": "commercial",
+      "targetAudience": "Small businesses, startups and growing brands",
+      "targetLocation": "India",
+      "keywordNotes": "Homepage targeting small businesses seeking professional website design and development services in India, with worldwide service availability.",
+      "seoTitle": "VIONICHE — Web Design Studio for Small Businesses in India",
+      "metaDescription": "Custom website design and development for small businesses. Fast, mobile-first sites built to rank on Google. Based in India, working worldwide.",
+      "canonical": "https://www.vioniche.com",
+      "updatedAt": "2026-11-02T22:44:52.989Z"
+    }
+  }
 }
