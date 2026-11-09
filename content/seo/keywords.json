@@ -253,6 +253,72 @@
       "id": "kw-dde5b88f4532",
       "createdAt": "2026-11-07T08:02:28.461Z",
       "updatedAt": "2026-11-07T08:02:28.461Z"
+    },
+    {
+      "id": "kw-a51fa67b39eb",
+      "keyword": "leveraging youtube for brand growth",
+      "type": "secondary",
+      "status": "idea",
+      "source": "other",
+      "createdAt": "2026-11-09T13:30:46.371Z",
+      "updatedAt": "2026-11-09T13:30:46.371Z",
+      "history": [
+        {
+          "provider": "other",
+          "at": "2026-11-09T13:30:46.371Z",
+          "summary": "Added from Keyword Discovery."
+        }
+      ]
+    },
+    {
+      "id": "kw-2f6b494a54b9",
+      "keyword": "YouTube audience growth",
+      "type": "secondary",
+      "status": "idea",
+      "source": "other",
+      "createdAt": "2026-11-09T13:30:46.371Z",
+      "updatedAt": "2026-11-09T13:30:46.371Z",
+      "history": [
+        {
+          "provider": "other",
+          "at": "2026-11-09T13:30:46.371Z",
+          "summary": "Added from Keyword Discovery."
+        }
+      ]
+    },
+    {
+      "id": "kw-d1e5df4d1268",
+      "keyword": "YouTube growth agency",
+      "type": "secondary",
+      "status": "idea",
+      "source": "manual",
+      "createdAt": "2026-11-09T13:30:46.371Z",
+      "updatedAt": "2026-11-09T13:30:46.371Z",
+      "intent": "commercial",
+      "history": [
+        {
+          "provider": "manual",
+          "at": "2026-11-09T13:30:46.371Z",
+          "summary": "Added from Keyword Discovery."
+        }
+      ]
+    },
+    {
+      "id": "kw-95c84e2191ee",
+      "keyword": "YouTube SEO services",
+      "type": "secondary",
+      "status": "idea",
+      "source": "manual",
+      "createdAt": "2026-11-09T13:30:46.371Z",
+      "updatedAt": "2026-11-09T13:30:46.371Z",
+      "intent": "commercial",
+      "history": [
+        {
+          "provider": "manual",
+          "at": "2026-11-09T13:30:46.371Z",
+          "summary": "Added from Keyword Discovery."
+        }
+      ]
     }
   ],
   "clusters": []
